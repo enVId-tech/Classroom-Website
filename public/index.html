@@ -1,0 +1,110 @@
+<html>
+
+<head>
+    <title>CS Pathway | Home</title>
+
+    <!-- Bootstrap CSS Elements -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <!-- Internal CSS-->
+    <link rel="stylesheet" href="Assets/css/stylesheet.css">
+
+    <!-- Internal JS -->
+    <script src="/Assets/js/home.js"></script>
+</head>
+
+<body>
+    <!-- Top Nav Bar (May be removed later) -->
+    <nav class="desktoptopnav">
+        <div id="NameDropdown">
+            <button id="Profile">Profile & Settings</button>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-item">
+            <button class="img" id="LeftImg">
+                <img src="/Assets/images/Placeholder.png" class="image">
+                <br>
+                <h4 id="Loggedinas">Logged in as Erick Tran</h4>
+            </button>
+        </div>
+        <div class="sidebar-item">
+            <button class="sidebar-label">Home</button>
+        </div>
+        <div class="sidebar-item">
+            <button class="sidebar-label">Connections</button>
+            <div class="sidebar-dropdown">
+                <div class="sidebar-item extras">
+                    <button class="sidebar-item extras">View Appointments</button>
+                </div>
+                <div class="siderbar-item extras">
+                    <button class="sidebar-item extras">Schedule an appointment</button>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-item">
+            <button class="sidebar-label">AP CSP</button>
+            <div class="sidebar-dropdown">
+                <p>Content for Item 3</p>
+            </div>
+        </div>
+        <div class="sidebar-item">
+            <button class="sidebar-label">AP CSA</button>
+            <div class="sidebar-dropdown">
+                <p>Content for Item 4</p>
+            </div>
+        </div>
+        <div class="sidebar-item">
+            <button class="sidebar-label">Mobile Web. Dev.</button>
+            <div class="sidebar-dropdown">
+                <p>Content for Item 5</p>
+            </div>
+        </div>
+        <div class="sidebar-item">
+            <button class="sidebar-label">Admin Panel</button>
+            <div class="sidebar-dropdown">
+                <p>Content for Item 6</p>
+            </div>
+            <br><br><br><br>
+            <div class="sidebar-item">
+                <button class="item signout siderbar-label" onclick="window.location.href = '/';">
+                    <h3 class="text signout">Log Out</h3>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <center>
+            <div id="NamePlate">Welcome Erick Tran!</div>
+            <div id="NewsOfTheDay">
+                <span id="Assignments">
+                    <div>
+                        <h1>Div1</h1>
+                    </div>
+                    <div>
+                        <h1>Div2</h1>
+                    </div>
+                </span>
+                <div>
+                    <h1>Div3</h1>
+                </div>
+            </div>
+            <footer>
+                <h1 id="ComputerScience">Computer Science Pathway | <a id="FooterName"
+                        onclick="window.location = 'https://www.mrwai.com'">
+                        MrWai.com
+                    </a>
+                </h1>
+                <h2 id="Copyright">(Unofficial) Copyright 2010-2023; All rights reserved.</h2>
+            </footer>
+        </center>
+    </div>
+</body>
+
+</html>

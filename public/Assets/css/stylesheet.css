@@ -1,0 +1,197 @@
+html {
+    overflow-x: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background-color: #383838;
+    color: white;
+    padding-top: 1.8%;
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+    width: 100vw;
+    line-height: 0px;
+    font-size: 10px;
+}
+
+.image {
+    border-radius: 100px;
+}
+
+.sidebar {
+    height: 100%;
+    width: 200px;
+    background-color: #222222;
+}
+
+.content {
+    margin-left: 200px;
+    top: 0; /* Let content occupy the remaining space */
+}
+
+.sidebar-item {
+    position: relative;
+}
+
+.sidebar button {
+    width: 200px;
+    background-color: transparent;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-width: 0.5px;
+}
+
+.sidebar button:hover {
+    background-color: #555;
+    border-left-width: 0;
+    border-right-width: 0;
+    color: #202020;
+}
+
+.sidebar-label {
+    display: block;
+    padding: 10px;
+    background-color: #222222;
+    cursor: pointer;
+}
+
+.sidebar-dropdown {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 200px;
+    padding: 5px;
+    background-color: #222222;
+    line-height: 27px;
+}
+
+.sidebar-item.extras {
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    border-left-width: 0px;
+    border-right-width: 0px;
+    transition: background-color 0.1s linear;
+}
+
+.sidebar-item:hover .sidebar-dropdown {
+    display: block;
+}
+
+#Loggedinas {
+    color: white;
+}
+
+.item.signout {
+    background-color: transparent;
+    color: white;
+    width: 100%;
+    text-align: center;
+    padding: 1px;
+    text-decoration: none;
+    border-left-width: 0px;
+    border-right-width: 0px;
+    transition: background-color 0.1s linear;
+}
+
+
+.item.signout:hover {
+    background-color: red;
+}
+
+.sidebar-item:hover .sidebar-dropdown {
+    display: block;
+}
+
+.desktoptopnav {
+    background-color: rgb(24, 24, 24);
+    position: fixed;
+    top: 0;
+    overflow: auto;
+    width: 100%;
+    z-index: 10000;
+}
+
+.desktoptopnav button:not(.img) {
+    float: left;
+    text-align: center;
+    padding: 4px 16px;
+    text-decoration: none;
+    color: white;
+    font-size: 15px;
+    background-color: transparent;
+    border-width: 0;
+}
+
+.img {
+    float: left;
+    text-align: center;
+    padding: 4px 16px;
+    text-decoration: none;
+    font-size: 12px;
+    color: black;
+    background-color: transparent;
+    border-width: 0;
+}
+
+.image {
+    width: 75px;
+    height: 75px;
+}
+
+.item:hover .text::after,
+.active .text::after:not(.item.signout:hover .text::after) {
+    width: 50%;
+}
+
+.text,
+.active .text {
+    position: relative;
+    display: inline-block;
+    font-weight: 500;
+}
+
+.text::after {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 25%;
+    width: 0%;
+    height: 2.5px;
+    background-color: #6dd3ff;
+    transition: width 0.5s ease-in-out;
+}
+
+#Profile {
+    float: right;
+    background-color: transparent;
+    transition: background-color 0.1s linear;
+    border-radius: 10px;
+}
+
+#Profile:hover {
+    background-color: #00ffc3;
+    color: black;
+}
+
+#Name {
+    float: right;
+}
+
+#NewsOfTheDay {
+    background-color: rgb(176, 176, 176);
+    opacity: 0.3;
+    border-radius: 30px;
+    width: 80%;
+}
+
+#NamePlate {
+    position: static;
+    text-align: justify;
+    font-size: 70px;
+    top: 5%;
+}
