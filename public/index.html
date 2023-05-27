@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -9,7 +10,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
     <!-- Internal CSS-->
-    <link rel="stylesheet" href="Assets/css/stylesheet.css">
+    <link rel="stylesheet" href="Assets/css/home.css">
 
     <!-- Internal JS -->
     <script src="/Assets/js/home.js"></script>
@@ -26,11 +27,11 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-item">
-            <button class="img" id="LeftImg">
+            <div class="img" id="LeftImg">
                 <img src="/Assets/images/Placeholder.png" class="image">
                 <br>
                 <h4 id="Loggedinas">Logged in as Erick Tran</h4>
-            </button>
+            </div>
         </div>
         <div class="sidebar-item">
             <button class="sidebar-label">Home</button>
@@ -69,42 +70,49 @@
             <div class="sidebar-dropdown">
                 <p>Content for Item 6</p>
             </div>
-            <br><br><br><br>
-            <div class="sidebar-item">
-                <button class="item signout siderbar-label" onclick="window.location.href = '/';">
-                    <h3 class="text signout">Log Out</h3>
-                </button>
-            </div>
+        </div>
+        <br><br><br><br>
+        <div class="sidebar-item">
+            <button class="item signout siderbar-label" onclick="window.location.href = '/';">
+                <h3 class="text signout">Log Out</h3>
+            </button>
         </div>
     </div>
 
     <!-- Content -->
-    <div class="content">
-        <center>
-            <div id="NamePlate">Welcome Erick Tran!</div>
-            <div id="NewsOfTheDay">
-                <span id="Assignments">
-                    <div>
-                        <h1>Div1</h1>
-                    </div>
-                    <div>
-                        <h1>Div2</h1>
-                    </div>
+    <center>
+        <div class="content">
+            <center>
+                <div id="NamePlate">Welcome Erick Tran!</div>
+                <span id="NewsOfTheDay">
+                    <span id="Prerequistes">
+                        <div id="Assignments">
+                            <h1 id="AssignmentsTitle">Assignments</h1>
+                            <p id="AssignmentsContent">This is where the assigments will be listed.</p>
+                        </div>
+                        <div id="Announcements">
+                            <h1 id="AnnouncementsTitle">Announcements</h1>
+                            <p id="AnnouncementsContent">This is where the announcements will be listed.</p>
+                        </div>
+                        <div id="UpcomingEvents">
+                            <h1 id="UpcomingEventsTitle">Upcoming Events</h1>
+                            <p id="UpcomingEventsContent">This is where the upcoming events will be listed.</p>
+                        </div>
+                    </span>
                 </span>
-                <div>
-                    <h1>Div3</h1>
-                </div>
-            </div>
-            <footer>
-                <h1 id="ComputerScience">Computer Science Pathway | <a id="FooterName"
-                        onclick="window.location = 'https://www.mrwai.com'">
-                        MrWai.com
-                    </a>
-                </h1>
-                <h2 id="Copyright">(Unofficial) Copyright 2010-2023; All rights reserved.</h2>
-            </footer>
-        </center>
-    </div>
+            </center>
+        </div>
+    </center>
+
+    <!-- Bottom Credit Notes -->
+    <footer>
+        <h1 id="ComputerScience">Computer Science Pathway | <a id="FooterName"
+                onclick="window.location = 'https://www.mrwai.com'">
+                MrWai.com
+            </a>
+        </h1>
+        <h2 id="Copyright">(Unofficial) Copyright 2010-2023; All rights reserved.</h2>
+    </footer>
 </body>
 
 </html>
