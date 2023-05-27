@@ -5,7 +5,7 @@ html {
 body {
     background-color: #383838;
     color: white;
-    padding-top: 1.8%;
+    padding-top: 1.5%;
 }
 
 footer {
@@ -30,6 +30,7 @@ footer {
     width: 200px;
     background-color: #222222;
     left: 0;
+    z-index: 10000;
     /* Add this property to position the sidebar on the left */
 }
 
@@ -71,12 +72,11 @@ footer {
     top: 0;
     left: 100%;
     width: 200px;
-    padding: 5px;
     background-color: #222222;
     line-height: 27px;
 }
 
-.sidebar-item.extras {
+.extras {
     width: 100%;
     text-align: center;
     text-decoration: none;
@@ -215,8 +215,8 @@ footer {
     width: 30%;
     padding-top: 1px;
     height: 80%;
-    margin-left: 50px;
-    margin-right: 50px;
+    margin-left: 75px;
+    margin-right: 75px;
     height: 60%;
     min-height: 550px; /* Optional: Set a minimum width for responsiveness */
   
