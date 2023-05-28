@@ -1,4 +1,17 @@
 {
+  "name": "MrWai.com",
+  "version": "0.0.101",
+  "description": "MrWai.com experimental website",
+  "main": "src/index.js",
+  "scripts": {
+      "start": "node src/index.js",
+      "error": "error: no test specified"
+  },
+  "keywords": [
+      "testing",
+      "example"
+  ],
+  "author": "Lil Gamer Playz - Erick Tran",
   "dependencies": {
     "dotenv": "^16.0.3",
     "ejs": "^3.1.9",
