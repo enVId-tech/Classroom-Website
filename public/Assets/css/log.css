@@ -67,6 +67,21 @@ footer {
     z-index: 0; /* Set a higher z-index value */
 }
 
+.googlesignin {
+    background-color: transparent;
+    border-width: 0;
+    color: white;
+    font-size: 15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-family: 'Work Sans', sans-serif;
+}
+
+.googlesignin:hover {
+    background-color: transparent;
+    color: white;
+}
+
 #Profile {
     float: right;
     background-color: transparent;
@@ -77,6 +92,16 @@ footer {
 #Profile:hover {
     background-color: #00ffc3;
     color: black;
+}
+
+#LoginButton {
+    width: 70%;
+    background-color: rgb(0, 174, 255);
+    height: 45px;
+    border-radius: 10px;
+    border-width: 0;
+    font-size: large;
+    font-weight: bold;
 }
 
 .desktoptopnav {

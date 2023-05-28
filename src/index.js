@@ -17,9 +17,10 @@ app.use(session({
   secret: 'SECRET'
 }));
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log('App listening on port ' + port));
+const portnum = 3000;
 
+const port = process.env.PORT || portnum;
+app.listen(port, () => console.log('App listening on port ' + 3000));
 /*  PASSPORT SETUP  */
 
 const passport = require('passport');
@@ -28,7 +29,12 @@ var userProfile;
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get('/success', (req, res) => res.send(userProfile));
+
+app.get('/api/GetAll', (req, res) => {
+  // Send a response with the userProfile data
+  res.send({ userProfile });
+});
+
 app.get('/error', (req, res) => res.send("error logging in"));
 
 passport.serializeUser(function (user, cb) {
@@ -63,5 +69,9 @@ app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/error' }),
   function (req, res) {
     // Successful authentication, redirect success.
-    res.redirect('/');
+    if(userProfile._json.hd == "student.auhsd.us" || userProfile._json.hd == "auhsd.us") {
+      res.redirect('/');
+    } else {
+      res.redirect('/User/Authentication/Log-In').send("You are not a student");
+    }
   });
