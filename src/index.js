@@ -168,7 +168,7 @@ const GOOGLE_CLIENT_SECRET = process.env.CLIENT_SECRET;
 passport.use(new GoogleStrategy({
   clientID: GOOGLE_CLIENT_ID,
   clientSecret: GOOGLE_CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/auth/google/callback"
+  callbackURL: "http://mr-wai-s-website-production.up.railway.app/auth/google/callback"
 },
   function (accessToken, refreshToken, profile, done) {
     userProfile = profile;
