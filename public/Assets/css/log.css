@@ -3,7 +3,7 @@ html {
 }
 
 body {
-    background-color: #1b1b1b;
+    background-color: #1f1f1f;
     color: white;
     padding-top: 1.5%;
 }
@@ -21,7 +21,7 @@ footer {
     margin-top: 13%;
     width: 20%;
     height: 60%;
-    background-color: rgb(49, 49, 49);
+    background-color: rgb(39, 39, 39);
     text-align: center;
     color: white;
     z-index: 10000;
@@ -41,8 +41,8 @@ footer {
     border-right-width: 0;
     border-bottom-width: 2px;
     width: 70%;
-    spellcheck: false;
     position: relative;
+    transition: border-bottom-color 0.1s linear;
 }
 
 #username:focus, #password:focus {

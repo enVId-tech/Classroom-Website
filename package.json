@@ -4,12 +4,12 @@
   "description": "MrWai.com experimental website",
   "main": "src/index.js",
   "scripts": {
-      "start": "node src/index.js",
-      "error": "error: no test specified"
+    "start": "node src/index.js",
+    "error": "error: no test specified"
   },
   "keywords": [
-      "testing",
-      "example"
+    "testing",
+    "example"
   ],
   "author": "Lil Gamer Playz - Erick Tran",
   "dependencies": {
@@ -17,6 +17,7 @@
     "ejs": "^3.1.9",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
+    "fs": "^0.0.1-security",
     "nodemon": "^2.0.22",
     "passport": "^0.6.0",
     "passport-google-oauth": "^2.0.0",

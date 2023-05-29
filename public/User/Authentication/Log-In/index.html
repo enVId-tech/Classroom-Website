@@ -14,7 +14,7 @@
     <link rel="stylesheet" type="text/css" href="/Assets/css/log.css">
 
     <!-- Internal JS -->
-    <script type="text/js" src="Assets/js/login.js"></script>
+    <script type="text/javascript" src="/Assets/js/login.js"></script>
 </head>
 
 <body>
@@ -27,13 +27,13 @@
             <p>Login</p>
             <br>
             <br>
-            <input type="text" placeholder="Username" id="username">
+            <input type="text" placeholder="Username" id="username" spellcheck="false">
             <br>
             <br>
-            <input type="password" placeholder="Password" id="password">
+            <input type="password" placeholder="Password" id="password" spellcheck="false">
             <br>
             <br>
-            <button onclick="window.location.href='/';" id="LoginButton">Login</button>
+            <button onclick="LogCheck()" id="LoginButton">Login</button>
             <br>
             <br>
             <a href="/auth/google" class="googlesignin"><span class="fa fa-google"></span> Sign In with Google</a>
@@ -44,6 +44,13 @@
             console.log(document.cookie);
             document.cookie = "connect.sid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
         }
+        window.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                // Enter key was pressed
+                event.preventDefault();
+                LogCheck();
+            }
+        });
     </script>
 </body>
 
