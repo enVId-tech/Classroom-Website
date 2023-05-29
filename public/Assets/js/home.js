@@ -1,20 +1,13 @@
-let data;
-
-window.onload = () => {
-    async function dataGet() {
-        let getData = {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+document.addEventListener("DOMContentLoaded", function () {
+    async function waitForUserData() {
+        while (!userData) {
+            await new Promise((resolve) => setTimeout(resolve, 100));
         }
-        await fetch('/api/GetAll', getData)
-            .then(response => response.json())
-            .then(data => {
-                data = data;
-                console.log(data);
-            });
     }
-    dataGet();
-}    
 
+    (async () => {
+        await waitForUserData();
+        document.getElementById("NamePlate").innerHTML = "Welcome " + userData.firstName + "!";
+        document.getElementById("Loggedinas").innerHTML = "Logged in as " + userData.displayName;
+    })();
+});
