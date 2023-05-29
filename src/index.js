@@ -26,116 +26,182 @@ app.listen(port, () => console.log('App listening on port ' + 3000));
 
 //Global Variables
 let userProfile;
+let loggedIn = true; // Keep this at false for testing, real use keep false
+
+// Functions
+
+//Decrypts Encrypted Session ID
+function decryptSessionID(encryptedKey) {
+  //Decryption
+  const unencryptedLength = 6;
+  let decryptedKey = "";
+
+  for (let i = 0; i < encryptedKey.length; i += unencryptedLength) {
+    const encryptedChunk = encryptedKey.substr(i, unencryptedLength);
+
+    switch (encryptedChunk) {
+      case "&$*M<%": decryptedKey += "1"; break;
+      case ")@F$>.": decryptedKey += "2"; break;
+      case "$(&F$f": decryptedKey += "3"; break;
+      case "#!NF*#": decryptedKey += "4"; break;
+      case "@#!F?@": decryptedKey += "5"; break;
+      case "(_(%)^": decryptedKey += "6"; break;
+      case "]}T~~$": decryptedKey += "7"; break;
+      case "H`G^&>": decryptedKey += "8"; break;
+      case "KJH^,&": decryptedKey += "9"; break;
+      case "F!,%^/": decryptedKey += "0"; break;
+      default: break;
+    }
+  }
+  return decryptedKey;
+}
+
+//Logout
+app.get('/logout', function (req, res) {
+  loggedIn = false;
+  res.clearCookie('connect.sid', { path: '/' });
+  // Perform any other logout-related actions (e.g., session termination)
+  res.redirect('/'); // Redirect to the home page or a login page
+});
+app.post('/getstudentaccess', (req, res) => {
+  let dataID = decryptSessionID(req.body.dataID);
+
+  // Read the JSON file
+  fs.readFile('./src/studentinformation.json', 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading the file:', err);
+      return;
+    }
+
+    try {
+      // Parse the JSON data
+      const jsonData = JSON.parse(data);
+
+      // Find the student object with the matching data_id
+      const student = jsonData.find(item => item.data_id === dataID);
+
+      if (student) {
+        // Get the contents of "hasAccessTo"
+        const hasAccessTo = student.hasAccessTo;
+        // Send the student access data as the response
+        res.send({ hasAccessTo });
+      } else {
+        // Handle the case when the student with the specified data_id is not found
+        res.status(404).send('Student not found');
+      }
+    } catch (error) {
+      console.error('Error parsing JSON:', error);
+      res.status(500).send('Internal server error');
+    }
+  });
+});
 
 //Data ID and Session ID Identification, Encryption, and Decryption
 
 //Decrypts Encrypted Session ID and Retrieves Data
 app.post('/getData', (req, res) => {
   try {
-  // Read the encrypted ID from the request body
-  let encryptedKey = req.body.dataID;
-  let decryptedKey = "";
 
-  function decryptSessionID() {
-    //Decryption
-    const unencryptedLength = 6;
+    userProfile = "";
 
-    for (let i = 0; i < encryptedKey.length; i += unencryptedLength) {
-      const encryptedChunk = encryptedKey.substr(i, unencryptedLength);
+    // Read the encrypted ID from the request body
+    let encryptedKey = req.body.dataID;
+    let decryptedKey = decryptSessionID(encryptedKey);
 
-      switch (encryptedChunk) {
-        case "&$*M<%": decryptedKey += "1"; break;
-        case ")@F$>.": decryptedKey += "2"; break;
-        case "$(&F$f": decryptedKey += "3"; break;
-        case "#!NF*#": decryptedKey += "4"; break;
-        case "@#!F?@": decryptedKey += "5"; break;
-        case "(_(%)^": decryptedKey += "6"; break;
-        case "]}T~~$": decryptedKey += "7"; break;
-        case "H`G^&>": decryptedKey += "8"; break;
-        case "KJH^,&": decryptedKey += "9"; break;
-        case "F!,%^/": decryptedKey += "0"; break;
-        default: break;
+    
+
+    function retrieveDataFromFile() {
+      // Read existing JSON data from the file
+      let existingData = fs.readFileSync('./src/studentinformation.json', 'utf8');
+      // Parse the JSON data into a JavaScript array
+      let jsonArray = JSON.parse(existingData);
+
+      // Iterate over the array to find the matching data based on the decrypted ID
+      for (let i = 0; i < jsonArray.length; i++) {
+        let data = jsonArray[i];
+
+        // Assuming the decrypted ID matches the 'session_id' property
+        if (data.data_id == decryptedKey) {
+          return data; // Return the matching data
+        }
       }
     }
-  }
 
-  decryptSessionID();
+    // Retrieve the data based on the decrypted ID
+    let retrievedData = retrieveDataFromFile();
 
-  function retrieveDataFromFile() {
-    // Read existing JSON data from the file
-    let existingData = fs.readFileSync('./src/studentinformation.json', 'utf8');
-    // Parse the JSON data into a JavaScript array
-    let jsonArray = JSON.parse(existingData);
+    const modifiedObject = _.omit(retrievedData, 'data_id');
 
-    // Iterate over the array to find the matching data based on the decrypted ID
-    for (let i = 0; i < jsonArray.length; i++) {
-      let data = jsonArray[i];
 
-      // Assuming the decrypted ID matches the 'session_id' property
-      if (data.data_id == decryptedKey) {
-        return data; // Return the matching data
-      }
+    if (modifiedObject) {
+      res.send(modifiedObject); // Send the retrieved data as the response
+    } else {
+      res.send({ error: 'Data not found' }); // Handle the case when no matching data is found
     }
-  }
-
-  // Retrieve the data based on the decrypted ID
-  let retrievedData = retrieveDataFromFile();
-  
-  const modifiedObject = _.omit(retrievedData, 'data_id');
-
-
-  if (modifiedObject) {
-    res.send(modifiedObject); // Send the retrieved data as the response
-  } else {
-    res.send({ error: 'Data not found' }); // Handle the case when no matching data is found
-  }
   } catch (err) {
-  res.send({ error: 'Invalid data' }); // Handle the case when the data is invalid
+    res.send({ error: 'Invalid data' }); // Handle the case when the data is invalid
+  }
+});
+
+//Checks if User is Logged In
+app.get('/checkLoggedIn', (req, res) => {
+  if (loggedIn == true) {
+    res.sendStatus(200);
+  } else if (loggedIn == false) {
+    res.sendStatus(401);
   }
 });
 
 //Sends Encrypted Session ID to Client
 app.get('/api/GetMain', (req, res) => {
-  // Read existing JSON data from the file
-  let existingData = fs.readFileSync('./src/studentinformation.json', 'utf8');
+  try {
+    if (loggedIn == true) {
+      // Read existing JSON data from the file
+      let existingData = fs.readFileSync('./src/studentinformation.json', 'utf8');
 
-  // Parse the JSON data into a JavaScript array
-  let jsonArray = JSON.parse(existingData);
+      // Parse the JSON data into a JavaScript array
+      let jsonArray = JSON.parse(existingData);
 
-  if (jsonArray.length > 0) {
-    // Access the first object in the array
-    let firstObject = jsonArray[0];
+      if (jsonArray.length > 0) {
+        // Access the first object in the array
+        let firstObject = jsonArray[0];
 
-    // Read the session ID from the first object
-    let dataID = firstObject.data_id;
+        // Read the session ID from the first object
+        let dataID = firstObject.data_id;
 
-    let newSessionID = "";
+        let newSessionID = "";
 
-    //Encryption
-    function encryptSessionID() {
-      for (let i = 0; i < dataID.length; i++) {
-        switch (dataID[i]) {
-          case "1": newSessionID += "&$*M<%"; break;
-          case "2": newSessionID += ")@F$>."; break;
-          case "3": newSessionID += "$(&F$f"; break;
-          case "4": newSessionID += "#!NF*#"; break;
-          case "5": newSessionID += "@#!F?@"; break;
-          case "6": newSessionID += "(_(%)^"; break;
-          case "7": newSessionID += "]}T~~$"; break;
-          case "8": newSessionID += "H`G^&>"; break;
-          case "9": newSessionID += "KJH^,&"; break;
-          case "0": newSessionID += "F!,%^/"; break;
-          default: break;
+        //Encryption
+        function encryptSessionID() {
+          for (let i = 0; i < dataID.length; i++) {
+            switch (dataID[i]) {
+              case "1": newSessionID += "&$*M<%"; break;
+              case "2": newSessionID += ")@F$>."; break;
+              case "3": newSessionID += "$(&F$f"; break;
+              case "4": newSessionID += "#!NF*#"; break;
+              case "5": newSessionID += "@#!F?@"; break;
+              case "6": newSessionID += "(_(%)^"; break;
+              case "7": newSessionID += "]}T~~$"; break;
+              case "8": newSessionID += "H`G^&>"; break;
+              case "9": newSessionID += "KJH^,&"; break;
+              case "0": newSessionID += "F!,%^/"; break;
+              default: break;
+            }
+          }
         }
-      }
-    }
-    encryptSessionID();
+        encryptSessionID();
 
-    // Send the sessionID as the response
-    res.send({ newSessionID });
-  } else {
-    // Handle the case when the JSON array is empty
-    res.send({ error: 'No data available' });
+        // Send the sessionID as the response
+        res.send({ newSessionID });
+      } else {
+        // Handle the case when the JSON array is empty
+        res.send({ error: 'No data available' });
+      }
+    } else if (loggedIn == false) {
+      res.redirect('/User/Authentication/Log-In');
+    }
+  } catch (err) {
+    res.send({ error: 'Invalid data' }); // Handle the case when the data is invalid
   }
 });
 
@@ -168,7 +234,7 @@ const GOOGLE_CLIENT_SECRET = process.env.CLIENT_SECRET;
 passport.use(new GoogleStrategy({
   clientID: GOOGLE_CLIENT_ID,
   clientSecret: GOOGLE_CLIENT_SECRET,
-  callbackURL: "http://mr-wai-s-website-production.up.railway.app/auth/google/callback"
+  callbackURL: "http://localhost:3000/auth/google/callback"
 },
   function (accessToken, refreshToken, profile, done) {
     userProfile = profile;
@@ -192,6 +258,13 @@ app.get('/auth/google/callback',
         "email": userProfile.emails[0].value,
         "profilePicture": userProfile.photos[0].value,
         "hd": userProfile._json.hd,
+        "hasAccessTo": {
+          "CSD": "false",
+          "CSP": "false",
+          "CSA": "false",
+          "MobileWebDev": "false",
+          "AdminPanel": "false"
+        },
         "data_id": userProfile.id
       };
 
@@ -225,9 +298,11 @@ app.get('/auth/google/callback',
         //console.log('Data already exists. Skipping write operation.');
       }
       // Redirect to the home page if successful
+      loggedIn = true;
       res.redirect('/');
     } else {
       // Redirect to the login page if unsuccessful or not a student
       res.redirect('/User/Authentication/Log-In').send("You are not a student");
     }
   });
+

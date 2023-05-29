@@ -30,7 +30,6 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 userData = data;
-                console.log(userData);
             });
     }
 });

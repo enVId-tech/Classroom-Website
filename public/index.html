@@ -3,6 +3,7 @@
 
 <head>
     <title>CS Pathway | Home</title>
+    <meta name="referrer" content="no-referrer" />
 
     <!-- Bootstrap CSS Elements -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
@@ -26,6 +27,8 @@
     <!-- Internal JS -->
     <script type="text/javascript" src="/Assets/js/home.js"></script>
     <script type="text/javascript" src="/Assets/js/personalprofile.js"></script>
+    <script type="text/javascript" src="/Assets/js/keeploggedout.js"></script>
+    <script type="text/javascript" src="/Assets/js/useraccess.js"></script>
 </head>
 
 <body>
@@ -37,10 +40,10 @@
     </nav>
 
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-item">
             <div class="img" id="LeftImg">
-                <img src="/Assets/images/Placeholder.png" class="image">
+                <img id="ProfilePicture" src="/" class="image" referrerpolicy="no-referrer">
                 <br>
                 <h4 id="Loggedinas">Logged in as "Placeholder"</h4>
             </div>
@@ -61,38 +64,6 @@
                         appointment</button>
                 </div>
             </div>
-        </div>
-        <div class="sidebar-item">
-            <button class="sidebar-label" onclick="window.location.href='Classes/CSP';">AP CSP</button>
-            <div class="sidebar-dropdown">
-                <p>Content for Item 3</p>
-            </div>
-        </div>
-        <div class="sidebar-item">
-            <button class="sidebar-label" onclick="window.location.href='Classes/CSA';">AP CSA</button>
-            <div class="sidebar-dropdown">
-                <p>Content for Item 4</p>
-            </div>
-        </div>
-        <div class="sidebar-item">
-            <button class="sidebar-label" onclick="window.location.href='Classes/MobileWebDev';">Mobile Web.
-                Dev.</button>
-            <div class="sidebar-dropdown">
-                <p>Content for Item 5</p>
-            </div>
-        </div>
-        <div class="sidebar-item">
-            <button class="sidebar-label" onclick="window.location.href='adminPanel';">Admin Panel</button>
-            <div class="sidebar-dropdown">
-                <p>Content for Item 6</p>
-            </div>
-        </div>
-        <br><br><br><br>
-        <div class="sidebar-item">
-            <button class="item signout siderbar-label"
-                onclick="window.location.replace('User/Authentication/Log-Out');">
-                <h3 class="text signout">Log Out</h3>
-            </button>
         </div>
     </div>
 

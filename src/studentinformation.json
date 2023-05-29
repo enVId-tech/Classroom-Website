@@ -6,6 +6,13 @@
     "email": "1071039@student.auhsd.us",
     "profilePicture": "https://lh3.googleusercontent.com/a/AAcHTtcnGDgbPNcDTK38ue9aN6Fb2CDx9ib0S0hjj9gt=s96-c",
     "hd": "student.auhsd.us",
+    "hasAccessTo": {
+      "CSD": true,
+      "CSP": true,
+      "CSA": true,
+      "MobileWebDev": true,
+      "AdminPanel": true
+    },
     "data_id": "106100972820352913794"
   }
 ]
