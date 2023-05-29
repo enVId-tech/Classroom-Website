@@ -7,7 +7,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     (async () => {
         await waitForUserData();
-        document.getElementById("NamePlate").innerHTML = "Welcome " + userData.firstName + "!";
+        if (userData.firstName == "" || userData.firstName == undefined || userData.firstName == null) {
+            window.location.href = "/User/Authentication/Log-In"
+        }
+            document.getElementById("NamePlate").innerHTML = "Welcome " + userData.firstName + "!";
         document.getElementById("Loggedinas").innerHTML = "Logged in as " + userData.displayName;
     })();
 });
