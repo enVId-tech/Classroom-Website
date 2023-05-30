@@ -1,14 +1,42 @@
 async function logOut() {
     // Make a request to the logout endpoint on the server
-    fetch('/logout')
+    let logoutData = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ dataID: document.cookie.split("=")[1] })
+    }
+    console.log(logoutData);
+    fetch('/logout', logoutData)
         .then(function (response) {
             // Redirect to the login page
-            window.location.replace("/User/Authentication/Log-Out");
+            //window.location.replace("/User/Authentication/Log-Out");
         });
 }
 
 window.onload = function () {
-    fetch('/checkLoggedIn')
+    // POST Request to check if user is logged in
+    let checkLoggedIndata;
+    if (document.cookie.split("=")[1] != undefined || document.cookie.split("=")[1] != null) {
+        checkLoggedIndata = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ DataID: document.cookie.split("=")[1] })
+        }
+    } else {
+        checkLoggedIndata = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ DataID: null })
+        }
+    }
+
+    fetch('/checkLoggedIn', checkLoggedIndata)
         .then(function (response) {
             if (response.status == 200) {
                 // User is logged in

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>CS Pathway | Request Appointment</title>
+    <meta name="referrer" content="no-referrer" />
+
+    <!-- Bootstrap CSS Elements -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <!-- Internal CSS-->
+    <link rel="stylesheet" type="text/css" href="/Assets/css/sidebar.css">
+    <link rel="stylesheet" type="text/css" href="/Assets/css/selectiontabs.css">
+
+    <!-- External CSS -->
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:wght@100&display=swap' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&display=swap" rel="stylesheet" type='text/css'>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300&display=swap" rel="stylesheet" type='text/css'>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet" type='text/css'>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Internal JS -->
+    <script type="text/javascript" src="/Assets/js/loadinuidata.js"></script>
+    <script type="text/javascript" src="/Assets/js/personalprofile.js"></script>
+    <script type="text/javascript" src="/Assets/js/keeploggedout.js"></script>
+    <script type="text/javascript" src="/Assets/js/useraccess.js"></script>
+</head>
+
+<body>
+    <!-- Top Nav Bar (May be removed later) -->
+    <nav class="desktoptopnav">
+        <div id="NameDropdown">
+            <button id="Profile" onclick="window.location.href='/User/profile-settings/settings';">Profile & Settings</button>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <section class="sidebar" id="sidebar">
+        <div class="sidebar-item">
+            <div class="img" id="LeftImg">
+                <img id="ProfilePicture" src="/" class="image" referrerpolicy="no-referrer">
+                <br>
+                <h4 id="Loggedinas">Logged in as<br>"Placeholder"</h4>
+            </div>
+        </div>
+        <div class="sidebar-item">
+            <button class="sidebar-label" onclick="window.location.href='/';">Home</button>
+        </div>
+        <div class="sidebar-item">
+            <button class="sidebar-label" onclick="window.location.href='/connections';">Connections</button>
+            <div class="sidebar-dropdown">
+                <div class="sidebar-item extras">
+                    <button class="sidebar-item extras"
+                        onclick="window.location.href='/connections/appointmentView';">View Appointments</button>
+                </div>
+                <div class="siderbar-item extras">
+                    <button class="sidebar-item extras"
+                        onclick="window.location.href='/connections/appointmentRequest';">Schedule an
+                        appointment</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Content -->
+    <center>
+        <section class="content">
+            <h1 id="NamePlate">Request an Appointment</h1>
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                  <button class="nav-link" id="connections-tab" onclick="window.location.href='/connections'">Connections</button>
+                </li>
+                <li class="nav-item">
+                  <button class="nav-link" id="appointments-tab" onclick="window.location.href='/connections/appointmentView'">View Appointments</button>
+                </li>
+                <li class="nav-item">
+                  <button class="nav-link enabled" id="request-appointment-tab" onclick="window.location.href='/connections/appointmentRequest'">Request an Appointment</button>
+                </li>
+              </ul>
+        </section>
+    </center>
+
+    <!-- Bottom Credit Notes -->
+    <footer>
+        <h1 id="ComputerScience">Computer Science Pathway | <a id="FooterName"
+                onclick="window.location = 'https://www.mrwai.com'">
+                MrWai.com
+            </a>
+        </h1>
+        <h2 id="Copyright">(Unofficial) Copyright 2010-2023; All rights reserved.</h2>
+    </footer>
+</body>
+
+</html>

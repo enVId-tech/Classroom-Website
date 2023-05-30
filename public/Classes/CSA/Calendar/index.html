@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>CS Pathway | View Appointments</title>
+    <title>CS Pathway | APCSA Calendar</title>
     <meta name="referrer" content="no-referrer" />
 
     <!-- Bootstrap CSS Elements -->
@@ -13,11 +13,15 @@
     <!-- Internal CSS-->
     <link rel="stylesheet" type="text/css" href="/Assets/css/sidebar.css">
     <link rel="stylesheet" type="text/css" href="/Assets/css/selectiontabs.css">
+    <link rel="stylesheet" type="text/css" href="/Assets/css/calendar.css">
 
     <!-- External CSS -->
-    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:wght@100&display=swap' rel='stylesheet' type='text/css'>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&display=swap" rel="stylesheet" type='text/css'>
-    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300&display=swap" rel="stylesheet" type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:wght@100&display=swap' rel='stylesheet'
+        type='text/css'>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&display=swap" rel="stylesheet"
+        type='text/css'>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300&display=swap" rel="stylesheet"
+        type='text/css'>
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet" type='text/css'>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,13 +32,15 @@
     <script type="text/javascript" src="/Assets/js/personalprofile.js"></script>
     <script type="text/javascript" src="/Assets/js/keeploggedout.js"></script>
     <script type="text/javascript" src="/Assets/js/useraccess.js"></script>
+    <script type="text/javascript" src="/Assets/js/createCalendar.js"></script>
 </head>
 
 <body>
     <!-- Top Nav Bar (May be removed later) -->
     <nav class="desktoptopnav">
         <div id="NameDropdown">
-            <button id="Profile" onclick="window.location.href='/User/profile-settings/settings';">Profile & Settings</button>
+            <button id="Profile" onclick="window.location.href='/User/profile-settings/settings';">Profile &
+                Settings</button>
         </div>
     </nav>
 
@@ -69,18 +75,26 @@
     <!-- Content -->
     <center>
         <section class="content">
-            <h1 id="NamePlate">View Existing Appointment</h1>
+            <h1 id="NamePlate">APCSA Calendar</h1>
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item">
-                  <button class="nav-link" id="connections-tab" onclick="window.location.href='/connections'">Connections</button>
+                    <button class="nav-link" id="connections-tab" onclick="window.location.href='/Classes/CSA'">APCSA
+                        Home</button>
                 </li>
                 <li class="nav-item">
-                  <button class="nav-link enabled" id="appointments-tab" onclick="window.location.href='/connections/appointmentView'">View Appointments</button>
+                    <button class="nav-link enabled" id="appointments-tab"
+                        onclick="window.location.href='/Classes/CSA/Calendar'">CSA Calendar</button>
                 </li>
                 <li class="nav-item">
-                  <button class="nav-link" id="request-appointment-tab" onclick="window.location.href='/connections/appointmentRequest'">Request an Appointment</button>
+                    <button class="nav-link" id="request-appointment-tab"
+                        onclick="window.location.href='/Classes/CSA/Announcements'">Announcements</button>
                 </li>
-              </ul>
+            </ul>
+            <br>
+            <div class="slider">
+                <div class="slider-tabs"></div>
+                <div class="slider-content"></div>
+            </div>
         </section>
     </center>
 

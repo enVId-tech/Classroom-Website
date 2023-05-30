@@ -13,12 +13,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 data = data;
                 document.cookie = "dataID=" + data.newSessionID;
                 getUserDataFromServer();
+                Elements();
             });
     }
     dataGet();
 
     async function getUserDataFromServer() {
-        let dataID = document.cookie.split("=")[1];
+    let dataID = document.cookie.split("=")[1];
         let getData = {
             method: 'POST',
             headers: {

@@ -13,6 +13,15 @@
       "MobileWebDev": true,
       "AdminPanel": true
     },
-    "data_id": "106100972820352913794"
+    "unchangeableSettings": {
+      "isLoggedin": true,
+      "latestTimeLoggedIn": "Tue May 30 2023 15:34:10",
+      "dayToLogOut": "Tue Jun 06 2023 15:34:10",
+      "isStudent": true,
+      "isStaff": false,
+      "latestIPAddress": "VAf@*!)|}:VAf@*!)|}:NF(@#&:;><",
+      "isLockedOut": false
+    },
+    "data_id": "93982337173297964412716583225686248408432704721391"
   }
 ]
