@@ -94,25 +94,25 @@ const iv = crypto.randomBytes(16); // 128 bytes for AES-256-CBC
 
 //Encrypts Session ID
 function encryptSessionID(newSessionID) {
-    // Create an AES cipher object
-    const cipher = crypto.createCipheriv('aes-256-cbc', encryptionKey, iv);
+  // Create an AES cipher object
+  const cipher = crypto.createCipheriv('aes-256-cbc', encryptionKey, iv);
 
-    // Encrypt the data
-    let encryptedData = cipher.update(newSessionID, 'utf8', 'hex');
-    encryptedData += cipher.final('hex');
+  // Encrypt the data
+  let encryptedData = cipher.update(newSessionID, 'utf8', 'hex');
+  encryptedData += cipher.final('hex');
 
-    return encryptedData;
+  return encryptedData;
 }
 
 //Decrypts Encrypted Session ID
 function decryptSessionID(encryptedData) {
-    const decipher = crypto.createDecipheriv('aes-256-cbc', encryptionKey, iv);
+  const decipher = crypto.createDecipheriv('aes-256-cbc', encryptionKey, iv);
 
-    // Decrypt the data
-    let decryptedData = decipher.update(encryptedData, 'hex', 'utf8');
-    decryptedData += decipher.final('utf8');
+  // Decrypt the data
+  let decryptedData = decipher.update(encryptedData, 'hex', 'utf8');
+  decryptedData += decipher.final('utf8');
 
-    return decryptedData;
+  return decryptedData;
 }
 
 //IP Encryption
@@ -308,6 +308,7 @@ app.post('/checkLoggedIn', (req, res) => {
 
   if (data == null) {
     loggedIn = false;
+    res.sendStatus(401);
   } else if (data != null) {
     let fileData = fs.readFileSync('./src/studentinformation.json', 'utf8');
     let jsonArray = JSON.parse(fileData);
@@ -323,17 +324,28 @@ app.post('/checkLoggedIn', (req, res) => {
       }
     }
 
-    if (jsonArray[dataNumber].unchangeableSettings.isLoggedin == true) {
-      loggedIn = true;
-    } else {
-      loggedIn = false;
-    }
-  }
+    const expiraryDate = new Date(jsonArray[dataNumber].unchangeableSettings.dayToLogOut.toString())
 
-  if (loggedIn == true) {
-    res.sendStatus(200);
-  } else if (loggedIn == false) {
-    res.sendStatus(401);
+    const currentDate = new Date()
+
+    console.log(expiraryDate);
+    console.log(currentDate);
+    console.log(expiraryDate < currentDate);
+
+    if (expiraryDate < currentDate) {
+      loggedIn = false;
+      res.sendStatus(401);
+      jsonArray[dataNumber].unchangeableSettings.isLoggedin = false;
+      writeUserDataToFile(jsonArray[dataNumber]);
+    } else if (!expiraryDate < currentDate) {
+      if (jsonArray[dataNumber].unchangeableSettings.isLoggedin == true) {
+        loggedIn = true;
+        res.sendStatus(200);
+      } else {
+        loggedIn = false;
+        res.sendStatus(401);
+      }
+    }
   }
 });
 
