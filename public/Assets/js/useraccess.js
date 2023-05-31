@@ -87,11 +87,24 @@ function createElements(data) {
             CSAContent.innerHTML = "Announcements";
             CSADiv.appendChild(CSAContent);
 
+            let CSAContent3 = document.createElement("button");
+            CSAContent3.className = "sidebar-item extras";
+            CSAContent3.onclick = function() { window.location.href = "/Classes/CSA/Agenda" };
+            CSAContent3.innerHTML = "Agenda";
+            CSADiv.appendChild(CSAContent3);
+
+
             let CSAContent2 = document.createElement("button");
             CSAContent2.className = "sidebar-item extras";
-            CSAContent2.onclick = function() { window.location.href = "/Classes/CSA/Calendar" };
-            CSAContent2.innerHTML = "Calendar";
+            CSAContent2.onclick = function() { window.location.href = "/Classes/CSA/AssignmentList" };
+            CSAContent2.innerHTML = "Assignment List";
             CSADiv.appendChild(CSAContent2);
+
+            let CSAContent4 = document.createElement("button");
+            CSAContent4.className = "sidebar-item extras";
+            CSAContent4.onclick = function() { window.location.href = "/Classes/CSA/LearningLog" };
+            CSAContent4.innerHTML = "Learning Log";
+            CSADiv.appendChild(CSAContent4);
         } else {
             console.error("Sidebar element not found");
         }
@@ -129,7 +142,7 @@ function createElements(data) {
 
             let AdminPanelButton = document.createElement("button");
             AdminPanelButton.className = "sidebar-label";
-            AdminPanelButton.onclick = function () { window.location.href = "/AdminPanel" };
+            AdminPanelButton.onclick = function () { window.location.href = "/adminPanel" };
             AdminPanelButton.innerHTML = "Admin Panel";
             AdminPanel.appendChild(AdminPanelButton);
 
@@ -137,9 +150,15 @@ function createElements(data) {
             AdminPanelDropdown.className = "sidebar-dropdown";
             AdminPanel.appendChild(AdminPanelDropdown);
 
-            let AdminPanelContent = document.createElement("p");
-            AdminPanelContent.innerHTML = "Content for Item 3";
-            AdminPanelDropdown.appendChild(AdminPanelContent);
+            let AdminPanelDiv = document.createElement("div");
+            AdminPanelDiv.className = "sidebar-item extras";
+            AdminPanelDropdown.appendChild(AdminPanelDiv);
+
+            let AdminButton = document.createElement("button");
+            AdminButton.className = "sidebar-item extras";
+            AdminButton.onclick = function() { window.location.href = "/adminPanel/StudentList" };
+            AdminButton.innerHTML = "Student List";
+            AdminPanelDropdown.appendChild(AdminButton);
         } else {
             console.error("Sidebar element not found");
         }

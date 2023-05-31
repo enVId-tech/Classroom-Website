@@ -5,6 +5,7 @@ const app = express();
 const session = require('express-session');
 const passport = require('passport');
 const _ = require('lodash');
+const crypto = require('crypto');
 
 // Library Initialization
 app.use(express.json());
@@ -84,59 +85,35 @@ function generateRandomNumber(NumberofDigits) {
   }
 
   return randomNumber;
-}
+};
 
-const random15DigitNumber = generateRandomNumber();
-console.log(random15DigitNumber);
+const encryptionKey = crypto.randomBytes(32); // 512 bytes for AES-256
+
+const iv = crypto.randomBytes(16); // 16 bytes for AES-256-CBC
 
 //Encrypts Session ID
 function encryptSessionID(newSessionID) {
-  let dataID = newSessionID;
+  // Generate a random encryption key
 
-  let SessionID = "";
+  // Create an AES cipher object
+  const cipher = crypto.createCipheriv('aes-256-cbc', encryptionKey, iv);
+  
+  // Encrypt the data
+  let encryptedData = cipher.update(newSessionID, 'utf8', 'hex');
+  encryptedData += cipher.final('hex');
 
-  for (let i = 0; i < dataID.length; i++) {
-    switch (dataID[i]) {
-      case "1": SessionID += "&$*M<%"; break;
-      case "2": SessionID += ")@F$>."; break;
-      case "3": SessionID += "$(&F$f"; break;
-      case "4": SessionID += "#!NF*#"; break;
-      case "5": SessionID += "@#!F?@"; break;
-      case "6": SessionID += "(_(%)^"; break;
-      case "7": SessionID += "]}T~~$"; break;
-      case "8": SessionID += "H`G^&>"; break;
-      case "9": SessionID += "KJH^,&"; break;
-      case "0": SessionID += "F!,%^/"; break;
-      default: break;
-    }
-  }
-  return SessionID;
+  return encryptedData;
 }
 
 //Decrypts Encrypted Session ID
-function decryptSessionID(encryptedKey) {
-  //Decryption
-  const unencryptedLength = 6;
-  let decryptedKey = "";
+function decryptSessionID(encryptedData) {
+  const decipher = crypto.createDecipheriv('aes-256-cbc', encryptionKey, iv);
 
-  for (let i = 0; i < encryptedKey.length; i += unencryptedLength) {
-    const encryptedChunk = encryptedKey.substr(i, unencryptedLength);
-
-    switch (encryptedChunk) {
-      case "&$*M<%": decryptedKey += "1"; break;
-      case ")@F$>.": decryptedKey += "2"; break;
-      case "$(&F$f": decryptedKey += "3"; break;
-      case "#!NF*#": decryptedKey += "4"; break;
-      case "@#!F?@": decryptedKey += "5"; break;
-      case "(_(%)^": decryptedKey += "6"; break;
-      case "]}T~~$": decryptedKey += "7"; break;
-      case "H`G^&>": decryptedKey += "8"; break;
-      case "KJH^,&": decryptedKey += "9"; break;
-      case "F!,%^/": decryptedKey += "0"; break;
-      default: break;
-    }
-  }
-  return decryptedKey;
+  // Decrypt the data
+  let decryptedData = decipher.update(encryptedData, 'hex', 'utf8');
+  decryptedData += decipher.final('utf8');
+  
+  return decryptedData;
 }
 
 //IP Encryption
@@ -178,11 +155,34 @@ app.post('/logout', function (req, res) {
   for (let i = 0; i < existingJSON.length; i++) {
     if (existingJSON[i].data_id == dataID) {
       findData = existingJSON[i];
-      let userData = writeUserDataToFile(findData);
+      let modifiedData = {
+        "displayName": findData.displayName,
+        "firstName": findData.firstName,
+        "lastName": findData.lastName,
+        "email": findData.email,
+        "profilePicture": findData.profilePicture,
+        "hd": findData.hd,
+        "hasAccessTo": {
+          "CSD": findData.hasAccessTo.CSD,
+          "CSP": findData.hasAccessTo.CSP,
+          "CSA": findData.hasAccessTo.CSA,
+          "MobileWebDev": findData.hasAccessTo.MobileWebDev,
+          "AdminPanel": findData.hasAccessTo.AdminPanel
+        },
+        "unchangeableSettings": {
+          isLoggedin: false,
+          latestTimeLoggedIn: "null",
+          dayToLogOut: "null",
+          isStudent: findData.unchangeableSettings.isStudent,
+          isStaff: findData.unchangeableSettings.isStaff,
+          latestIPAddress: findData.unchangeableSettings.latestIPAddress,
+          isLockedOut: findData.unchangeableSettings.isLockedOut
+        },
+        "data_id": findData.data_id
+      }
+      let userData = writeUserDataToFile(modifiedData);
       if (userData == "Success") {
         res.redirect('/User/Authentication/Log-Out');
-        res.clearCookie('connect.sid', { path: '/' });
-        res.clearCookie('dataID', { path: '/' });
       }
     }
   }

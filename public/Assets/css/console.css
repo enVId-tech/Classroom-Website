@@ -1,0 +1,22 @@
+#console {
+  background-color: #000;
+  color: #fff;
+  padding: 10px;
+  margin-top: 2.5%;
+  height: 500px;
+  width: 70%;
+  font-family: monospace;
+}
+
+#output {
+  margin-top: 10px;
+}
+
+#input {
+  width: 100%;
+  border: none;
+  background-color: transparent;
+  color: #fff;
+  outline: none;
+  margin-bottom: 10px;
+}

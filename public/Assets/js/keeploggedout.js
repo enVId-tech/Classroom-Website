@@ -11,7 +11,7 @@ async function logOut() {
     fetch('/logout', logoutData)
         .then(function (response) {
             // Redirect to the login page
-            //window.location.replace("/User/Authentication/Log-Out");
+            window.location.replace("/User/Authentication/Log-Out");
         });
 }
 
@@ -38,9 +38,7 @@ window.onload = function () {
 
     fetch('/checkLoggedIn', checkLoggedIndata)
         .then(function (response) {
-            if (response.status == 200) {
-                // User is logged in
-            } else {
+            if (!response.status == 200) {
                 window.location.href = "/User/Authentication/Log-In";
             }
         });

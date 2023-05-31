@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     (async () => {
         await waitForUserData();
-        console.log(userData);
         if (userData.firstName == "" || userData.firstName == undefined || userData.firstName == null) {
             window.location.href = "/User/Authentication/Log-In"
             if (document.cookie) {
