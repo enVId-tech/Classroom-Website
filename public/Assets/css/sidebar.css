@@ -168,3 +168,18 @@ footer {
     background-color: #00ffc3;
     color: black;
 }
+
+#Credits {
+    margin-top: 75px;
+    position: relative;
+}
+
+#Credits,
+#ComputerScience
+{
+    font-size: 25px;
+}
+
+#Copyright {
+    font-size: 20px;
+}

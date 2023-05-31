@@ -14,9 +14,8 @@ async function Elements() {
         });
 }
 function createElements(data) {
-    console.log(data)
-    let sidebar = document.getElementById("sidebar");
-    if (data.hasAccessTo.CSD == true) {
+    let sidebar = document.getElementById("sidebardiv");
+    if (data.hasAccessTo.CSD.hasAccess == true) {
         if (sidebar) {
             let CSD = document.createElement("div");
             CSD.className = "sidebar-item";
@@ -37,7 +36,7 @@ function createElements(data) {
             CSDDropdown.appendChild(CSDContent);
         }
     }
-    if (data.hasAccessTo.CSP == true) {
+    if (data.hasAccessTo.CSP.hasAccess == true) {
         if (sidebar) {
             let CSP = document.createElement("div");
             CSP.className = "sidebar-item";
@@ -61,7 +60,7 @@ function createElements(data) {
         }
     }
 
-    if (data.hasAccessTo.CSA == true) {
+    if (data.hasAccessTo.CSA.hasAccess == true) {
         if (sidebar) {
             let CSA = document.createElement("div");
             CSA.className = "sidebar-item";
@@ -110,7 +109,7 @@ function createElements(data) {
         }
     }
 
-    if (data.hasAccessTo.MobileWebDev == true) {
+    if (data.hasAccessTo.MobileWebDev.hasAccess == true) {
         if (sidebar) {
             let MobileWebDev = document.createElement("div");
             MobileWebDev.className = "sidebar-item";
@@ -134,7 +133,7 @@ function createElements(data) {
         }
     }
 
-    if (data.hasAccessTo.AdminPanel == true) {
+    if (data.hasAccessTo.AdminPanel.hasAccess == true) {
         if (sidebar) {
             let AdminPanel = document.createElement("div");
             AdminPanel.className = "sidebar-item";

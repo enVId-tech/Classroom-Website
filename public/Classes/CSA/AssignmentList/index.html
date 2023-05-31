@@ -13,6 +13,7 @@
     <!-- Internal CSS-->
     <link rel="stylesheet" type="text/css" href="/Assets/css/sidebar.css">
     <link rel="stylesheet" type="text/css" href="/Assets/css/selectiontabs.css">
+    <link rel="stylesheet" type="text/css" href="/Assets/css/sidescrollbar.css">
 
     <!-- External CSS -->
     <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:wght@100&display=swap' rel='stylesheet' type='text/css'>
@@ -34,35 +35,46 @@
     <!-- Top Nav Bar (May be removed later) -->
     <nav class="desktoptopnav">
         <div id="NameDropdown">
-            <button id="Profile" onclick="window.location.href='/User/profile-settings/settings';">Profile & Settings</button>
+            <button id="Profile" onclick="window.location.replace('/User/profile-settings/settings');">Profile & Settings</button>
         </div>
     </nav>
 
+
     <!-- Sidebar -->
     <section class="sidebar" id="sidebar">
-        <div class="sidebar-item">
-            <div class="img" id="LeftImg">
-                <img id="ProfilePicture" src="/" class="image" referrerpolicy="no-referrer">
-                <br>
-                <h4 id="Loggedinas">Logged in as<br>"Placeholder"</h4>
-            </div>
-        </div>
-        <div class="sidebar-item">
-            <button class="sidebar-label" onclick="window.location.href='/';">Home</button>
-        </div>
-        <div class="sidebar-item">
-            <button class="sidebar-label" onclick="window.location.href='/connections';">Connections</button>
-            <div class="sidebar-dropdown">
-                <div class="sidebar-item extras">
-                    <button class="sidebar-item extras"
-                        onclick="window.location.href='/connections/appointmentView';">View Appointments</button>
-                </div>
-                <div class="siderbar-item extras">
-                    <button class="sidebar-item extras"
-                        onclick="window.location.href='/connections/appointmentRequest';">Schedule an
-                        appointment</button>
+        <div class="sidebardiv" id="sidebardiv">
+            <div class="sidebar-item">
+                <div class="img" id="LeftImg">
+                    <img id="ProfilePicture" src="/" class="image" referrerpolicy="no-referrer">
+                    <br>
+                    <h4 id="Loggedinas">Logged in as<br>"Placeholder"</h4>
                 </div>
             </div>
+            <div class="sidebar-item">
+                <button class="sidebar-label" onclick="window.location.replace('/');">Home</button>
+            </div>
+            <div class="sidebar-item">
+                <button class="sidebar-label" onclick="window.location.replace('/connections');">Connections</button>
+                <div class="sidebar-dropdown">
+                    <div class="sidebar-item extras">
+                        <button class="sidebar-item extras"
+                            onclick="window.location.replace('/connections/appointmentView');">View Appointments</button>
+                    </div>
+                    <div class="siderbar-item extras">
+                        <button class="sidebar-item extras"
+                            onclick="window.location.replace('/connections/appointmentRequest');">Schedule an
+                            appointment</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="Credits">
+            <h1 id="ComputerScience">Computer Science Pathway | <a id="FooterName"
+                    onclick="window.location = 'https://www.mrwai.com'">
+                    MrWai.com
+                </a>
+            </h1>
+            <h2 id="Copyright">(Unofficial) Copyright 2010-2023; All rights reserved.</h2>
         </div>
     </section>
 
@@ -72,38 +84,28 @@
             <h1 id="NamePlate">APCSA | Assignment List</h1>
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item">
-                    <button class="nav-link" id="connections-tab" onclick="window.location.href='/Classes/CSA'">APCSA
+                    <button class="nav-link" id="connections-tab" onclick="window.location.replace('/Classes/CSA')">APCSA
                         Home</button>
                 </li>
                 <li class="nav-item">
                     <button class="nav-link" id="appointments-tab"
-                        onclick="window.location.href='/Classes/CSA/Agenda'">Agenda</button>
+                        onclick="window.location.replace('/Classes/CSA/Agenda')">Agenda</button>
                 </li>
                 <li class="nav-item">
                     <button class="nav-link" id="request-appointment-tab"
-                        onclick="window.location.href='/Classes/CSA/Announcements'">Announcements</button>
+                        onclick="window.location.replace('/Classes/CSA/Announcements')">Announcements</button>
                 </li>
                 <li class="nav-item">
                     <button class="nav-link enabled" id="request-appointment-tab"
-                        onclick="window.location.href='/Classes/CSA/AssignmentList'">Assignment Summary</button>
+                        onclick="window.location.replace('/Classes/CSA/AssignmentList')">Assignment Summary</button>
                 </li>
                 <li class="nav-item">
                     <button class="nav-link" id="request-appointment-tab"
-                        onclick="window.location.href='/Classes/CSA/LearningLog'">Learning Log</button>
+                        onclick="window.location.replace('/Classes/CSA/LearningLog')">Learning Log</button>
                 </li>
               </ul>
         </section>
     </center>
-
-    <!-- Bottom Credit Notes -->
-    <footer>
-        <h1 id="ComputerScience">Computer Science Pathway | <a id="FooterName"
-                onclick="window.location = 'https://www.mrwai.com'">
-                MrWai.com
-            </a>
-        </h1>
-        <h2 id="Copyright">(Unofficial) Copyright 2010-2023; All rights reserved.</h2>
-    </footer>
 </body>
 
 </html>

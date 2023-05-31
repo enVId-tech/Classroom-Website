@@ -12,40 +12,27 @@
     <!-- Internal CSS-->
     <link rel="stylesheet" type="text/css" href="/Assets/css/home.css">
     <link rel="stylesheet" type="text/css" href="/Assets/css/log.css">
-
-    <!-- Internal JS -->
-    <script type="text/js" src="Assets/js/universal.js"></script>
 </head>
 
 <body>
-    <!-- Top Nav Bar (May be removed later) -->
-    <nav class="desktoptopnav">
-        <div id="NameDropdown">
-            <button id="Profile" onclick="window.location.href='/User/Authentication/Log-In';">Log In</button>
-        </div>
-    </nav>
-
-    <!-- Content -->
     <center>
-        <div class="content">
-            <h1>You have been logged out!</h1>
-            <br>
-            <h3>Want to log in again? <a href="/User/Authentication/Log-In">Click here!</a></h3>
+        <div class="LoginContainer">
+            <span id="BackgroundImage">
+                <br><br><br>
+                <h1 id="CopyrightedMaterial">© MrWai.com</h1>
+            </span> <!-- Add a new span element for the background image -->
+            <br><br>
+            <h1 id="LoginTitle">You have been logged out!</h1>
+            <br><br>
+            <button id="LoginButton" onclick="window.location.replace('/User/Authentication/Log-In');">Return to Login Page</button>
         </div>
     </center>
-        <!-- Bottom Credit Notes -->
-        <footer>
-            <h1 id="ComputerScience">Computer Science Pathway | <a id="FooterName"
-                    onclick="window.location = 'https://www.mrwai.com'">
-                    MrWai.com
-                </a>
-            </h1>
-            <h2 id="Copyright">(Unofficial) Copyright 2010-2023; All rights reserved.</h2>
-        </footer>
     <script>
         window.onload = function () {
-            document.cookie = "connect.sid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=localhost;"
-            document.cookie = "dataID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+            document.cookie = "connect.sid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+            if (document.cookie.includes("dataID")) {
+                document.cookie = "dataID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+            }
         }
     </script>
 </body>

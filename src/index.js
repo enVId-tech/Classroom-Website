@@ -87,33 +87,32 @@ function generateRandomNumber(NumberofDigits) {
   return randomNumber;
 };
 
-const encryptionKey = crypto.randomBytes(32); // 512 bytes for AES-256
+//Random encryption key and iv
+const encryptionKey = crypto.randomBytes(32); // 256 bytes for AES-256
 
-const iv = crypto.randomBytes(16); // 16 bytes for AES-256-CBC
+const iv = crypto.randomBytes(16); // 128 bytes for AES-256-CBC
 
 //Encrypts Session ID
 function encryptSessionID(newSessionID) {
-  // Generate a random encryption key
+    // Create an AES cipher object
+    const cipher = crypto.createCipheriv('aes-256-cbc', encryptionKey, iv);
 
-  // Create an AES cipher object
-  const cipher = crypto.createCipheriv('aes-256-cbc', encryptionKey, iv);
-  
-  // Encrypt the data
-  let encryptedData = cipher.update(newSessionID, 'utf8', 'hex');
-  encryptedData += cipher.final('hex');
+    // Encrypt the data
+    let encryptedData = cipher.update(newSessionID, 'utf8', 'hex');
+    encryptedData += cipher.final('hex');
 
-  return encryptedData;
+    return encryptedData;
 }
 
 //Decrypts Encrypted Session ID
 function decryptSessionID(encryptedData) {
-  const decipher = crypto.createDecipheriv('aes-256-cbc', encryptionKey, iv);
+    const decipher = crypto.createDecipheriv('aes-256-cbc', encryptionKey, iv);
 
-  // Decrypt the data
-  let decryptedData = decipher.update(encryptedData, 'hex', 'utf8');
-  decryptedData += decipher.final('utf8');
-  
-  return decryptedData;
+    // Decrypt the data
+    let decryptedData = decipher.update(encryptedData, 'hex', 'utf8');
+    decryptedData += decipher.final('utf8');
+
+    return decryptedData;
 }
 
 //IP Encryption
@@ -163,11 +162,26 @@ app.post('/logout', function (req, res) {
         "profilePicture": findData.profilePicture,
         "hd": findData.hd,
         "hasAccessTo": {
-          "CSD": findData.hasAccessTo.CSD,
-          "CSP": findData.hasAccessTo.CSP,
-          "CSA": findData.hasAccessTo.CSA,
-          "MobileWebDev": findData.hasAccessTo.MobileWebDev,
-          "AdminPanel": findData.hasAccessTo.AdminPanel
+          "CSD": {
+            "hasAccess": findData.hasAccessTo.CSD.hasAccess,
+            "Assignments": findData.hasAccessTo.CSD.Assignments
+          },
+          "CSP": {
+            "hasAccess": findData.hasAccessTo.CSP.hasAccess,
+            "Assignments": findData.hasAccessTo.CSP.Assignments
+          },
+          "CSA": {
+            "hasAccess": findData.hasAccessTo.CSA.hasAccess,
+            "Assignments": findData.hasAccessTo.CSA.Assignments
+          },
+          "MobileWebDev": {
+            "hasAccess": findData.hasAccessTo.MobileWebDev.hasAccess,
+            "Assignments": findData.hasAccessTo.MobileWebDev.Assignments
+          },
+          "AdminPanel": {
+            "hasAccess": findData.hasAccessTo.AdminPanel.hasAccess,
+            "Assignments": findData.hasAccessTo.AdminPanel.Assignments
+          }
         },
         "unchangeableSettings": {
           isLoggedin: false,
@@ -383,11 +397,11 @@ app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/error' }),
   function (req, res) {
     // Checks if the user is using an auhsd email
-    if (userProfile._json.hd == "student.auhsd.us" || userProfile._json.hd == "auhsd.us" || userProfile._json.hd == "frc4079.org") {
+    if (userProfile._json.hd == "student.auhsd.us" || userProfile._json.hd == "auhsd.us") {
       let JSONdata;
 
-      const randomNumber = generateRandomNumber(50);
-      if (userProfile._json.hd == "student.auhsd.us" || userProfile._json.hs == "frc4079.org") {
+      const randomNumber = generateRandomNumber(64);
+      if (userProfile._json.hd == "student.auhsd.us") {
         let newDate = new Date();
 
         // Create a Date object for the current date
@@ -436,11 +450,26 @@ app.get('/auth/google/callback',
             "profilePicture": userProfile.photos[0].value,
             "hd": userProfile._json.hd,
             "hasAccessTo": {
-              "CSD": false,
-              "CSP": false,
-              "CSA": false,
-              "MobileWebDev": false,
-              "AdminPanel": false
+              "CSD": {
+                "hasAccess": false,
+                "Assignments": {}
+              },
+              "CSP": {
+                "hasAccess": false,
+                "Assignments": {}
+              },
+              "CSA": {
+                "hasAccess": false,
+                "Assignments": {}
+              },
+              "MobileWebDev": {
+                "hasAccess": false,
+                "Assignments": {}
+              },
+              "AdminPanel": {
+                "hasAccess": false,
+                "Assignments": {}
+              }
             },
             "unchangeableSettings": {
               isLoggedin: true,
@@ -466,11 +495,26 @@ app.get('/auth/google/callback',
             "profilePicture": jsonArray[numberFound].profilePicture,
             "hd": jsonArray[numberFound].hd,
             "hasAccessTo": {
-              "CSD": jsonArray[numberFound].hasAccessTo.CSD,
-              "CSP": jsonArray[numberFound].hasAccessTo.CSP,
-              "CSA": jsonArray[numberFound].hasAccessTo.CSA,
-              "MobileWebDev": jsonArray[numberFound].hasAccessTo.MobileWebDev,
-              "AdminPanel": jsonArray[numberFound].hasAccessTo.AdminPanel
+              "CSD": {
+                "hasAccess": jsonArray[numberFound].hasAccessTo.CSD.hasAccess,
+                "Assignments": jsonArray[numberFound].hasAccessTo.CSD.Assignments
+              },
+              "CSP": {
+                "hasAccess": jsonArray[numberFound].hasAccessTo.CSP.hasAccess,
+                "Assignments": jsonArray[numberFound].hasAccessTo.CSP.Assignments
+              },
+              "CSA": {
+                "hasAccess": jsonArray[numberFound].hasAccessTo.CSA.hasAccess,
+                "Assignments": jsonArray[numberFound].hasAccessTo.CSA.Assignments
+              },
+              "MobileWebDev": {
+                "hasAccess": jsonArray[numberFound].hasAccessTo.MobileWebDev.hasAccess,
+                "Assignments": jsonArray[numberFound].hasAccessTo.MobileWebDev.Assignments
+              },
+              "AdminPanel": {
+                "hasAccess": jsonArray[numberFound].hasAccessTo.AdminPanel.hasAccess,
+                "Assignments": jsonArray[numberFound].hasAccessTo.AdminPanel.Assignments
+              }
             },
             "unchangeableSettings": {
               isLoggedin: true,
@@ -488,7 +532,7 @@ app.get('/auth/google/callback',
 
           writeUserDataToFile(JSONdata);
 
-        } else if (userProfile._json.hd == "auhsd.us") {
+        } else if (userProfile._json.hd == "auhsd.us" || userProfile._json.hs == "frc4079.org" || userProfile._json.hd == "gmail.com") {
           // Create a Date object for the current date
           let newDate = new Date();
 
@@ -512,11 +556,26 @@ app.get('/auth/google/callback',
             "profilePicture": userProfile.photos[0].value,
             "hd": userProfile._json.hd,
             "hasAccessTo": {
-              "CSD": true,
-              "CSP": true,
-              "CSA": true,
-              "MobileWebDev": true,
-              "AdminPanel": true
+              "CSD": {
+                "hasAccess": false,
+                "Assignments": {}
+              },
+              "CSP": {
+                "hasAccess": false,
+                "Assignments": {}
+              },
+              "CSA": {
+                "hasAccess": false,
+                "Assignments": {}
+              },
+              "MobileWebDev": {
+                "hasAccess": false,
+                "Assignments": {}
+              },
+              "AdminPanel": {
+                "hasAccess": false,
+                "Assignments": {}
+              }
             },
             "unchangeableSettings": {
               isLoggedin: true,

@@ -7,21 +7,36 @@
     "profilePicture": "https://lh3.googleusercontent.com/a/AAcHTtcnGDgbPNcDTK38ue9aN6Fb2CDx9ib0S0hjj9gt=s96-c",
     "hd": "student.auhsd.us",
     "hasAccessTo": {
-      "CSD": true,
-      "CSP": true,
-      "CSA": true,
-      "MobileWebDev": true,
-      "AdminPanel": true
+      "CSD": {
+        "hasAccess": true,
+        "Assignments": {}
+      },
+      "CSP": {
+        "hasAccess": true,
+        "Assignments": {}
+      },
+      "CSA": {
+        "hasAccess": true,
+        "Assignments": {}
+      },
+      "MobileWebDev": {
+        "hasAccess": true,
+        "Assignments": {}
+      },
+      "AdminPanel": {
+        "hasAccess": true,
+        "Assignments": {}
+      }
     },
     "unchangeableSettings": {
       "isLoggedin": true,
-      "latestTimeLoggedIn": "Tue May 30 2023 20:16:00",
-      "dayToLogOut": "Tue Jun 06 2023 20:16:00",
+      "latestTimeLoggedIn": "Wed May 31 2023 10:38:43",
+      "dayToLogOut": "Wed Jun 07 2023 10:38:43",
       "isStudent": true,
       "isStaff": false,
       "latestIPAddress": "VAf@*!)|}:VAf@*!)|}:NF(@#&:;><",
       "isLockedOut": false
     },
-    "data_id": "24024419510169669964033916001306558648691613940291"
+    "data_id": "7551398188955104184946303081669114402493037860665043359767025040"
   }
 ]

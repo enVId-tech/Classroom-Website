@@ -14,57 +14,79 @@
     <link rel="stylesheet" type="text/css" href="/Assets/css/sidebar.css">
     <link rel="stylesheet" type="text/css" href="/Assets/css/selectiontabs.css">
     <link rel="stylesheet" type="text/css" href="/Assets/css/console.css">
+    <link rel="stylesheet" type="text/css" href="/Assets/css/sidescrollbar.css">
 
     <!-- External CSS -->
-    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:wght@100&display=swap' rel='stylesheet' type='text/css'>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&display=swap" rel="stylesheet" type='text/css'>
-    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300&display=swap" rel="stylesheet" type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:wght@100&display=swap' rel='stylesheet'
+        type='text/css'>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&display=swap" rel="stylesheet"
+        type='text/css'>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300&display=swap" rel="stylesheet"
+        type='text/css'>
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet" type='text/css'>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
+
+    <!-- Scroll Bar Browser Compatibility -->
+    <link rel="stylesheet" href="https://unpkg.com/simplebar@latest/dist/simplebar.min.css" />
+    <script src="https://unpkg.com/simplebar@latest/dist/simplebar.min.js"></script>
+
+
     <!-- Internal JS -->
+    <script type="text/javascript" src="/Assets/js/console.js"></script>
     <script type="text/javascript" src="/Assets/js/loadinuidata.js"></script>
     <script type="text/javascript" src="/Assets/js/personalprofile.js"></script>
     <script type="text/javascript" src="/Assets/js/keeploggedout.js"></script>
     <script type="text/javascript" src="/Assets/js/useraccess.js"></script>
-    <script type="text/javascript" src="/Assets/js/console.js"></script>
 </head>
 
 <body>
     <!-- Top Nav Bar (May be removed later) -->
     <nav class="desktoptopnav">
         <div id="NameDropdown">
-            <button id="Profile" onclick="window.location.href='/User/profile-settings/settings';">Profile & Settings</button>
+            <button id="Profile" onclick="window.location.replace('/User/profile-settings/settings');">Profile &
+                Settings</button>
         </div>
     </nav>
 
+
     <!-- Sidebar -->
     <section class="sidebar" id="sidebar">
-        <div class="sidebar-item">
-            <div class="img" id="LeftImg">
-                <img id="ProfilePicture" src="/" class="image" referrerpolicy="no-referrer">
-                <br>
-                <h4 id="Loggedinas">Logged in as<br>"Placeholder"</h4>
-            </div>
-        </div>
-        <div class="sidebar-item">
-            <button class="sidebar-label" onclick="window.location.href='/';">Home</button>
-        </div>
-        <div class="sidebar-item">
-            <button class="sidebar-label" onclick="window.location.href='/connections';">Connections</button>
-            <div class="sidebar-dropdown">
-                <div class="sidebar-item extras">
-                    <button class="sidebar-item extras"
-                        onclick="window.location.href='/connections/appointmentView';">View Appointments</button>
-                </div>
-                <div class="siderbar-item extras">
-                    <button class="sidebar-item extras"
-                        onclick="window.location.href='/connections/appointmentRequest';">Schedule an
-                        appointment</button>
+        <div class="sidebardiv" id="sidebardiv">
+            <div class="sidebar-item">
+                <div class="img" id="LeftImg">
+                    <img id="ProfilePicture" src="/" class="image" referrerpolicy="no-referrer">
+                    <br>
+                    <h4 id="Loggedinas">Logged in as<br>"Placeholder"</h4>
                 </div>
             </div>
+            <div class="sidebar-item">
+                <button class="sidebar-label" onclick="window.location.replace('/');">Home</button>
+            </div>
+            <div class="sidebar-item">
+                <button class="sidebar-label" onclick="window.location.replace('/connections');">Connections</button>
+                <div class="sidebar-dropdown">
+                    <div class="sidebar-item extras">
+                        <button class="sidebar-item extras"
+                            onclick="window.location.replace('/connections/appointmentView');">View Appointments</button>
+                    </div>
+                    <div class="siderbar-item extras">
+                        <button class="sidebar-item extras"
+                            onclick="window.location.replace('/connections/appointmentRequest');">Schedule an
+                            appointment</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="Credits">
+            <h1 id="ComputerScience">Computer Science Pathway | <a id="FooterName"
+                    onclick="window.location = 'https://www.mrwai.com'">
+                    MrWai.com
+                </a>
+            </h1>
+            <h2 id="Copyright">(Unofficial) Copyright 2010-2023; All rights reserved.</h2>
         </div>
     </section>
 
@@ -74,29 +96,20 @@
             <h1 id="NamePlate">Administrator Console</h1>
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item">
-                    <button class="nav-link enabled" id="connections-tab" onclick="window.location.href='/adminpanel'">Console</button>
+                    <button class="nav-link enabled" id="connections-tab"
+                        onclick="window.location.replace('/adminpanel')">Console</button>
                 </li>
                 <li class="nav-item">
                     <button class="nav-link" id="appointments-tab"
-                        onclick="window.location.href='/adminpanel/StudentList'">Student List</button>
+                        onclick="window.location.replace('/adminpanel/StudentList')">Student List</button>
                 </li>
-              </ul>
-              <div id="console">
+            </ul>
+            <div id="console">
                 <div id="output"></div>
                 <input type="text" id="input" autofocus />
-              </div>
+            </div>
         </section>
     </center>
-
-    <!-- Bottom Credit Notes -->
-    <footer>
-        <h1 id="ComputerScience">Computer Science Pathway | <a id="FooterName"
-                onclick="window.location = 'https://www.mrwai.com'">
-                MrWai.com
-            </a>
-        </h1>
-        <h2 id="Copyright">(Unofficial) Copyright 2010-2023; All rights reserved.</h2>
-    </footer>
 </body>
 
 </html>
