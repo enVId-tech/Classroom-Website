@@ -1,5 +1,3 @@
-const { split } = require("lodash");
-
 let inputHistory = []; // Store input history
 let historyIndex = 0; // Track current history index
 
@@ -12,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (e.key === "Enter") {
       const input = inputField.value.substring(3); // Remove the first 3 characters
       inputField.value = ""; // Clear the input field
-      processCommand(input);
+      sendConsoleDataToServer(input);
       inputField.value = ">> "; // Reset the input field
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
@@ -58,71 +56,12 @@ function writeToConsole(message) {
   outputDiv.scrollTop = outputDiv.scrollHeight; // Scroll to the bottom
 }
 
-function processCommand(input) {
-
-  if (!input == "") {
-    inputHistory.push(input);
-    switch (input) {
-      case "clear": clearConsole(); break;
-      case "help": writeToConsole("Available commands: clear, help, test"); break;
-      case "help 1": writeToConsole("Available commands: 'clear', help [int], test"); break;
-      case "help 2": writeToConsole("Available commands: clear, 'help [int]', test"); break;
-      case "help 3": writeToConsole("Available commands: clear, help [int], 'test'"); break;
-      case "announcements": announcements(input); break;
-      case "test": writeToConsole("Test command executed."); break;
-      default: writeToConsole("Unknown command: '" + input + "'. Type 'help' for a list of commands."); break;
-    }
-  }
-}
-
-function clearConsole() {
-  writeToConsole("Console cleared.");
-}
-
-// Announcements function
-function announcements(input) {
-
-  const splitInput = input.split(" ");
-
-  let JSONdata = {};
-  switch (splitInput[1].toLowerCase()) {
-    case "CSD":
-      JSONdata = {
-        "class": "CSD",
-        "announcements": [{}]
-      };
-      break;
-    case "APCSP":
-      JSONdata = {
-        "class": "APCSP",
-        "announcements": []
-      };
-      break;
-    case "APCSA":
-      JSONdata = {
-        "class": "APCSA",
-        "announcements": []
-      };
-      break;
-    case "MAD":
-      JSONdata = {
-        "class": "MAD",
-        "announcements": []
-      };
-      break;
-    default:
-      writeToConsole("Unknown input: '" + input + "'. Type 'help' for a list of commands.");
-  };
-
-  fetch('/announcements', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(JSONdata)
-  })
-    .then(function (response) {
-      return response.json();
-    });
-    
+async function sendConsoleDataToServer(input) {
+  const response = await fetch("/console", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ input })
+  });
+  const data = await response.json();
+  writeToConsole(JSON.stringify(data.commandprocess).trimEnd().trimStart());
 }

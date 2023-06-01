@@ -33,6 +33,7 @@
     <script type="text/javascript" src="/Assets/js/personalprofile.js"></script>
     <script type="text/javascript" src="/Assets/js/keeploggedout.js"></script>
     <script type="text/javascript" src="/Assets/js/useraccess.js"></script>
+    <script type="text/javascript" src="/Assets/js/learninglog.js"></script>
 </head>
 
 <body>
@@ -103,7 +104,7 @@
             <br>
             <div class="PeriodSelection">
                 <div class="RequirePeriodSelection">Select a period</div>
-                <ul class="dropdown-list">
+                <ul class="dropdown-list" id="PeriodList">
                     <li>Period 1</li>
                     <li>Period 2</li>
                     <li>Period 3</li>
@@ -117,7 +118,7 @@
 
             <div class="DateSelection">
                 <div class="RequireDateSelection">Select a date</div>
-                <ul class="dropdown-list">
+                <ul class="dropdown-list" id="DateList">
                     <li>EXAMPLE: 5-28-2023, Overdue</li>
                     <li>EXAMPLE: 5-21-2023, Submitted</li>
                     <li>EXAMPLE: 5-14-2023, Missing</li>
@@ -158,8 +159,8 @@
                 most of this yesterday, but I continued working on the worksheet I did not finish.
             </h1>
 
-            <textarea></textarea>
-            <button id="Submit" type="submit">
+            <textarea id="textarea"></textarea>
+            <button id="Submit" type="submit" onclick="SubmitData()">
                 <h1 id="SubmitLabel">Submit</h1>
             </button>
         </section>
