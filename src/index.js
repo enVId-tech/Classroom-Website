@@ -9,7 +9,7 @@ const crypto = require('crypto');
 
 // Library Initialization
 app.use(express.json());
-app.set('trust proxy', true)
+app.set('trust proxy', true);
 
 //Credentials
 require('dotenv').config({ path: './src/credentials.env' });
@@ -38,7 +38,7 @@ let loggedIn = true; // Keep this at false for testing, real use keep false
 function writeUserDataToFile(JSONdata) {
   try {
     // Read existing JSON data from the file
-    let existingData = fs.readFileSync('./src/studentinformation.json', 'utf8');
+    let existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
 
     let existingJSON;
 
@@ -66,7 +66,7 @@ function writeUserDataToFile(JSONdata) {
     let updatedJSON = JSON.stringify(existingJSON, null, 2);
 
     // Write the updated JSON data back to the file
-    fs.writeFileSync('./src/studentinformation.json', updatedJSON);
+    fs.writeFileSync('./src/studentinformation/studentinformation.json', updatedJSON);
     return "Success";
   } catch (err) {
     return "Error";
@@ -94,25 +94,32 @@ const iv = crypto.randomBytes(16); // 128 bytes for AES-256-CBC
 
 //Encrypts Session ID
 function encryptSessionID(newSessionID) {
-  // Create an AES cipher object
-  const cipher = crypto.createCipheriv('aes-256-cbc', encryptionKey, iv);
+  try {  // Create an AES cipher object
+    const cipher = crypto.createCipheriv('aes-256-cbc', encryptionKey, iv);
 
-  // Encrypt the data
-  let encryptedData = cipher.update(newSessionID, 'utf8', 'hex');
-  encryptedData += cipher.final('hex');
+    // Encrypt the data
+    let encryptedData = cipher.update(newSessionID, 'utf8', 'hex');
+    encryptedData += cipher.final('hex');
 
-  return encryptedData;
+    return encryptedData;
+  } catch (err) {
+    return "Error";
+  }
 }
 
 //Decrypts Encrypted Session ID
 function decryptSessionID(encryptedData) {
-  const decipher = crypto.createDecipheriv('aes-256-cbc', encryptionKey, iv);
+  try {
+    const decipher = crypto.createDecipheriv('aes-256-cbc', encryptionKey, iv);
 
-  // Decrypt the data
-  let decryptedData = decipher.update(encryptedData, 'hex', 'utf8');
-  decryptedData += decipher.final('utf8');
+    // Decrypt the data
+    let decryptedData = decipher.update(encryptedData, 'hex', 'utf8');
+    decryptedData += decipher.final('utf8');
 
-  return decryptedData;
+    return decryptedData;
+  } catch (err) {
+    return "Error";
+  }
 }
 
 //IP Encryption
@@ -146,7 +153,7 @@ app.post('/logout', function (req, res) {
   // Read existing JSON data from the file
   let dataID = decryptSessionID(req.body.dataID);
 
-  let existingData = fs.readFileSync('./src/studentinformation.json', 'utf8');
+  let existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
   let existingJSON = JSON.parse(existingData);
 
   let findData;
@@ -225,7 +232,7 @@ app.post('/logout', function (req, res) {
 app.post('/getstudentaccess', (req, res) => {
   // Read the JSON file
   const dataID = req.body.dataID;
-  fs.readFile('./src/studentinformation.json', 'utf8', (err, data) => {
+  fs.readFile('./src/studentinformation/studentinformation.json', 'utf8', (err, data) => {
     if (err) {
       console.error('Error reading the file:', err);
       return;
@@ -271,7 +278,7 @@ app.post('/getData', (req, res) => {
 
     function retrieveDataFromFile() {
       // Read existing JSON data from the file
-      let existingData = fs.readFileSync('./src/studentinformation.json', 'utf8');
+      let existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
       // Parse the JSON data into a JavaScript array
       let jsonArray = JSON.parse(existingData);
 
@@ -310,7 +317,7 @@ app.post('/checkLoggedIn', (req, res) => {
     loggedIn = false;
     res.sendStatus(401);
   } else if (data != null) {
-    let fileData = fs.readFileSync('./src/studentinformation.json', 'utf8');
+    let fileData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
     let jsonArray = JSON.parse(fileData);
 
     let unencryptedData = decryptSessionID(data);
@@ -327,10 +334,6 @@ app.post('/checkLoggedIn', (req, res) => {
     const expiraryDate = new Date(jsonArray[dataNumber].unchangeableSettings.dayToLogOut.toString())
 
     const currentDate = new Date()
-
-    console.log(expiraryDate);
-    console.log(currentDate);
-    console.log(expiraryDate < currentDate);
 
     if (expiraryDate < currentDate) {
       loggedIn = false;
@@ -428,7 +431,7 @@ app.get('/auth/google/callback',
         // Convert the updated date to a formatted string
         let updatedDate = newDate.toString().slice(0, 24);
 
-        let fileData = fs.readFileSync('./src/studentinformation.json', 'utf8');
+        let fileData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
         let jsonArray = JSON.parse(fileData);
 
         let numberFound = null;

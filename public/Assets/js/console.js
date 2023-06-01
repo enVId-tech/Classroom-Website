@@ -1,21 +1,40 @@
+let inputHistory = []; // Store input history
+let historyIndex = 0; // Track current history index
+
 document.addEventListener("DOMContentLoaded", function () {
   const inputField = document.getElementById("input");
 
   inputField.value = ">> " + inputField.value.trim(3);
 
-  inputField.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-      const input = inputField.value.substring(3); // Remove the '>> ' prefix
+  inputField.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      const input = inputField.value.substring(3); // Remove the first 3 characters
       inputField.value = ""; // Clear the input field
       processCommand(input);
-      inputField.value = ">> "; // Restore the '>> ' prefix
+      inputField.value = ">> "; // Reset the input field
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (historyIndex > 0) {
+        historyIndex--;
+        inputField.value = ">> " + inputHistory[historyIndex];
+      }
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (historyIndex < inputHistory.length - 1) {
+        historyIndex++;
+        inputField.value = ">> " + inputHistory[historyIndex];
+      } else {
+        inputField.value = ">> ";
+      }
+    } else if (inputField.selectionStart < 3 && e.key !== "Backspace" && e.key !== "Delete") {
+      e.preventDefault();
     }
-  
 
     // Prevent deleting the '>> ' prefix
-    if (event.key === "Backspace" && inputField.selectionStart <= 3) {
-      event.preventDefault();
+    if (e.key === "Backspace" && inputField.selectionStart <= 3) {
+      e.preventDefault();
     }
+
   });
 
   inputField.addEventListener("input", function () {
@@ -38,6 +57,21 @@ function writeToConsole(message) {
 }
 
 function processCommand(input) {
-  // Example: Echo the command back to the console
-  writeToConsole(input);
+
+  if (!input == "") {
+    inputHistory.push(input);
+    switch (input) {
+      case "clear": clearConsole(); break;
+      case "help": writeToConsole("Available commands: clear, help, test"); break;
+      case "help 1": writeToConsole("Available commands: 'clear', help [int], test"); break;
+      case "help 2": writeToConsole("Available commands: clear, 'help [int]', test"); break;
+      case "help 3": writeToConsole("Available commands: clear, help [int], 'test'"); break;
+      case "test": writeToConsole("Test command executed."); break;
+      default: writeToConsole("Unknown command: '" + input + "'. Type 'help' for a list of commands."); break;
+    }
+  }
+}
+
+function clearConsole() {
+  writeToConsole("Console cleared.");
 }

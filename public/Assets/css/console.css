@@ -23,6 +23,8 @@
   font-family: monospace;
   height: 500px; /* Set the desired height of the console */
   overflow: auto; /* Enable vertical scrolling */
+  overflow-x: hidden; /* Disable horizontal scrolling */
+  white-space: pre-wrap;
 }
 
 #output {

@@ -82,26 +82,26 @@ function createElements(data) {
 
             let CSAContent = document.createElement("button");
             CSAContent.className = "sidebar-item extras";
-            CSAContent.onclick = function() { window.location.href = "/Classes/CSA/Announcements" };
+            CSAContent.onclick = function () { window.location.href = "/Classes/CSA/Announcements" };
             CSAContent.innerHTML = "Announcements";
             CSADiv.appendChild(CSAContent);
 
             let CSAContent3 = document.createElement("button");
             CSAContent3.className = "sidebar-item extras";
-            CSAContent3.onclick = function() { window.location.href = "/Classes/CSA/Agenda" };
+            CSAContent3.onclick = function () { window.location.href = "/Classes/CSA/Agenda" };
             CSAContent3.innerHTML = "Agenda";
             CSADiv.appendChild(CSAContent3);
 
 
             let CSAContent2 = document.createElement("button");
             CSAContent2.className = "sidebar-item extras";
-            CSAContent2.onclick = function() { window.location.href = "/Classes/CSA/AssignmentList" };
+            CSAContent2.onclick = function () { window.location.href = "/Classes/CSA/AssignmentList" };
             CSAContent2.innerHTML = "Assignment List";
             CSADiv.appendChild(CSAContent2);
 
             let CSAContent4 = document.createElement("button");
             CSAContent4.className = "sidebar-item extras";
-            CSAContent4.onclick = function() { window.location.href = "/Classes/CSA/LearningLog" };
+            CSAContent4.onclick = function () { window.location.href = "/Classes/CSA/LearningLog" };
             CSAContent4.innerHTML = "Learning Log";
             CSADiv.appendChild(CSAContent4);
         } else {
@@ -155,7 +155,7 @@ function createElements(data) {
 
             let AdminButton = document.createElement("button");
             AdminButton.className = "sidebar-item extras";
-            AdminButton.onclick = function() { window.location.href = "/adminPanel/StudentList" };
+            AdminButton.onclick = function () { window.location.href = "/adminPanel/StudentList" };
             AdminButton.innerHTML = "Student List";
             AdminPanelDropdown.appendChild(AdminButton);
         } else {
@@ -166,6 +166,28 @@ function createElements(data) {
     sidebar.appendChild(document.createElement("br"));
     sidebar.appendChild(document.createElement("br"));
     sidebar.appendChild(document.createElement("br"));
+
+    if (!window.location.pathname.includes("profile-settings")) {
+        let profile = document.createElement("div");
+        profile.className = "sidebar-item";
+        sidebar.appendChild(profile);
+
+        let profileButton = document.createElement("button");
+        profileButton.className = "sidebar-label";
+        profileButton.onclick = function () { window.location.href = "/User/profile-settings/settings" };
+        profileButton.innerHTML = "Profile and Settings";
+        profile.appendChild(profileButton);
+    } else {
+        let profile = document.createElement("div");
+        profile.className = "sidebar-item";
+        sidebar.appendChild(profile);
+
+        let profileButton = document.createElement("button");
+        profileButton.className = "sidebar-label";
+        profileButton.onclick = function () { window.location.href = "/" };
+        profileButton.innerHTML = "Back to Dashboard";
+        profile.appendChild(profileButton);
+    }
 
     let logout = document.createElement("div");
     logout.className = "sidebar-item";
@@ -181,4 +203,6 @@ function createElements(data) {
     logoutContent.innerHTML = "Log Out";
     logoutContent.className = "text signout";
     logoutButton.appendChild(logoutContent);
+
+
 }

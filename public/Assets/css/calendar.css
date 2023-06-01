@@ -1,9 +1,26 @@
 /* CSS styles for the calendar */
 .slider {
-    height: 60vh;
+    height: 65vh;
     overflow-x: auto;
     margin-left: 50px;
     margin-right: 175px;
+    scrollbar-width: thin;
+    scrollbar-color: #888888 #383838;
+}
+
+/* Customize scrollbar appearance */
+.slider::-webkit-scrollbar {
+    width: 6px;
+    height: 80%;
+}
+
+.slider::-webkit-scrollbar-track {
+    background: #383838;
+}
+
+.slider::-webkit-scrollbar-thumb {
+    background-color: #888888;
+    border-radius: 100px;
 }
 
 .slider-tabs {
@@ -60,5 +77,5 @@
 
 .month:not(.month.active) {
     display: none;
-    
+
 }
