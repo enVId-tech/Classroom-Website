@@ -9,11 +9,12 @@
 
 #console::-webkit-scrollbar-thumb {
   background-color: #888;
+  border-radius: 100px;
 }
 
 #console {
   scrollbar-width: thin;
-  scrollbar-color: #888 transparent;
+  scrollbar-color: #000000 transparent;
   background-color: #000;
   color: #fff;
   padding: 10px;

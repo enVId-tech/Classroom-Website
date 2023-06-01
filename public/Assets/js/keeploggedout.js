@@ -7,6 +7,7 @@ async function logOut() {
         },
         body: JSON.stringify({ dataID: document.cookie.split("=")[1] })
     }
+    
     fetch('/logout', logoutData)
         .then(function (response) {
             // Redirect to the login page

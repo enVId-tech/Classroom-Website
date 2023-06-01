@@ -117,8 +117,8 @@ function createElements(data) {
 
             let MobileWebDevButton = document.createElement("button");
             MobileWebDevButton.className = "sidebar-label";
-            MobileWebDevButton.onclick = function () { window.location.href = "/Classes/MobileWebDev" };
-            MobileWebDevButton.innerHTML = "Mobile Web. Dev.";
+            MobileWebDevButton.onclick = function () { window.location.href = "/Classes/MobileAppDev" };
+            MobileWebDevButton.innerHTML = "Mobile App. Dev.";
             MobileWebDev.appendChild(MobileWebDevButton);
 
             let MobileWebDevDropdown = document.createElement("div");

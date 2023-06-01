@@ -1,3 +1,5 @@
+const { split } = require("lodash");
+
 let inputHistory = []; // Store input history
 let historyIndex = 0; // Track current history index
 
@@ -66,6 +68,7 @@ function processCommand(input) {
       case "help 1": writeToConsole("Available commands: 'clear', help [int], test"); break;
       case "help 2": writeToConsole("Available commands: clear, 'help [int]', test"); break;
       case "help 3": writeToConsole("Available commands: clear, help [int], 'test'"); break;
+      case "announcements": announcements(input); break;
       case "test": writeToConsole("Test command executed."); break;
       default: writeToConsole("Unknown command: '" + input + "'. Type 'help' for a list of commands."); break;
     }
@@ -74,4 +77,52 @@ function processCommand(input) {
 
 function clearConsole() {
   writeToConsole("Console cleared.");
+}
+
+// Announcements function
+function announcements(input) {
+
+  const splitInput = input.split(" ");
+
+  let JSONdata = {};
+  switch (splitInput[1].toLowerCase()) {
+    case "CSD":
+      JSONdata = {
+        "class": "CSD",
+        "announcements": [{}]
+      };
+      break;
+    case "APCSP":
+      JSONdata = {
+        "class": "APCSP",
+        "announcements": []
+      };
+      break;
+    case "APCSA":
+      JSONdata = {
+        "class": "APCSA",
+        "announcements": []
+      };
+      break;
+    case "MAD":
+      JSONdata = {
+        "class": "MAD",
+        "announcements": []
+      };
+      break;
+    default:
+      writeToConsole("Unknown input: '" + input + "'. Type 'help' for a list of commands.");
+  };
+
+  fetch('/announcements', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(JSONdata)
+  })
+    .then(function (response) {
+      return response.json();
+    });
+    
 }

@@ -35,10 +35,10 @@ let loggedIn = true; // Keep this at false for testing, real use keep false
 
 //Write User Data to File (JSON)
 
-function writeUserDataToFile(JSONdata) {
+function writeUserDataToFile(JSONdata, filePath) {
   try {
     // Read existing JSON data from the file
-    let existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
+    let existingData = fs.readFileSync(filePath, 'utf8');
 
     let existingJSON;
 
@@ -66,7 +66,7 @@ function writeUserDataToFile(JSONdata) {
     let updatedJSON = JSON.stringify(existingJSON, null, 2);
 
     // Write the updated JSON data back to the file
-    fs.writeFileSync('./src/studentinformation/studentinformation.json', updatedJSON);
+    fs.writeFileSync(filePath, updatedJSON);
     return "Success";
   } catch (err) {
     return "Error";
@@ -201,7 +201,7 @@ app.post('/logout', function (req, res) {
         },
         "data_id": findData.data_id
       }
-      let userData = writeUserDataToFile(modifiedData);
+      let userData = writeUserDataToFile(modifiedData, "./src/studentinformation/studentinformation.json");
       if (userData == "Success") {
         res.redirect('/User/Authentication/Log-Out');
       }
@@ -339,7 +339,7 @@ app.post('/checkLoggedIn', (req, res) => {
       loggedIn = false;
       res.sendStatus(401);
       jsonArray[dataNumber].unchangeableSettings.isLoggedin = false;
-      writeUserDataToFile(jsonArray[dataNumber]);
+      writeUserDataToFile(jsonArray[dataNumber], "./src/studentinformation/studentinformation.json");
     } else if (!expiraryDate < currentDate) {
       if (jsonArray[dataNumber].unchangeableSettings.isLoggedin == true) {
         loggedIn = true;
@@ -404,6 +404,39 @@ passport.use(new GoogleStrategy({
     return done(null, userProfile);
   }
 ));
+
+app.post('/announcements', (req, res) => {
+  // Retrieve the JSON data from the request body
+  let data = req.body;
+
+  // Read the existing JSON data from the file
+  let jsonData = fs.readFileSync("/src/studentinformation/announcements.json", 'utf8');
+  let jsonArray = JSON.parse(jsonData);
+
+  // Iterate through each object in the array
+  for (let i = 0; i < jsonArray.length; i++) {
+    const obj = jsonArray[i];
+    const key = Object.keys(obj)[0]; // Get the key of the object
+
+    // Check if there is existing data
+    if (Object.keys(obj[key]).length === 0) {
+      // No existing data, assign the new data directly
+      obj[key] = data;
+    } else {
+      // Existing data, update it with the new data
+      Object.assign(obj[key], data);
+    }
+  }
+
+  // Convert the modified array back to JSON
+  let updatedJsonData = JSON.stringify(jsonArray, null, 2);
+
+  // Write the updated JSON data to the file
+  fs.writeFileSync('/src/studentinformation/announcements.json', updatedJsonData);
+
+  res.send('Data written successfully!');
+});
+
 
 app.get('/auth/google',
   passport.authenticate('google', { scope: ['profile', 'email'] }));
@@ -499,7 +532,7 @@ app.get('/auth/google/callback',
           };
           tempDataID = randomNumber;
 
-          writeUserDataToFile(JSONdata);
+          writeUserDataToFile(JSONdata, "./src/studentinformation/studentinformation.json");
 
         } else if (numberFound != null) {
           JSONdata = {
@@ -545,7 +578,7 @@ app.get('/auth/google/callback',
 
           tempDataID = randomNumber;
 
-          writeUserDataToFile(JSONdata);
+          writeUserDataToFile(JSONdata, "./src/studentinformation/studentinformation.json");
 
         } else if (userProfile._json.hd == "auhsd.us" || userProfile._json.hs == "frc4079.org" || userProfile._json.hd == "gmail.com") {
           // Create a Date object for the current date
@@ -605,7 +638,7 @@ app.get('/auth/google/callback',
           };
           tempDataID = randomNumber;
         };
-        writeUserDataToFile(JSONdata);
+        writeUserDataToFile(JSONdata, "./src/studentinformation/studentinformation.json");
 
         //console.log(tempDataID);
         loggedIn = true;
