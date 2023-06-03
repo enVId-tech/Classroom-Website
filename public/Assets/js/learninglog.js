@@ -2,8 +2,8 @@ async function SubmitData() {
     let data = {
         "dataID": document.cookie.split("=")[1].split(";")[0],
         "text": document.getElementById("textarea").value,
-        "period": document.getElementById("PeriodList"),
-        "date": document.getElementById("DateList"),
+        "period": document.getElementById("PeriodList").value,
+        "date": document.getElementById("DateList").value,
         "Class": window.location.pathname.split("/")[2]
     }
 

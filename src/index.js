@@ -36,10 +36,10 @@ let loggedIn = true; // Keep this at false for testing, real use keep false
 app.post('/console', function (req, res) {
   let input = req.body.input;
   let commandprocess = processCommand(input);
-  res.send({commandprocess})
+  res.send({ commandprocess })
 });
 
-app.post('/submitdata' ,function (req, res) {
+app.post('/submitdata', function (req, res) {
   let data = req.body;
   let dataID = decryptSessionID(data.dataID);
   let existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
@@ -53,16 +53,67 @@ app.post('/submitdata' ,function (req, res) {
     }
   }
 
-  let modifiedData = {
-    "Name": findData.firstName + " " + findData.lastName,
-    "Email": findData.email,
-    "Period": data.period,
-    "Text": data.text,
-    "Date": data.date,
-    "Class": data.Class
+  let StudentLearningLogData = fs.readFileSync('./src/Classes/' + data.Class + '/LearningLog.json', 'utf8');
+  let StudentLearningLogJSON
+  if (!StudentLearningLogData == "") {
+    StudentLearningLogJSON = JSON.parse(StudentLearningLogData);
+  } else {
+    StudentLearningLogJSON = [];
   }
 
-  writeUserDataToFile(modifiedData, './src/studentinformation/learninglog.json');
+  let findStudent;
+
+  for (let i = 0; i < StudentLearningLogJSON.length; i++) {
+
+    if (StudentLearningLogJSON[i].Email) {
+      if (StudentLearningLogJSON[i].Email == findData.email) {
+        findStudent = StudentLearningLogJSON[i];
+      } else if (StudentLearningLogJSON[i].Email != findData.email) {
+        findStudent = null;
+      }
+    } else {
+      findStudent = null;
+    }
+  }
+
+  let modifiedData;
+  if (findStudent == null) {
+    modifiedData = {
+      "Name": findData.firstName + " " + findData.lastName,
+      "Email": findData.Email,
+      "Period": data.period,
+      "Assignment": {
+        "LearningLog": {
+          "LearningLog": 1,
+        }
+      },
+      "Class": data.Class,
+      "data_id": dataID,
+    }
+
+    const tagName = "LearningLog " + modifiedData.Assignment.LearningLog.LearningLog.toString();
+    modifiedData.Assignment.LearningLog.LearningLog = modifiedData.Assignment.LearningLog.LearningLog + 1;
+
+    const tagData = {
+      "text": data.text,
+      "date": data.date,
+      "timeSubmitted": new Date().toLocaleString().toString().slice(0, 24)
+    }
+    modifiedData.Assignment.LearningLog[tagName] = tagData;
+  } else if (findStudent != null) {
+    modifiedData = findStudent;
+
+    const tagName = "LearningLog " + modifiedData.Assignment.LearningLog.LearningLog.toString();
+    modifiedData.Assignment.LearningLog.LearningLog = modifiedData.Assignment.LearningLog.LearningLog + 1;
+
+    const tagData = {
+      "text": data.text,
+      "date": data.date,
+      "timeSubmitted": new Date().toLocaleString().toString().slice(0, 24)
+    }
+    modifiedData.Assignment.LearningLog[tagName] = tagData;
+  }
+  writeUserDataToFile(modifiedData, './src/Classes/' + data.Class + '/LearningLog.json');
 });
 
 //Logout
@@ -116,7 +167,7 @@ app.post('/logout', function (req, res) {
           latestIPAddress: findData.unchangeableSettings.latestIPAddress,
           isLockedOut: findData.unchangeableSettings.isLockedOut
         },
-        "data_id": findData.data_id
+        "data_id": "null"
       }
       let userData = writeUserDataToFile(modifiedData, "./src/studentinformation/studentinformation.json");
       if (userData == "Success") {
@@ -551,7 +602,7 @@ app.get('/auth/google/callback',
               latestIPAddress: encryptIP(req.socket.remoteAddress),
               isLockedOut: false
             },
-            "data_id": randomNumber
+            "data_id": randomNumber,
           };
           tempDataID = randomNumber;
         };

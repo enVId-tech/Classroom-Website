@@ -55,7 +55,8 @@
                 <div class="sidebar-dropdown">
                     <div class="sidebar-item extras">
                         <button class="sidebar-item extras"
-                            onclick="window.location.replace('/connections/appointmentView');">View Appointments</button>
+                            onclick="window.location.replace('/connections/appointmentView');">View
+                            Appointments</button>
                     </div>
                     <div class="siderbar-item extras">
                         <button class="sidebar-item extras"
@@ -81,7 +82,8 @@
             <h1 id="NamePlate">ASCSA | Learning Log</h1>
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item">
-                    <button class="nav-link" id="connections-tab" onclick="window.location.replace('/Classes/CSA')">APCSA
+                    <button class="nav-link" id="connections-tab"
+                        onclick="window.location.replace('/Classes/CSA')">APCSA
                         Home</button>
                 </li>
                 <li class="nav-item">
@@ -103,26 +105,26 @@
             </ul>
             <br>
             <div class="PeriodSelection">
-                <div class="RequirePeriodSelection">Select a period</div>
-                <ul class="dropdown-list" id="PeriodList">
-                    <li>Period 1</li>
-                    <li>Period 2</li>
-                    <li>Period 3</li>
-                    <li>Period 4</li>
-                    <li>Period 5</li>
-                    <li>Period 6</li>
-                    <li>Period 7</li>
-                    <li>Period 8</li>
-                </ul>
+                <select class="PeriodDropdown" id="PeriodList">
+                    <option disabled selected>Select a period</option>
+                    <option>Period 1</option>
+                    <option>Period 2</option>
+                    <option>Period 3</option>
+                    <option>Period 4</option>
+                    <option>Period 5</option>
+                    <option>Period 6</option>
+                    <option>Period 7</option>
+                    <option>Period 8</option>
+                </select>
             </div>
 
             <div class="DateSelection">
-                <div class="RequireDateSelection">Select a date</div>
-                <ul class="dropdown-list" id="DateList">
-                    <li>EXAMPLE: 5-28-2023, Overdue</li>
-                    <li>EXAMPLE: 5-21-2023, Submitted</li>
-                    <li>EXAMPLE: 5-14-2023, Missing</li>
-                </ul>
+                <select class="DateDropdown" id="DateList">
+                    <option disabled selected>Select a date</option>
+                    <option>EXAMPLE: 5-28-2023, Overdue</option>
+                    <option>EXAMPLE: 5-21-2023, Submitted</option>
+                    <option>EXAMPLE: 5-14-2023, Missing</option>
+                </select>
             </div>
 
             <hr>
@@ -165,41 +167,6 @@
             </button>
         </section>
     </center>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            let dropdown = document.querySelector('.PeriodSelection');
-            let selectedOption = dropdown.querySelector('.RequirePeriodSelection');
-            let dropdownList = dropdown.querySelector('.dropdown-list');
-
-            selectedOption.addEventListener('click', function () {
-                dropdownList.style.display = dropdownList.style.display === 'none' ? 'block' : 'none';
-            });
-
-            dropdownList.addEventListener('click', function (e) {
-                if (e.target.tagName === 'LI') {
-                    selectedOption.textContent = e.target.textContent;
-                    dropdownList.style.display = 'none';
-                }
-            });
-
-
-            let dropdown2 = document.querySelector('.DateSelection');
-            let selectedOption2 = dropdown2.querySelector('.RequireDateSelection');
-            let dropdownList2 = dropdown2.querySelector('.dropdown-list');
-
-            selectedOption2.addEventListener('click', function () {
-                dropdownList2.style.display = dropdownList2.style.display === 'none' ? 'block' : 'none';
-            });
-
-            dropdownList2.addEventListener('click', function (e) {
-                if (e.target.tagName === 'LI') {
-                    selectedOption2.textContent = e.target.textContent;
-                    dropdownList2.style.display = 'none';
-                }
-            });
-        });
-    </script>
 </body>
 
 </html>

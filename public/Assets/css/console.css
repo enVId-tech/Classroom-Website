@@ -32,6 +32,10 @@
   height: 450px;
 }
 
+#output div {
+  float: left;
+}
+
 .output-line {
   margin-left: 5px;
   place-content: left;

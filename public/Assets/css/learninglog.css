@@ -15,7 +15,16 @@
     border-radius: 10px;
 }
 
-.dropdown-list {
+.PeriodDropdown, .DateDropdown {
+    height: 50px;
+    margin-bottom: 10px;
+    background-color: #383838;
+    border: 1px solid white;
+    color: white;
+    border-radius: 10px;
+}
+
+.RequirePeriodSelection {
     position: absolute;
     top: 100%;
     left: 0;
@@ -26,13 +35,7 @@
     background-color: #383838;
     border: 1px solid white;
     color: white;
-    display: none;
     border-radius: 10px;
-}
-
-.dropdown-list li {
-    padding: 10px;
-    cursor: pointer;
 }
 
 #Instructions {

@@ -48,20 +48,27 @@ document.addEventListener("DOMContentLoaded", function () {
 function writeToConsole(message) {
   const outputDiv = document.getElementById("output");
   const outputLine = document.createElement("div");
+
+  const br = document.createElement("br");
+  outputDiv.appendChild(br);
+
   outputLine.className = "output-line";
-  outputLine.textContent = message;
+  outputLine.textContent = message.slice(1, -1);
   outputDiv.appendChild(outputLine);
 
   outputDiv.prepend(outputLine);
-  outputDiv.scrollTop = outputDiv.scrollHeight; // Scroll to the bottom
 }
 
 async function sendConsoleDataToServer(input) {
-  const response = await fetch("/console", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ input })
-  });
-  const data = await response.json();
-  writeToConsole(JSON.stringify(data.commandprocess).trimEnd().trimStart());
+  if (input === "") {
+    return;
+  } else {
+    const response = await fetch("/console", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input })
+    });
+    const data = await response.json();
+    writeToConsole(JSON.stringify(data.commandprocess).trimEnd().trimStart());
+  }
 }
