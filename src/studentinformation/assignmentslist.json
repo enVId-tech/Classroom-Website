@@ -1,0 +1,24 @@
+[
+  {
+    "Name": "Erick Tran",
+    "Email": "1071039@student.auhsd.us",
+    "Period": "Period 8",
+    "Assignment": {
+      "LearningLog": {
+        "LearningLog": 3,
+        "LearningLog 0": {
+          "text": "Today we died.",
+          "date": "EXAMPLE: 5-28-2023, Overdue",
+          "timeSubmitted": "6/3/2023, 12:31:37 PM"
+        },
+        "LearningLog 1": {
+          "text": "Today we died.",
+          "date": "EXAMPLE: 5-28-2023, Overdue",
+          "timeSubmitted": "6/3/2023, 12:31:43 PM"
+        }
+      }
+    },
+    "Class": "CSA",
+    "data_id": "9502237957777513890730164508760687710615129534827806430669539238"
+  }
+]

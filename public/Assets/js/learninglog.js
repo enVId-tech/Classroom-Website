@@ -21,7 +21,7 @@ async function SubmitData() {
                 body: JSON.stringify(data)
             }
 
-            fetch('/submitdata', sendData)
+            fetch('/submitlearninglog', sendData)
                 .then(response => response.json())
                 .then(data => {
                     console.log(data);

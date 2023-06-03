@@ -29,91 +29,96 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => console.log('App listening on port ' + 3000));
 
 //Global Variables
-let userProfile;
-let tempDataID;
-let loggedIn = true; // Keep this at false for testing, real use keep false
+var userProfile;
+var tempDataID;
+var loggedIn = true; // Keep this at false for testing, real use keep false
 
 app.post('/console', function (req, res) {
-  let input = req.body.input;
-  let commandprocess = processCommand(input);
+  const input = req.body.input;
+  const commandprocess = processCommand(input);
   res.send({ commandprocess })
 });
 
-app.post('/submitdata', function (req, res) {
-  let data = req.body;
-  let dataID = decryptSessionID(data.dataID);
-  let existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
+app.post('/submitlearninglog', function (req, res) {
+  const data = req.body;
+  const dataID = decryptSessionID(data.dataID);
+  const existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
 
-  let existingJSON = JSON.parse(existingData);
+  const existingJSON = JSON.parse(existingData);
   let findData;
 
   for (let i = 0; i < existingJSON.length; i++) {
     if (existingJSON[i].data_id == dataID) {
       findData = existingJSON[i];
+      break;
     }
   }
 
-  let StudentLearningLogData = fs.readFileSync('./src/Classes/' + data.Class + '/LearningLog.json', 'utf8');
-  let StudentLearningLogJSON
-  if (!StudentLearningLogData == "") {
-    StudentLearningLogJSON = JSON.parse(StudentLearningLogData);
+  if (findData == null || findData == undefined || findData == "" || findData == "null" || findData == "undefined") {
+    res.send({ error: "User not found" });
   } else {
-    StudentLearningLogJSON = [];
-  }
-
-  let findStudent;
-
-  for (let i = 0; i < StudentLearningLogJSON.length; i++) {
-
-    if (StudentLearningLogJSON[i].Email) {
-      if (StudentLearningLogJSON[i].Email == findData.email) {
-        findStudent = StudentLearningLogJSON[i];
-      } else if (StudentLearningLogJSON[i].Email != findData.email) {
-        findStudent = null;
-      }
+    let StudentLearningLogData = fs.readFileSync('./src/studentinformation/assignmentslist.json', 'utf8');
+    let StudentLearningLogJSON
+    if (!StudentLearningLogData == "") {
+      StudentLearningLogJSON = JSON.parse(StudentLearningLogData);
     } else {
-      findStudent = null;
+      StudentLearningLogJSON = [];
     }
-  }
 
-  let modifiedData;
-  if (findStudent == null) {
-    modifiedData = {
-      "Name": findData.firstName + " " + findData.lastName,
-      "Email": findData.Email,
-      "Period": data.period,
-      "Assignment": {
-        "LearningLog": {
-          "LearningLog": 1,
+    let findStudent;
+
+    for (let i = 0; i < StudentLearningLogJSON.length; i++) {
+      if (StudentLearningLogJSON[i].Email) {
+        if (StudentLearningLogJSON[i].Email == findData.email) {
+          findStudent = StudentLearningLogJSON[i];
+          break;
         }
-      },
-      "Class": data.Class,
-      "data_id": dataID,
+      }
     }
 
-    const tagName = "LearningLog " + modifiedData.Assignment.LearningLog.LearningLog.toString();
-    modifiedData.Assignment.LearningLog.LearningLog = modifiedData.Assignment.LearningLog.LearningLog + 1;
-
-    const tagData = {
-      "text": data.text,
-      "date": data.date,
-      "timeSubmitted": new Date().toLocaleString().toString().slice(0, 24)
+    if (!findStudent) {
+      findStudent = "null";
     }
-    modifiedData.Assignment.LearningLog[tagName] = tagData;
-  } else if (findStudent != null) {
-    modifiedData = findStudent;
 
-    const tagName = "LearningLog " + modifiedData.Assignment.LearningLog.LearningLog.toString();
-    modifiedData.Assignment.LearningLog.LearningLog = modifiedData.Assignment.LearningLog.LearningLog + 1;
+    let modifiedData;
+    if (findStudent == "null" || findStudent == null || findStudent == undefined || findStudent == "undefined" || findStudent == "") {
+      modifiedData = {
+        "Name": findData.firstName + " " + findData.lastName,
+        "Email": findData.email,
+        "Period": data.period,
+        "Assignment": {
+          "LearningLog": {
+            "LearningLog": 0,
+          }
+        },
+        "Class": data.Class,
+        "data_id": dataID,
+      }
 
-    const tagData = {
-      "text": data.text,
-      "date": data.date,
-      "timeSubmitted": new Date().toLocaleString().toString().slice(0, 24)
+      const tagName = "LearningLog " + modifiedData.Assignment.LearningLog.LearningLog.toString();
+      modifiedData.Assignment.LearningLog.LearningLog = modifiedData.Assignment.LearningLog.LearningLog + 1;
+
+      const tagData = {
+        "text": data.text,
+        "date": data.date,
+        "timeSubmitted": new Date().toLocaleString().toString().slice(0, 24)
+      }
+      modifiedData.Assignment.LearningLog[tagName] = tagData;
+    } else if (!findStudent == null || !findStudent == "null" || !findStudent == undefined || !findStudent == "undefined" || !findStudent == "") {
+      modifiedData = findStudent;
+
+      const tagName = "LearningLog " + modifiedData.Assignment.LearningLog.LearningLog.toString();
+      modifiedData.Assignment.LearningLog.LearningLog = modifiedData.Assignment.LearningLog.LearningLog + 1;
+
+      const tagData = {
+        "text": data.text,
+        "date": data.date,
+        "timeSubmitted": new Date().toLocaleString().toString().slice(0, 24)
+      }
+      modifiedData.Assignment.LearningLog[tagName] = tagData;
     }
-    modifiedData.Assignment.LearningLog[tagName] = tagData;
+    writeUserDataToFile(modifiedData, './src/studentinformation/assignmentslist.json');
   }
-  writeUserDataToFile(modifiedData, './src/Classes/' + data.Class + '/LearningLog.json');
 });
 
 //Logout
