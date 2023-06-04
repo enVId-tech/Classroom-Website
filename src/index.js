@@ -33,206 +33,203 @@ var userProfile;
 var tempDataID;
 var loggedIn = true; // Keep this at false for testing, real use keep false
 
+//Console Commands
 app.post('/console', function (req, res) {
-  const input = req.body.input;
-  const commandprocess = processCommand(input);
-  res.send({ commandprocess })
+  try {
+    const input = req.body.input;
+    const commandprocess = processCommand(input);
+    res.send({ commandprocess })
+  } catch (err) {
+    res.send({ commandprocess: err.message });
+  }
 });
 
-app.post('/submitlearninglog', function (req, res) {
-  const data = req.body;
-  const dataID = decryptSessionID(data.dataID);
-  const existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
+//Get sidebar data
+app.post('/sidebarget', function (req, res) {
+  try {
+    const data = req.body;
+    const dataID = decryptSessionID(data.dataID);
+    const existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
 
-  const existingJSON = JSON.parse(existingData);
-  let findData;
+    const existingJSON = JSON.parse(existingData);
+    let findData;
 
-  for (let i = 0; i < existingJSON.length; i++) {
-    if (existingJSON[i].data_id == dataID) {
-      findData = existingJSON[i];
-      break;
+    for (let i = 0; i < existingJSON.length; i++) {
+      if (existingJSON[i].data_id == dataID) {
+        findData = existingJSON[i];
+        break;
+      }
     }
-  }
 
-  if (findData == null || findData == undefined || findData == "" || findData == "null" || findData == "undefined") {
-    res.send({ error: "User not found" });
-  } else {
-    let StudentLearningLogData = fs.readFileSync('./src/studentinformation/assignmentslist.json', 'utf8');
-    let StudentLearningLogJSON
-    if (!StudentLearningLogData == "") {
-      StudentLearningLogJSON = JSON.parse(StudentLearningLogData);
+    const sidebarData = fs.readFileSync('./src/studentinformation/classesavailable.json', 'utf8');
+    const sidebarJSON = JSON.parse(sidebarData);
+
+    if (findData && sidebarJSON) {
+      res.send({ hasAccessTo: findData.hasAccessTo, sidebarJSON });
     } else {
-      StudentLearningLogJSON = [];
+      res.send({ error: "Error" });
+    }
+  } catch (err) {
+    res.send({ error: err.message });
+  }
+});
+
+//Writing Learning Log to File
+app.post('/submitlearninglog', function (req, res) {
+  try {
+    const data = req.body;
+    const dataID = decryptSessionID(data.dataID);
+    const existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
+
+    const existingJSON = JSON.parse(existingData);
+    let findData;
+
+    for (let i = 0; i < existingJSON.length; i++) {
+      if (existingJSON[i].data_id == dataID) {
+        findData = existingJSON[i];
+        break;
+      }
     }
 
-    let findStudent;
+    if (findData == null || findData == undefined || findData == "" || findData == "null" || findData == "undefined") {
+      res.send({ error: "User not found" });
+    } else {
+      let StudentLearningLogData = fs.readFileSync('./src/studentinformation/assignmentslist.json', 'utf8');
+      let StudentLearningLogJSON
+      if (!StudentLearningLogData == "") {
+        StudentLearningLogJSON = JSON.parse(StudentLearningLogData);
+      } else {
+        StudentLearningLogJSON = [];
+      }
 
-    for (let i = 0; i < StudentLearningLogJSON.length; i++) {
-      if (StudentLearningLogJSON[i].Email) {
-        if (StudentLearningLogJSON[i].Email == findData.email) {
-          findStudent = StudentLearningLogJSON[i];
-          break;
+      let findStudent;
+
+      for (let i = 0; i < StudentLearningLogJSON.length; i++) {
+        if (StudentLearningLogJSON[i].Email) {
+          if (StudentLearningLogJSON[i].Email == findData.email) {
+            findStudent = StudentLearningLogJSON[i];
+            break;
+          }
         }
       }
-    }
 
-    if (!findStudent) {
-      findStudent = "null";
-    }
-
-    let modifiedData;
-    if (findStudent == "null" || findStudent == null || findStudent == undefined || findStudent == "undefined" || findStudent == "") {
-      modifiedData = {
-        "Name": findData.firstName + " " + findData.lastName,
-        "Email": findData.email,
-        "Period": data.period,
-        "Assignment": {
-          "LearningLog": {
-            "LearningLog": 0,
-          }
-        },
-        "Class": data.Class,
-        "data_id": dataID,
+      if (!findStudent) {
+        findStudent = "null";
       }
 
-      const tagName = "LearningLog " + modifiedData.Assignment.LearningLog.LearningLog.toString();
-      modifiedData.Assignment.LearningLog.LearningLog = modifiedData.Assignment.LearningLog.LearningLog + 1;
+      let modifiedData;
+      if (findStudent == "null" || findStudent == null || findStudent == undefined || findStudent == "undefined" || findStudent == "") {
+        modifiedData = {
+          "Name": findData.firstName + " " + findData.lastName,
+          "Email": findData.email,
+          "Period": data.period,
+          "Assignment": {
+            "LearningLog": {
+              "LearningLog": 0,
+            }
+          },
+          "Class": data.Class,
+          "data_id": dataID,
+        }
 
-      const tagData = {
-        "text": data.text,
-        "date": data.date,
-        "timeSubmitted": new Date().toLocaleString().toString().slice(0, 24)
+        const tagName = "LearningLog " + modifiedData.Assignment.LearningLog.LearningLog.toString();
+        modifiedData.Assignment.LearningLog.LearningLog = modifiedData.Assignment.LearningLog.LearningLog + 1;
+
+        const tagData = {
+          "text": data.text,
+          "date": data.date,
+          "timeSubmitted": new Date().toLocaleString().toString().slice(0, 24)
+        }
+        modifiedData.Assignment.LearningLog[tagName] = tagData;
+      } else if (!findStudent == null || !findStudent == "null" || !findStudent == undefined || !findStudent == "undefined" || !findStudent == "") {
+        modifiedData = findStudent;
+
+        const tagName = "LearningLog " + modifiedData.Assignment.LearningLog.LearningLog.toString();
+        modifiedData.Assignment.LearningLog.LearningLog = modifiedData.Assignment.LearningLog.LearningLog + 1;
+
+        const tagData = {
+          "text": data.text,
+          "date": data.date,
+          "timeSubmitted": new Date().toLocaleString().toString().slice(0, 24)
+        }
+        modifiedData.Assignment.LearningLog[tagName] = tagData;
       }
-      modifiedData.Assignment.LearningLog[tagName] = tagData;
-    } else if (!findStudent == null || !findStudent == "null" || !findStudent == undefined || !findStudent == "undefined" || !findStudent == "") {
-      modifiedData = findStudent;
-
-      const tagName = "LearningLog " + modifiedData.Assignment.LearningLog.LearningLog.toString();
-      modifiedData.Assignment.LearningLog.LearningLog = modifiedData.Assignment.LearningLog.LearningLog + 1;
-
-      const tagData = {
-        "text": data.text,
-        "date": data.date,
-        "timeSubmitted": new Date().toLocaleString().toString().slice(0, 24)
-      }
-      modifiedData.Assignment.LearningLog[tagName] = tagData;
+      writeUserDataToFile(modifiedData, './src/studentinformation/assignmentslist.json');
     }
-    writeUserDataToFile(modifiedData, './src/studentinformation/assignmentslist.json');
+  } catch (err) {
+    res.send({ error: err.message });
   }
 });
 
 //Logout
 app.post('/logout', function (req, res) {
-  // Read existing JSON data from the file
-  let dataID = decryptSessionID(req.body.dataID);
+  try {
+    // Read existing JSON data from the file
+    let dataID = decryptSessionID(req.body.dataID);
 
-  let existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
-  let existingJSON = JSON.parse(existingData);
+    let existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
+    let existingJSON = JSON.parse(existingData);
 
-  let findData;
+    let findData;
 
-  for (let i = 0; i < existingJSON.length; i++) {
-    if (existingJSON[i].data_id == dataID) {
-      findData = existingJSON[i];
-      let modifiedData = {
-        "displayName": findData.displayName,
-        "firstName": findData.firstName,
-        "lastName": findData.lastName,
-        "email": findData.email,
-        "profilePicture": findData.profilePicture,
-        "hd": findData.hd,
-        "hasAccessTo": {
-          "CSD": {
-            "hasAccess": findData.hasAccessTo.CSD.hasAccess,
-            "Assignments": findData.hasAccessTo.CSD.Assignments
-          },
-          "CSP": {
-            "hasAccess": findData.hasAccessTo.CSP.hasAccess,
-            "Assignments": findData.hasAccessTo.CSP.Assignments
-          },
-          "CSA": {
-            "hasAccess": findData.hasAccessTo.CSA.hasAccess,
-            "Assignments": findData.hasAccessTo.CSA.Assignments
-          },
-          "MobileWebDev": {
-            "hasAccess": findData.hasAccessTo.MobileWebDev.hasAccess,
-            "Assignments": findData.hasAccessTo.MobileWebDev.Assignments
-          },
-          "AdminPanel": {
-            "hasAccess": findData.hasAccessTo.AdminPanel.hasAccess,
-            "Assignments": findData.hasAccessTo.AdminPanel.Assignments
-          }
-        },
-        "unchangeableSettings": {
-          isLoggedin: false,
-          latestTimeLoggedIn: "null",
-          dayToLogOut: "null",
-          isStudent: findData.unchangeableSettings.isStudent,
-          isStaff: findData.unchangeableSettings.isStaff,
-          latestIPAddress: findData.unchangeableSettings.latestIPAddress,
-          isLockedOut: findData.unchangeableSettings.isLockedOut
-        },
-        "data_id": "null"
-      }
-      let userData = writeUserDataToFile(modifiedData, "./src/studentinformation/studentinformation.json");
-      if (userData == "Success") {
-        res.redirect('/User/Authentication/Log-Out');
+    for (let i = 0; i < existingJSON.length; i++) {
+      if (existingJSON[i].data_id == dataID) {
+        findData = existingJSON[i];
+        let modifiedData = findData;
+        modifiedData.unchangeableSettings.isLoggedin = false;
+        modifiedData.unchangeableSettings.latestTimeLoggedIn = "null";
+        modifiedData.unchangeableSettings.dayToLogOut = "null";
+        modifiedData.data_id = "null";
+
+        let userData = writeUserDataToFile(modifiedData, "./src/studentinformation/studentinformation.json");
+        if (userData == "Success") {
+          res.redirect('/User/Authentication/Log-Out');
+        }
       }
     }
+  } catch (err) {
+    res.send({ error: err.message });
   }
-
-  /*
-    if (findData) {
-      findData.unchangeableSettings.isLoggedin = false;
-      let userData = writeUserDataToFile(findData);
-      if (userData == "Success") {
-        res.redirect('/User/Authentication/Log-Out');
-      } else if (userData == "Error") {
-        res.redirect('/User/Authentication/Log-In');
-      }
-    } else {
-      console.log("User not found");
-      res.redirect('/User/Authentication/Log-In');
-    }
-    */
-  // Perform any other logout-related actions (e.g., session termination)
-  //res.redirect('/User/Authentication/Log-In'); // Redirect to the home page or a login page
 });
 
 
 
 //User Access
 app.post('/getstudentaccess', (req, res) => {
-  // Read the JSON file
-  const dataID = req.body.dataID;
-  fs.readFile('./src/studentinformation/studentinformation.json', 'utf8', (err, data) => {
-    if (err) {
-      console.error('Error reading the file:', err);
-      return;
-    }
-
-    try {
-      // Parse the JSON data
-      const jsonData = JSON.parse(data);
-
-      let studentDataIDUnencrypted = decryptSessionID(dataID);
-      // Find the student object with the matching data_id
-      const student = jsonData.find(item => item.data_id === studentDataIDUnencrypted);
-
-      if (student) {
-        // Get the contents of "hasAccessTo"
-        const hasAccessTo = student.hasAccessTo;
-        // Send the student access data as the response
-        res.send({ hasAccessTo });
-      } else {
-        // Handle the case when the student with the specified data_id is not found
-        res.status(404).send({ 'Error': 'Student not found' });
+  try {
+    // Read the JSON file
+    const dataID = req.body.dataID;
+    fs.readFile('./src/studentinformation/studentinformation.json', 'utf8', (err, data) => {
+      if (err) {
+        console.error('Error reading the file:', err);
+        return;
       }
-    } catch (error) {
-      console.error('Error parsing JSON:', error);
-      res.status(500).send('Internal server error');
-    }
-  });
+
+      try {
+        // Parse the JSON data
+        const jsonData = JSON.parse(data);
+
+        let studentDataIDUnencrypted = decryptSessionID(dataID);
+        // Find the student object with the matching data_id
+        const student = jsonData.find(item => item.data_id === studentDataIDUnencrypted);
+
+        if (student) {
+          // Get the contents of "hasAccessTo"
+          const hasAccessTo = student.hasAccessTo;
+          // Send the student access data as the response
+          res.send({ hasAccessTo });
+        } else {
+          // Handle the case when the student with the specified data_id is not found
+          res.status(404).send({ 'Error': 'Student not found' });
+        }
+      } catch (error) {
+        console.error('Error parsing JSON:', error);
+        res.status(500).send('Internal server error');
+      }
+    });
+  } catch (err) {
+    res.send({ error: err.message });
+  }
 });
 
 //Data ID and Session ID Identification, Encryption, and Decryption
@@ -282,46 +279,50 @@ app.post('/getData', (req, res) => {
 
 //Checks if User is Logged In
 app.post('/checkLoggedIn', (req, res) => {
-  let loggedIn;
+  try {
+    let loggedIn;
 
-  let data = req.body.DataID;
+    let data = req.body.DataID;
 
-  if (data == null) {
-    loggedIn = false;
-    res.sendStatus(401);
-  } else if (data != null) {
-    let fileData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
-    let jsonArray = JSON.parse(fileData);
-
-    let unencryptedData = decryptSessionID(data);
-
-    let dataNumber = 0;
-    for (let i = 0; i < jsonArray.length; i++) {
-      if (jsonArray[i].data_id == unencryptedData) {
-        dataNumber = i;
-      } else if (jsonArray[i].data_id != unencryptedData) {
-        loggedIn = false;
-      }
-    }
-
-    const expiraryDate = new Date(jsonArray[dataNumber].unchangeableSettings.dayToLogOut.toString())
-
-    const currentDate = new Date()
-
-    if (expiraryDate < currentDate) {
+    if (data == null) {
       loggedIn = false;
       res.sendStatus(401);
-      jsonArray[dataNumber].unchangeableSettings.isLoggedin = false;
-      writeUserDataToFile(jsonArray[dataNumber], "./src/studentinformation/studentinformation.json");
-    } else if (!expiraryDate < currentDate) {
-      if (jsonArray[dataNumber].unchangeableSettings.isLoggedin == true) {
-        loggedIn = true;
-        res.sendStatus(200);
-      } else {
+    } else if (data != null) {
+      let fileData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
+      let jsonArray = JSON.parse(fileData);
+
+      let unencryptedData = decryptSessionID(data);
+
+      let dataNumber = 0;
+      for (let i = 0; i < jsonArray.length; i++) {
+        if (jsonArray[i].data_id == unencryptedData) {
+          dataNumber = i;
+        } else if (jsonArray[i].data_id != unencryptedData) {
+          loggedIn = false;
+        }
+      }
+
+      const expiraryDate = new Date(jsonArray[dataNumber].unchangeableSettings.dayToLogOut.toString())
+
+      const currentDate = new Date()
+
+      if (expiraryDate < currentDate) {
         loggedIn = false;
         res.sendStatus(401);
+        jsonArray[dataNumber].unchangeableSettings.isLoggedin = false;
+        writeUserDataToFile(jsonArray[dataNumber], "./src/studentinformation/studentinformation.json");
+      } else if (!expiraryDate < currentDate) {
+        if (jsonArray[dataNumber].unchangeableSettings.isLoggedin == true) {
+          loggedIn = true;
+          res.sendStatus(200);
+        } else {
+          loggedIn = false;
+          res.sendStatus(401);
+        }
       }
     }
+  } catch (err) {
+    res.send({ error: 'Invalid data' }); // Handle the case when the data is invalid
   }
 });
 
@@ -337,7 +338,7 @@ app.get('/api/GetMain', (req, res) => {
       res.redirect('/User/Authentication/Log-In');
     }
   } catch (err) {
-    res.send({ error: 'Invalid data' }); // Handle the case when the data is invalid
+    res.send({ error: err.message }); // Handle the case when the data is invalid
   }
 });
 
@@ -470,28 +471,28 @@ app.get('/auth/google/callback',
             "email": userProfile.emails[0].value,
             "profilePicture": userProfile.photos[0].value,
             "hd": userProfile._json.hd,
-            "hasAccessTo": {
-              "CSD": {
-                "hasAccess": false,
-                "Assignments": {}
+            "hasAccessTo": [
+              {
+                "name": "CSD",
+                "hasAccess": false
               },
-              "CSP": {
-                "hasAccess": false,
-                "Assignments": {}
+              {
+                "name": "CSP",
+                "hasAccess": false
               },
-              "CSA": {
-                "hasAccess": false,
-                "Assignments": {}
+              {
+                "name": "CSA",
+                "hasAccess": false
               },
-              "MobileWebDev": {
-                "hasAccess": false,
-                "Assignments": {}
+              {
+                "name": "MobileAppDev",
+                "hasAccess": false
               },
-              "AdminPanel": {
-                "hasAccess": false,
-                "Assignments": {}
+              {
+                "name": "AdminPanel",
+                "hasAccess": false
               }
-            },
+            ],
             "unchangeableSettings": {
               isLoggedin: true,
               latestTimeLoggedIn: currentDate,
@@ -515,28 +516,28 @@ app.get('/auth/google/callback',
             "email": jsonArray[numberFound].email,
             "profilePicture": jsonArray[numberFound].profilePicture,
             "hd": jsonArray[numberFound].hd,
-            "hasAccessTo": {
-              "CSD": {
-                "hasAccess": jsonArray[numberFound].hasAccessTo.CSD.hasAccess,
-                "Assignments": jsonArray[numberFound].hasAccessTo.CSD.Assignments
+            "hasAccessTo": [
+              {
+                "name": "CSD",
+                "hasAccess": jsonArray[numberFound].hasAccessTo[0].hasAccess
               },
-              "CSP": {
-                "hasAccess": jsonArray[numberFound].hasAccessTo.CSP.hasAccess,
-                "Assignments": jsonArray[numberFound].hasAccessTo.CSP.Assignments
+              {
+                "name": "CSP",
+                "hasAccess": jsonArray[numberFound].hasAccessTo[1].hasAccess
               },
-              "CSA": {
-                "hasAccess": jsonArray[numberFound].hasAccessTo.CSA.hasAccess,
-                "Assignments": jsonArray[numberFound].hasAccessTo.CSA.Assignments
+              {
+                "name": "CSA",
+                "hasAccess": jsonArray[numberFound].hasAccessTo[2].hasAccess
               },
-              "MobileWebDev": {
-                "hasAccess": jsonArray[numberFound].hasAccessTo.MobileWebDev.hasAccess,
-                "Assignments": jsonArray[numberFound].hasAccessTo.MobileWebDev.Assignments
+              {
+                "name": "MobileAppDev",
+                "hasAccess": jsonArray[numberFound].hasAccessTo[3].hasAccess
               },
-              "AdminPanel": {
-                "hasAccess": jsonArray[numberFound].hasAccessTo.AdminPanel.hasAccess,
-                "Assignments": jsonArray[numberFound].hasAccessTo.AdminPanel.Assignments
+              {
+                "name": "AdminPanel",
+                "hasAccess": jsonArray[numberFound].hasAccessTo[4].hasAccess
               }
-            },
+            ],
             "unchangeableSettings": {
               isLoggedin: true,
               latestTimeLoggedIn: currentDate,
@@ -576,28 +577,28 @@ app.get('/auth/google/callback',
             "email": userProfile.emails[0].value,
             "profilePicture": userProfile.photos[0].value,
             "hd": userProfile._json.hd,
-            "hasAccessTo": {
-              "CSD": {
-                "hasAccess": false,
-                "Assignments": {}
+            "hasAccessTo": [
+              {
+                "name": "CSD",
+                "hasAccess": true
               },
-              "CSP": {
-                "hasAccess": false,
-                "Assignments": {}
+              {
+                "name": "CSP",
+                "hasAccess": true
               },
-              "CSA": {
-                "hasAccess": false,
-                "Assignments": {}
+              {
+                "name": "CSA",
+                "hasAccess": true
               },
-              "MobileWebDev": {
-                "hasAccess": false,
-                "Assignments": {}
+              {
+                "name": "MobileAppDev",
+                "hasAccess": true
               },
-              "AdminPanel": {
-                "hasAccess": false,
-                "Assignments": {}
+              {
+                "name": "AdminPanel",
+                "hasAccess": true
               }
-            },
+            ],
             "unchangeableSettings": {
               isLoggedin: true,
               latestTimeLoggedIn: currentDate,

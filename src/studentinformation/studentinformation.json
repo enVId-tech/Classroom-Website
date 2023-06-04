@@ -6,37 +6,37 @@
     "email": "1071039@student.auhsd.us",
     "profilePicture": "https://lh3.googleusercontent.com/a/AAcHTtcnGDgbPNcDTK38ue9aN6Fb2CDx9ib0S0hjj9gt=s96-c",
     "hd": "student.auhsd.us",
-    "hasAccessTo": {
-      "CSD": {
-        "hasAccess": true,
-        "Assignments": {}
+    "hasAccessTo": [
+      {
+        "name": "CSD",
+        "hasAccess": true
       },
-      "CSP": {
-        "hasAccess": true,
-        "Assignments": {}
+      {
+        "name": "CSP",
+        "hasAccess": true
       },
-      "CSA": {
-        "hasAccess": true,
-        "Assignments": {}
+      {
+        "name": "CSA",
+        "hasAccess": true
       },
-      "MobileWebDev": {
-        "hasAccess": true,
-        "Assignments": {}
+      {
+        "name": "MobileAppDev",
+        "hasAccess": true
       },
-      "AdminPanel": {
-        "hasAccess": true,
-        "Assignments": {}
+      {
+        "name": "AdminPanel",
+        "hasAccess": true
       }
-    },
+    ],
     "unchangeableSettings": {
       "isLoggedin": true,
-      "latestTimeLoggedIn": "Sat Jun 03 2023 13:08:04",
-      "dayToLogOut": "Sat Jun 10 2023 13:08:04",
+      "latestTimeLoggedIn": "Sat Jun 03 2023 21:51:24",
+      "dayToLogOut": "Sat Jun 10 2023 21:51:24",
       "isStudent": true,
       "isStaff": false,
       "latestIPAddress": "VAf@*!)|}:VAf@*!)|}:NF(@#&:;><",
       "isLockedOut": false
     },
-    "data_id": "6179989795161116645335782097605667864530855995255916814103367242"
+    "data_id": "8360789630944993904903661950178336983297435627345059179430216413"
   }
 ]
