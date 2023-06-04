@@ -34,7 +34,7 @@ var tempDataID;
 var loggedIn = true; // Keep this at false for testing, real use keep false
 
 //Console Commands
-app.post('/console', function (req, res) {
+app.post('/console', (req, res) => {
   try {
     const input = req.body.input;
     const commandprocess = processCommand(input);
@@ -45,7 +45,7 @@ app.post('/console', function (req, res) {
 });
 
 //Get sidebar data
-app.post('/sidebarget', function (req, res) {
+app.post('/sidebarget', (req, res) => {
   try {
     const data = req.body;
     const dataID = decryptSessionID(data.dataID);
@@ -74,8 +74,29 @@ app.post('/sidebarget', function (req, res) {
   }
 });
 
+app.post('/announcements/get', (req, res) => {
+  try {
+    // Retrieve the JSON data from the request body
+    let data = req.body;
+
+    // Read the existing JSON data from the file
+    let jsonData = fs.readFileSync("./src/studentinformation/announcements.json", 'utf8');
+    let jsonArray = JSON.parse(jsonData);
+
+    for (let i = 0; i < jsonArray.length; i++) {
+
+      if (jsonArray[i].url == data.url) {
+        res.send(jsonArray[i]);
+        break;
+      }
+    }
+  } catch (err) {
+    res.send({ error: err.message });
+  }
+});
+
 //Writing Learning Log to File
-app.post('/submitlearninglog', function (req, res) {
+app.post('/submitlearninglog', (req, res) => {
   try {
     const data = req.body;
     const dataID = decryptSessionID(data.dataID);
@@ -162,7 +183,7 @@ app.post('/submitlearninglog', function (req, res) {
 });
 
 //Logout
-app.post('/logout', function (req, res) {
+app.post('/logout', (req, res) => {
   try {
     // Read existing JSON data from the file
     let dataID = decryptSessionID(req.body.dataID);
@@ -417,7 +438,7 @@ app.get('/auth/google',
 
 app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/error' }),
-  function (req, res) {
+  (req, res) => {
     // Checks if the user is using an auhsd email
     if (userProfile._json.hd == "student.auhsd.us" || userProfile._json.hd == "auhsd.us") {
       let JSONdata;
