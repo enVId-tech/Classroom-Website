@@ -42,30 +42,39 @@ document.addEventListener("DOMContentLoaded", function () {
         dayElement.classList.add('current-day');
       }
 
-      // Add click event listener to each day element
-      dayElement.addEventListener('click', function () {
-        // Remove any existing expanded containers
-        var expandedContainers = document.querySelectorAll('.expanded');
-        expandedContainers.forEach(function (container) {
-          container.parentNode.removeChild(container);
-        });
+      // Check if the day is a weekend (Saturday or Sunday)
+      var dayOfWeek = new Date(date.getFullYear(), date.getMonth(), j).getDay();
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        dayElement.style.display = 'none'; // Hide weekends
+      }
 
-        // Create the expanded container
-        var expandedContainer = document.createElement('div');
-        expandedContainer.classList.add('expanded');
-        
-        // Create the day's details element
-        var detailsElement = document.createElement('div');
-        detailsElement.classList.add('details');
-        detailsElement.textContent = 'Details for day ' + this.textContent;
-        expandedContainer.appendChild(detailsElement);
+      // Add an editable pencil icon to the day element
+      var pencilIcon = document.createElement('i');
+      pencilIcon.classList.add('fas', 'fa-pencil-alt', 'edit-icon');
+      dayElement.appendChild(pencilIcon);
 
-        // Append expanded container to the day element's parent
-        this.parentNode.appendChild(expandedContainer);
+      // Add click event listener to the pencil icon
+      pencilIcon.addEventListener('click', function () {
+        var detailsElement = this.nextElementSibling;
+        var content = prompt('Enter your content:', detailsElement.textContent);
+        if (content !== null) {
+          detailsElement.textContent = content;
+          // Send the updated content to the server for saving
+          saveContentToServer(content);
+        }
       });
+
+      // Create the day's details element
+      var detailsElement = document.createElement('div');
+      detailsElement.classList.add('details');
+      detailsElement.textContent = 'Details for day ' + j;
+      dayElement.appendChild(detailsElement);
 
       daysContainer.appendChild(dayElement);
     }
+
+    // Sort the day elements by weekdays (Monday to Friday)
+    sortDaysByWeekday(daysContainer);
 
     monthElement.appendChild(daysContainer);
     sliderContent.appendChild(monthElement);
@@ -94,4 +103,47 @@ document.addEventListener("DOMContentLoaded", function () {
   // Set the first tab and month as active
   tabs[0].classList.add('active');
   months[0].classList.add('active');
+
+  // Function to save content to the server
+  function saveContentToServer(content) {
+    // Make an AJAX request or use fetch to send the content to the server
+    // Replace the URL below with your server endpoint
+    var url = '/agenda/write';
+    let filePath = window.location.pathname.split('/')[2];
+    var data = { content: content, filePath }; // Adjust the data format as per your server requirements
+
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then(function (response) {
+        if (response.ok) {
+          console.log('Content saved successfully');
+        } else {
+          console.error('Failed to save content');
+        }
+      })
+      .catch(function (error) {
+        console.error('Error:', error);
+      });
+  }
+
+  // Function to sort the day elements by weekdays (Monday to Friday)
+  function sortDaysByWeekday(daysContainer) {
+    var days = Array.from(daysContainer.children);
+    days.sort(function (a, b) {
+      var dayOfWeekA = new Date().toLocaleDateString('en-US', { weekday: 'long' }, { day: 'numeric' });
+      var dayOfWeekB = new Date().toLocaleDateString('en-US', { weekday: 'long' }, { day: 'numeric' });
+
+      var weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+      return weekdays.indexOf(dayOfWeekA) - weekdays.indexOf(dayOfWeekB);
+    });
+
+    days.forEach(function (day) {
+      daysContainer.appendChild(day);
+    });
+  }
 });

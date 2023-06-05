@@ -1,0 +1,30 @@
+[
+    {
+        "Class": "CSD",
+        "url": "/Classes/CSD/Agenda/",
+        "Calendar": [
+            
+        ]
+    },
+    {
+        "Class": "CSP",
+        "url": "/Classes/CSP/Agenda/",
+        "Calendar": [
+
+        ]
+    },
+    {
+        "Class": "CSA",
+        "url": "/Classes/CSA/Agenda/",
+        "Calendar": [
+
+        ]
+    },
+    {
+        "Class": "MAD",
+        "url": "/Classes/MAD/Agenda/",
+        "Calendar": [
+
+        ]
+    }
+]

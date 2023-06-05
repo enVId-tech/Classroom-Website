@@ -5,26 +5,16 @@
     "Period": "Period 8",
     "Assignment": {
       "LearningLog": {
-        "LearningLog": 5,
+        "LearningLog": 2,
         "LearningLog 0": {
           "text": "Today we died.",
           "date": "EXAMPLE: 5-28-2023, Overdue",
           "timeSubmitted": "6/3/2023, 12:31:37 PM"
         },
         "LearningLog 1": {
-          "text": "Today we died.",
+          "text": "Today we died in CSA.",
           "date": "EXAMPLE: 5-28-2023, Overdue",
           "timeSubmitted": "6/3/2023, 12:31:43 PM"
-        },
-        "LearningLog 3": {
-          "text": "fgfdgsd",
-          "date": "EXAMPLE: 5-28-2023, Overdue",
-          "timeSubmitted": "6/3/2023, 4:35:51 PM"
-        },
-        "LearningLog 4": {
-          "text": "fgfdgsde",
-          "date": "EXAMPLE: 5-28-2023, Overdue",
-          "timeSubmitted": "6/3/2023, 4:36:02 PM"
         }
       }
     },

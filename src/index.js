@@ -5,7 +5,6 @@ const app = express();
 const session = require('express-session');
 const passport = require('passport');
 const _ = require('lodash');
-const crypto = require('crypto');
 const { saveAnnouncement, processCommand } = require('./modules/consolecommands.js');
 const { writeUserDataToFile, generateRandomNumber, encryptSessionID, decryptSessionID, encryptIP } = require('./modules/StudentInformation.js');
 
@@ -32,6 +31,21 @@ app.listen(port, () => console.log('App listening on port ' + 3000));
 var userProfile;
 var tempDataID;
 var loggedIn = true; // Keep this at false for testing, real use keep false
+
+app.post('/agenda/write', (req, res) => {
+  const content = req.body;
+  
+  let agendaData = fs.readFileSync('./src/studentinformation/agenda.json', 'utf8');
+  let agendaJSON = JSON.parse(agendaData);
+
+  for (let i = 0; i < agendaJSON.length; i++) {
+    if (agendaJSON[i].filePath == content.filePath) {
+      agendaJSON[i].content = content.content;
+    }
+  }
+
+  res.send(content);
+});
 
 //Console Commands
 app.post('/console', (req, res) => {
