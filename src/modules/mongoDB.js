@@ -41,7 +41,7 @@ async function writeToDatabase(data, collectionName) {
     } finally {
         if (client) {
             await client.close();
-        
+        }
     }
 }
 
