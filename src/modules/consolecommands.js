@@ -38,4 +38,7 @@ function processCommand(input) {
   }
 }
 
-module.exports = { saveAnnouncement, processCommand };
+export { 
+  saveAnnouncement, 
+  processCommand 
+};

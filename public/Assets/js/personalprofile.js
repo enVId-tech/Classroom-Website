@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
         await fetch('/getData', getData)
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 userData = data;
             });
     }

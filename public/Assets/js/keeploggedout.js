@@ -39,7 +39,7 @@ window.onload = function () {
     fetch('/checkLoggedIn', checkLoggedIndata)
         .then(function (response) {
             if (!response.status == 200) {
-                window.location.href = "/User/Authentication/Log-In";
+                //window.location.href = "/User/Authentication/Log-In";
             }
         });
 }

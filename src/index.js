@@ -1,19 +1,21 @@
-//Libraries
-const fs = require('fs');
-const express = require('express');
+// Libraries
+import fs from 'fs';
+import express, { json } from 'express';
 const app = express();
-const session = require('express-session');
-const passport = require('passport');
-const _ = require('lodash');
-const { saveAnnouncement, processCommand } = require('./modules/consolecommands.js');
-const { writeUserDataToFile, generateRandomNumber, encryptSessionID, decryptSessionID, encryptIP } = require('./modules/StudentInformation.js');
+import session from 'express-session';
+import passport from 'passport';
+import _ from 'lodash';
+import { processCommand } from './modules/consolecommands.js';
+import { generateRandomNumber, encryptSessionID, decryptSessionID, encryptIP } from './modules/encryption.js';
+import { writeToDatabase, modifyInDatabase, getItemsFromDatabase } from './modules/mongoDB.js';
 
 // Library Initialization
 app.use(express.json());
 app.set('trust proxy', true);
 
 //Credentials
-require('dotenv').config({ path: './src/credentials.env' });
+import dotenv from 'dotenv';
+dotenv.config({ path: './src/credentials.env' });
 
 //Website Pages Setup //DO NOT REMOVE THIS
 app.use(express.static('public'));
@@ -32,15 +34,43 @@ var userProfile;
 var tempDataID;
 var loggedIn = true; // Keep this at false for testing, real use keep false
 
+//Agenda Write Permissions
+app.post('/agenda/permission', (req, res) => {
+  let dataID = decryptSessionID(req.body.dataID);
+
+  //let existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
+  let existingJSON = getItemsFromDatabase("students", dataID);
+
+  console.log("/agenda/permission: " + existingJSON);
+
+  let findData;
+
+  for (let i = 0; i < existingJSON.length; i++) {
+    if (existingJSON[i].dataIDNum == dataID) {
+      findData = existingJSON[i];
+      break;
+    }
+  }
+
+  if (findData.isStaff == true) {
+    res.send({ hasPermission: true });
+  } else {
+    res.send({ hasPermission: false });
+  }
+});
+
+//Write to agenda
 app.post('/agenda/write', (req, res) => {
   const content = req.body;
-  
-  let agendaData = fs.readFileSync('./src/studentinformation/agenda.json', 'utf8');
-  let agendaJSON = JSON.parse(agendaData);
+
+  let agendaJSON = getItemsFromDatabase("agenda");
+
+  console.log("/agenda/write: " + agendaJSON);
 
   for (let i = 0; i < agendaJSON.length; i++) {
     if (agendaJSON[i].filePath == content.filePath) {
       agendaJSON[i].content = content.content;
+      break;
     }
   }
 
@@ -59,34 +89,41 @@ app.post('/console', (req, res) => {
 });
 
 //Get sidebar data
-app.post('/sidebarget', (req, res) => {
+app.post('/sidebarget', async function (req, res) {
   try {
     const data = req.body;
     const dataID = decryptSessionID(data.dataID);
-    const existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
+    let existingJSON;
 
-    const existingJSON = JSON.parse(existingData);
-    let findData;
+    console.log("Before getItemsFromDatabase");
+    existingJSON = await getItemsFromDatabase("students", dataID);
+    console.log("After getItemsFromDatabase");
+    console.log("existingJSON:", existingJSON);
 
-    for (let i = 0; i < existingJSON.length; i++) {
-      if (existingJSON[i].data_id == dataID) {
-        findData = existingJSON[i];
-        break;
-      }
-    }
+    console.log("Here 3");
 
-    const sidebarData = fs.readFileSync('./src/studentinformation/classesavailable.json', 'utf8');
-    const sidebarJSON = JSON.parse(sidebarData);
+    const sidebarJSON = await getItemsFromDatabase("classesavailable");
 
-    if (findData && sidebarJSON) {
-      res.send({ hasAccessTo: findData.hasAccessTo, sidebarJSON });
+    console.log("Here 1");
+    const parsedData = JSON.parse(existingJSON);
+    console.log(parsedData);
+    console.log(sidebarJSON);
+    console.log("Here 2");
+
+    let hasAccessTo = parsedData[0].hasAccessTo;
+    let studentData = JSON.stringify(hasAccessTo);
+
+    if (hasAccessTo && sidebarJSON) {
+      res.send({ studentData, sidebarJSON });
     } else {
-      res.send({ error: "Error" });
+      res.send({ error: "User not found" });
     }
   } catch (err) {
     res.send({ error: err.message });
   }
 });
+
+
 
 app.post('/announcements/get', (req, res) => {
   try {
@@ -94,8 +131,7 @@ app.post('/announcements/get', (req, res) => {
     let data = req.body;
 
     // Read the existing JSON data from the file
-    let jsonData = fs.readFileSync("./src/studentinformation/announcements.json", 'utf8');
-    let jsonArray = JSON.parse(jsonData);
+    let jsonArray = getItemsFromDatabase("announcements");
 
     for (let i = 0; i < jsonArray.length; i++) {
 
@@ -114,13 +150,13 @@ app.post('/submitlearninglog', (req, res) => {
   try {
     const data = req.body;
     const dataID = decryptSessionID(data.dataID);
-    const existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
+    const existingJSON = getItemsFromDatabase("students", dataID);
 
-    const existingJSON = JSON.parse(existingData);
+    //    const existingJSON = JSON.parse(existingData);
     let findData;
 
     for (let i = 0; i < existingJSON.length; i++) {
-      if (existingJSON[i].data_id == dataID) {
+      if (existingJSON[i].dataIDNum == dataID) {
         findData = existingJSON[i];
         break;
       }
@@ -129,13 +165,16 @@ app.post('/submitlearninglog', (req, res) => {
     if (findData == null || findData == undefined || findData == "" || findData == "null" || findData == "undefined") {
       res.send({ error: "User not found" });
     } else {
-      let StudentLearningLogData = fs.readFileSync('./src/studentinformation/assignmentslist.json', 'utf8');
-      let StudentLearningLogJSON
-      if (!StudentLearningLogData == "") {
+      let StudentLearningLogJSON = getItemsFromDatabase("assignmentslist");
+
+      console.log("/submitlearninglog: " + StudentLearningLogJSON);
+
+      //let StudentLearningLogJSON
+      /*if (!StudentLearningLogData == "") {
         StudentLearningLogJSON = JSON.parse(StudentLearningLogData);
       } else {
         StudentLearningLogJSON = [];
-      }
+      }*/
 
       let findStudent;
 
@@ -164,7 +203,7 @@ app.post('/submitlearninglog', (req, res) => {
             }
           },
           "Class": data.Class,
-          "data_id": dataID,
+          "dataIDNum": dataID,
         }
 
         const tagName = "LearningLog " + modifiedData.Assignment.LearningLog.LearningLog.toString();
@@ -202,24 +241,26 @@ app.post('/logout', (req, res) => {
     // Read existing JSON data from the file
     let dataID = decryptSessionID(req.body.dataID);
 
-    let existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
-    let existingJSON = JSON.parse(existingData);
+    let existingJSON = getItemsFromDatabase("students", dataID);
+
+    console.log("/logout: " + existingJSON);
 
     let findData;
 
-    for (let i = 0; i < existingJSON.length; i++) {
-      if (existingJSON[i].data_id == dataID) {
-        findData = existingJSON[i];
-        let modifiedData = findData;
-        modifiedData.unchangeableSettings.isLoggedin = false;
-        modifiedData.unchangeableSettings.latestTimeLoggedIn = "null";
-        modifiedData.unchangeableSettings.dayToLogOut = "null";
-        modifiedData.data_id = "null";
+    if (existingJSON[i].dataIDNum == dataID) {
+      findData = existingJSON[i];
+      let modifiedData = findData;
+      modifiedData.unchangeableSettings.isLoggedin = false;
+      modifiedData.unchangeableSettings.latestTimeLoggedIn = "null";
+      modifiedData.unchangeableSettings.dayToLogOut = "null";
+      modifiedData.dataIDNum = "null";
 
-        let userData = writeUserDataToFile(modifiedData, "./src/studentinformation/studentinformation.json");
-        if (userData == "Success") {
-          res.redirect('/User/Authentication/Log-Out');
-        }
+      let userData = modifyInDatabase(findData, modifiedData, "students");
+
+      if (userData == "Success") {
+        res.redirect('/User/Authentication/Log-Out');
+      } else {
+        res.send({ error: "Error" });
       }
     }
   } catch (err) {
@@ -234,46 +275,43 @@ app.post('/getstudentaccess', (req, res) => {
   try {
     // Read the JSON file
     const dataID = req.body.dataID;
-    fs.readFile('./src/studentinformation/studentinformation.json', 'utf8', (err, data) => {
-      if (err) {
-        console.error('Error reading the file:', err);
-        return;
+
+    let jsonData = getItemsFromDatabase("students");
+
+    console.log("/getstudentaccess: " + jsonData);
+
+    if (err) {
+      console.error('Error reading the file:', err);
+      return;
+    }
+
+    try {
+      let studentDataIDUnencrypted = decryptSessionID(dataID);
+      // Find the student object with the matching dataIDNum
+      const student = jsonData.find(item => item.dataIDNum === studentDataIDUnencrypted);
+
+      if (student) {
+        // Get the contents of "hasAccessTo"
+        const hasAccessTo = student.hasAccessTo;
+        // Send the student access data as the response
+        res.send({ hasAccessTo });
+      } else {
+        // Handle the case when the student with the specified dataIDNum is not found
+        res.status(404).send({ 'Error': 'Student not found' });
       }
-
-      try {
-        // Parse the JSON data
-        const jsonData = JSON.parse(data);
-
-        let studentDataIDUnencrypted = decryptSessionID(dataID);
-        // Find the student object with the matching data_id
-        const student = jsonData.find(item => item.data_id === studentDataIDUnencrypted);
-
-        if (student) {
-          // Get the contents of "hasAccessTo"
-          const hasAccessTo = student.hasAccessTo;
-          // Send the student access data as the response
-          res.send({ hasAccessTo });
-        } else {
-          // Handle the case when the student with the specified data_id is not found
-          res.status(404).send({ 'Error': 'Student not found' });
-        }
-      } catch (error) {
-        console.error('Error parsing JSON:', error);
-        res.status(500).send('Internal server error');
-      }
-    });
+    } catch (error) {
+      console.error('Error parsing JSON:', error);
+      res.status(500).send('Internal server error');
+    }
   } catch (err) {
     res.send({ error: err.message });
   }
 });
 
-//Data ID and Session ID Identification, Encryption, and Decryption
-
-
-
-//Decrypts Encrypted Session ID and Retrieves Data
-app.post('/getData', (req, res) => {
+app.post('/getData', async function (req, res) {
   try {
+
+    console.log("/getData 1: " + req.body.dataID)
 
     userProfile = "";
 
@@ -281,29 +319,24 @@ app.post('/getData', (req, res) => {
     let encryptedKey = req.body.dataID;
     let decryptedKey = decryptSessionID(encryptedKey);
 
-    function retrieveDataFromFile() {
-      // Read existing JSON data from the file
-      let existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
-      // Parse the JSON data into a JavaScript array
-      let jsonArray = JSON.parse(existingData);
+    // Iterate over the array to find the matching data based on the decrypted ID
+    let jsonArray = await getItemsFromDatabase("students", decryptedKey);
 
-      // Iterate over the array to find the matching data based on the decrypted ID
-      for (let i = 0; i < jsonArray.length; i++) {
-        let data = jsonArray[i];
+    await getItemsFromDatabase("students", decryptedKey).then((data) => {
+      jsonArray = data;
+    });
+    
+    // Parse the JSON string into an array of objects
+    const data = JSON.parse(jsonArray);
+    
+    // Iterate over the array and remove the "dataIDNum" property
+    data.forEach(obj => delete obj.dataIDNum);
 
-        // Assuming the decrypted ID matches the 'session_id' property
-        if (data.data_id == decryptedKey) {
-          return data; // Return the matching data
-        }
-      }
-    }
+    // Convert the updated array back into a JSON string
+    const updatedJsonString = JSON.stringify(data[0]);
 
-    // Retrieve the data based on the decrypted ID
-    let retrievedData = retrieveDataFromFile();
-    const modifiedObject = _.omit(retrievedData, 'data_id');
-
-    if (modifiedObject) {
-      res.send(modifiedObject); // Send the retrieved data as the response
+    if (updatedJsonString) {
+      res.send(updatedJsonString); // Send the retrieved data as the response
     } else {
       res.send({ error: 'Data not found' }); // Handle the case when no matching data is found
     }
@@ -323,16 +356,17 @@ app.post('/checkLoggedIn', (req, res) => {
       loggedIn = false;
       res.sendStatus(401);
     } else if (data != null) {
-      let fileData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
-      let jsonArray = JSON.parse(fileData);
+      jsonArray = getDataByDataId(data, "students");
+
+      console.log("/checkLoggedIn: " + jsonArray);
 
       let unencryptedData = decryptSessionID(data);
 
       let dataNumber = 0;
       for (let i = 0; i < jsonArray.length; i++) {
-        if (jsonArray[i].data_id == unencryptedData) {
+        if (jsonArray[i].dataIDNum == unencryptedData) {
           dataNumber = i;
-        } else if (jsonArray[i].data_id != unencryptedData) {
+        } else if (jsonArray[i].dataIDNum != unencryptedData) {
           loggedIn = false;
         }
       }
@@ -345,7 +379,7 @@ app.post('/checkLoggedIn', (req, res) => {
         loggedIn = false;
         res.sendStatus(401);
         jsonArray[dataNumber].unchangeableSettings.isLoggedin = false;
-        writeUserDataToFile(jsonArray[dataNumber], "./src/studentinformation/studentinformation.json");
+        writeToDatabase(jsonArray[dataNumber], "students");
       } else if (!expiraryDate < currentDate) {
         if (jsonArray[dataNumber].unchangeableSettings.isLoggedin == true) {
           loggedIn = true;
@@ -396,7 +430,7 @@ passport.deserializeUser(function (obj, cb) {
 
 
 //Google Authentication Page
-const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth';
 
 // Google OAuth Credentials
 const GOOGLE_CLIENT_ID = process.env.CLIENT_ID;
@@ -419,8 +453,9 @@ app.post('/announcements', (req, res) => {
   let data = req.body;
 
   // Read the existing JSON data from the file
-  let jsonData = fs.readFileSync("/src/studentinformation/announcements.json", 'utf8');
-  let jsonArray = JSON.parse(jsonData);
+  let jsonArray = getItemsFromDatabase("announcements");
+
+  console.log("/announcements: " + jsonArray);
 
   // Iterate through each object in the array
   for (let i = 0; i < jsonArray.length; i++) {
@@ -452,7 +487,7 @@ app.get('/auth/google',
 
 app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/error' }),
-  (req, res) => {
+  async function (req, res) {
     // Checks if the user is using an auhsd email
     if (userProfile._json.hd == "student.auhsd.us" || userProfile._json.hd == "auhsd.us") {
       let JSONdata;
@@ -473,17 +508,31 @@ app.get('/auth/google/callback',
         // Convert the updated date to a formatted string
         let updatedDate = newDate.toString().slice(0, 24);
 
-        let fileData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
-        let jsonArray = JSON.parse(fileData);
+        let fileData = null;
+
+        await getItemsFromDatabase("students").then((data) => {
+          fileData = JSON.parse(data); // Parse the JSON string to an object
+        });
 
         let numberFound = null;
-        for (let i = 0; i < jsonArray.length; i++) {
-          if (jsonArray[i].email == userProfile.emails[0].value) {
-            numberFound = i;
+        if (fileData !== null) {
+          for (let i = 0; i < fileData.length; i++) {
+            if (fileData[i].email === userProfile.emails[0].value) {
+              numberFound = i;
+              break; // Exit the loop if a match is found
+            }
           }
         }
 
+        console.log("Number Found: " + numberFound);
+
+        let jsonArray = JSON.stringify(fileData);
+        jsonArray = JSON.parse(jsonArray);
+        console.log("JSON Array: " + jsonArray);
+
+        console.log("JSON Array Num:" + jsonArray[numberFound].hasAccessTo[0].hasAccess);
         if (numberFound == null) {
+
           // Create a Date object for the current date
           let newDate = new Date();
 
@@ -529,19 +578,19 @@ app.get('/auth/google/callback',
               }
             ],
             "unchangeableSettings": {
-              isLoggedin: true,
-              latestTimeLoggedIn: currentDate,
-              dayToLogOut: updatedDate,
-              isStudent: true,
-              isStaff: false,
-              latestIPAddress: encryptIP(req.socket.remoteAddress),
-              isLockedOut: false
+              "isLoggedin": true,
+              "latestTimeLoggedIn": currentDate,
+              "dayToLogOut": updatedDate,
+              "isStudent": true,
+              "isStaff": false,
+              "latestIPAddress": encryptIP(req.socket.remoteAddress),
+              "isLockedOut": false
             },
-            "data_id": randomNumber
+            "dataIDNum": randomNumber
           };
           tempDataID = randomNumber;
 
-          writeUserDataToFile(JSONdata, "./src/studentinformation/studentinformation.json");
+          writeToDatabase(JSONdata, "students").catch(console.error);;
 
         } else if (numberFound != null) {
           JSONdata = {
@@ -574,21 +623,21 @@ app.get('/auth/google/callback',
               }
             ],
             "unchangeableSettings": {
-              isLoggedin: true,
-              latestTimeLoggedIn: currentDate,
-              dayToLogOut: updatedDate,
-              isStudent: jsonArray[numberFound].unchangeableSettings.isStudent,
-              isStaff: jsonArray[numberFound].unchangeableSettings.isStaff,
-              latestIPAddress: encryptIP(req.socket.remoteAddress),
-              isLockedOut: jsonArray[numberFound].unchangeableSettings.isLockedOut
+              "isLoggedin": true,
+              "latestTimeLoggedIn": currentDate,
+              "dayToLogOut": updatedDate,
+              "isStudent": jsonArray[numberFound].unchangeableSettings.isStudent,
+              "isStaff": jsonArray[numberFound].unchangeableSettings.isStaff,
+              "latestIPAddress": encryptIP(req.socket.remoteAddress),
+              "isLockedOut": jsonArray[numberFound].unchangeableSettings.isLockedOut
             },
-            "data_id": randomNumber
-          }
+            "dataIDNum": randomNumber
+          };
+
 
           tempDataID = randomNumber;
 
-          writeUserDataToFile(JSONdata, "./src/studentinformation/studentinformation.json");
-
+          modifyInDatabase({ email: jsonArray[numberFound].email }, JSONdata, "students");
         } else if (userProfile._json.hd == "auhsd.us" || userProfile._json.hs == "frc4079.org" || userProfile._json.hd == "gmail.com") {
           // Create a Date object for the current date
           let newDate = new Date();
@@ -635,19 +684,19 @@ app.get('/auth/google/callback',
               }
             ],
             "unchangeableSettings": {
-              isLoggedin: true,
-              latestTimeLoggedIn: currentDate,
-              dayToLogOut: updatedDate,
-              isStudent: false,
-              isStaff: true,
-              latestIPAddress: encryptIP(req.socket.remoteAddress),
-              isLockedOut: false
+              "isLoggedin": true,
+              "latestTimeLoggedIn": currentDate,
+              "dayToLogOut": updatedDate,
+              "isStudent": false,
+              "isStaff": true,
+              "latestIPAddress": encryptIP(req.socket.remoteAddress),
+              "isLockedOut": false
             },
-            "data_id": randomNumber,
+            "dataIDNum": randomNumber,
           };
           tempDataID = randomNumber;
         };
-        writeUserDataToFile(JSONdata, "./src/studentinformation/studentinformation.json");
+        writeToDatabase(JSONdata, "students").catch(console.error);;
 
         //console.log(tempDataID);
         loggedIn = true;

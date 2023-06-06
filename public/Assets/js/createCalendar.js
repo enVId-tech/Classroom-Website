@@ -34,8 +34,8 @@ document.addEventListener("DOMContentLoaded", function () {
       dayElement.textContent = j;
       dayElement.classList.add('day');
 
-      let theday = new Date(date.getFullYear(), date.getMonth(), j).toString().slice(0, 15);
-      let today = new Date().toString().slice(0, 15);
+      var theday = new Date(date.getFullYear(), date.getMonth(), j).toString().slice(0, 15);
+      var today = new Date().toString().slice(0, 15);
 
       // Add the "current-day" class to the appropriate day element
       if (theday === today) {
@@ -48,21 +48,33 @@ document.addEventListener("DOMContentLoaded", function () {
         dayElement.style.display = 'none'; // Hide weekends
       }
 
-      // Add an editable pencil icon to the day element
-      var pencilIcon = document.createElement('i');
-      pencilIcon.classList.add('fas', 'fa-pencil-alt', 'edit-icon');
-      dayElement.appendChild(pencilIcon);
+      // Create the weekday label
+      var weekdayLabel = document.createElement('div');
+      weekdayLabel.classList.add('weekday-label');
+      weekdayLabel.textContent = getWeekdayLabel(dayOfWeek);
 
-      // Add click event listener to the pencil icon
-      pencilIcon.addEventListener('click', function () {
-        var detailsElement = this.nextElementSibling;
-        var content = prompt('Enter your content:', detailsElement.textContent);
-        if (content !== null) {
-          detailsElement.textContent = content;
-          // Send the updated content to the server for saving
-          saveContentToServer(content);
-        }
-      });
+      dayElement.appendChild(weekdayLabel);
+
+      // Check if user has necessary permissions to access the pencil icon
+      var hasPermission = checkUserPermission(); // Implement the permission check on the server-side
+
+      if (hasPermission) {
+        // Add an editable pencil icon to the day element
+        var pencilIcon = document.createElement('i');
+        pencilIcon.classList.add('fas', 'fa-pencil-alt', 'edit-icon');
+        dayElement.appendChild(pencilIcon);
+
+        // Add click event listener to the pencil icon
+        pencilIcon.addEventListener('click', function () {
+          var detailsElement = this.nextElementSibling;
+          var content = prompt('Enter your content:', detailsElement.textContent);
+          if (content !== null) {
+            detailsElement.textContent = content;
+            // Send the updated content to the server for saving
+            saveContentToServer(content);
+          }
+        });
+      }
 
       // Create the day's details element
       var detailsElement = document.createElement('div');
@@ -72,9 +84,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
       daysContainer.appendChild(dayElement);
     }
-
-    // Sort the day elements by weekdays (Monday to Friday)
-    sortDaysByWeekday(daysContainer);
 
     monthElement.appendChild(daysContainer);
     sliderContent.appendChild(monthElement);
@@ -106,11 +115,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Function to save content to the server
   function saveContentToServer(content) {
-    // Make an AJAX request or use fetch to send the content to the server
-    // Replace the URL below with your server endpoint
+    // Make an AJAX request or use fetch to see content to the server
+    // Replace the URL below with your server int
     var url = '/agenda/write';
-    let filePath = window.location.pathname.split('/')[2];
-    var data = { content: content, filePath }; // Adjust the data format as per your server requirements
+    var data = { content: content }; // Adjustdata format as per your server requirements
 
     fetch(url, {
       method: 'POST',
@@ -131,19 +139,34 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
-  // Function to sort the day elements by weekdays (Monday to Friday)
-  function sortDaysByWeekday(daysContainer) {
-    var days = Array.from(daysContainer.children);
-    days.sort(function (a, b) {
-      var dayOfWeekA = new Date().toLocaleDateString('en-US', { weekday: 'long' }, { day: 'numeric' });
-      var dayOfWeekB = new Date().toLocaleDateString('en-US', { weekday: 'long' }, { day: 'numeric' });
+  // Function to get the weekday label based on the day of the week index
+  function getWeekdayLabel(dayOfWeek) {
+    var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    return days[dayOfWeek];
+  }
 
-      var weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-      return weekdays.indexOf(dayOfWeekA) - weekdays.indexOf(dayOfWeekB);
-    });
+  // Function to check user's permission (replace with server-side implementation)
+  async function checkUserPermission() {
+    // Implement the necessary permission check on the server-side and return the result
+    
+    let dataID = document.cookie.split("=")[1];
 
-    days.forEach(function (day) {
-      daysContainer.appendChild(day);
-    });
+    let data = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ dataID })
+    }
+
+    fetch('/agenda/permission', data)
+      .then(response => response.json())
+      .then(data => {
+        hasPermission = data.hasPermission;
+      })
+      .catch(function (error) {
+        console.error('Error:', error);
+      });
+    return hasPermission;
   }
 });

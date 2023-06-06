@@ -12,16 +12,18 @@ async function Elements() {
     fetch('/sidebarget', sidebarDataGet)
         .then(response => response.json())
         .then(data => {
-            sidebarElements(data);
+            const dataParsed = JSON.parse(data.data);
+            const sidebarParse = JSON.parse(data.sidebarJSON);
+            sidebarElements(dataParsed, sidebarParse);
         }
         );
 }
 
-function sidebarElements(data) {
+function sidebarElements(data, sidebarData) {
     let sidebar = document.getElementById("sidebardiv");
 
-    for (let i = 0; i < data.sidebarJSON.length; i++) {
-        if (data.hasAccessTo[i].hasAccess === true) {
+    for (let i = 0; i < data.length; i++) {
+        if (data[i].hasAccess === true) {
             if (sidebar) {
                 let sidebarItem = document.createElement("div");
                 sidebarItem.className = "sidebar-item";
@@ -30,25 +32,25 @@ function sidebarElements(data) {
                 let sidebarButton = document.createElement("button");
                 sidebarButton.className = "sidebar-label";
                 sidebarButton.onclick = function () {
-                    window.location.replace(data.sidebarJSON[i].link);
+                    window.location.replace(sidebarData[i].link);
                 };
 
-                sidebarButton.innerHTML = data.sidebarJSON[i].name;
+                sidebarButton.innerHTML = sidebarData[i].name;
                 sidebarItem.appendChild(sidebarButton);
 
                 let sidebarDropdown = document.createElement("div");
                 sidebarDropdown.className = "sidebar-dropdown";
                 sidebarItem.appendChild(sidebarDropdown);
 
-                if (data.sidebarJSON[i].Pages.length > 0) {
-                    for (let j = 0; j < data.sidebarJSON[i].Pages.length; j++) {
+                if (sidebarData[i].Pages.length > 0) {
+                    for (let j = 0; j < sidebarData[i].Pages.length; j++) {
 
                         let sidebarContent = document.createElement("button");
                         sidebarContent.className = "sidebar-item extras";
                         sidebarContent.onclick = function () {
-                            window.location.replace(data.sidebarJSON[i].Pages[j].link);
+                            window.location.replace(sidebarData[i].Pages[j].link);
                         };
-                        sidebarContent.innerHTML = data.sidebarJSON[i].Pages[j].name;
+                        sidebarContent.innerHTML = sidebarData[i].Pages[j].name;
                         sidebarDropdown.appendChild(sidebarContent);
                     }
                 } else {
