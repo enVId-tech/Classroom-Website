@@ -143,13 +143,73 @@ app.post('/announcements/get', (req, res) => {
 });
 
 //Writing Learning Log to File
-app.post('/submitlearninglog', (req, res) => {
+app.post('/submitlearninglog', async (req, res) => {
   try {
     const data = req.body;
     const dataID = decryptSessionID(data.dataID);
-    const existingJSON = getItemsFromDatabase("students", dataID);
+    const existingData = await getItemsFromDatabase("students", dataID);
+    const existingJSON = JSON.parse(existingData);
 
-    //    const existingJSON = JSON.parse(existingData);
+    if (existingJSON.length === 0) {
+      res.send({ error: 'User not found' });
+      return;
+    }
+
+    const StudentLearningLogJSON = await getItemsFromDatabase("assignmentslist");
+
+    console.log(StudentLearningLogJSON);
+
+    if (!StudentLearningLogJSON === 0) {
+      for (let i = 0; i < StudentLearningLogJSON.length; i++) {
+        if (StudentLearningLogJSON[i].Email === existingJSON[0].email) {
+          let findStudent = StudentLearningLogJSON[i];
+
+          let modifiedData = findStudent;
+
+          modifiedData.Assignment.LearningLog.LearningLog = modifiedData.Assignment.LearningLog.LearningLog + 1;
+          
+          const tagName = "LearningLog " + modifiedData.Assignment.LearningLog.LearningLog.toString();
+
+          const tagData = {
+            "text": data.text,
+            "date": data.date,
+            "timeSubmitted": new Date().toLocaleString().toString().slice(0, 24)
+          }
+          modifiedData.Assignment.LearningLog[tagName] = tagData;
+
+          await modifyInDatabase({ Email: existingJSON[0].email }, modifiedData, "assignmentslist");
+          break;
+        }
+      }
+    } else {
+
+      let data;
+
+      data = {
+        "Name": StudentLearningLogJSON.firstName + " " + StudentLearningLogJSON.lastName,
+        "Email": StudentLearningLogJSON.email,
+        "Period": data.period,
+        "Assignment": {
+          "LearningLog": {
+            "LearningLog": 0,
+          }
+        },
+        "Class": data.Class,
+        "dataIDNum": dataID,
+      }
+    }
+
+    await writeToDatabase(data, "assignmentslist"); // Write the data to the database
+  } catch (err) {
+    res.send({ error: err.message });
+  }
+
+  /*
+  try {
+    const data = req.body;
+    const dataID = decryptSessionID(data.dataID);
+    const existingJSON = await getItemsFromDatabase("students", dataID);
+
     let findData;
 
     for (let i = 0; i < existingJSON.length; i++) {
@@ -159,28 +219,17 @@ app.post('/submitlearninglog', (req, res) => {
       }
     }
 
-    if (findData == null || findData == undefined || findData == "" || findData == "null" || findData == "undefined") {
+    if (!findData) {
       res.send({ error: "User not found" });
     } else {
-      let StudentLearningLogJSON = getItemsFromDatabase("assignmentslist");
-
-      //console.log("/submitlearninglog: " + StudentLearningLogJSON);
-
-      //let StudentLearningLogJSON
-      /*if (!StudentLearningLogData == "") {
-        StudentLearningLogJSON = JSON.parse(StudentLearningLogData);
-      } else {
-        StudentLearningLogJSON = [];
-      }*/
+      let StudentLearningLogJSON = await getItemsFromDatabase("assignmentslist");
 
       let findStudent;
 
       for (let i = 0; i < StudentLearningLogJSON.length; i++) {
-        if (StudentLearningLogJSON[i].Email) {
-          if (StudentLearningLogJSON[i].Email == findData.email) {
-            findStudent = StudentLearningLogJSON[i];
-            break;
-          }
+        if (StudentLearningLogJSON[i].Email === findData.email) {
+          findStudent = StudentLearningLogJSON[i];
+          break;
         }
       }
 
@@ -189,6 +238,8 @@ app.post('/submitlearninglog', (req, res) => {
       }
 
       let modifiedData;
+      const tagName = "LearningLog " + modifiedData.Assignment.LearningLog.LearningLog.toString();
+      
       if (findStudent == "null" || findStudent == null || findStudent == undefined || findStudent == "undefined" || findStudent == "") {
         modifiedData = {
           "Name": findData.firstName + " " + findData.lastName,
@@ -203,7 +254,6 @@ app.post('/submitlearninglog', (req, res) => {
           "dataIDNum": dataID,
         }
 
-        const tagName = "LearningLog " + modifiedData.Assignment.LearningLog.LearningLog.toString();
         modifiedData.Assignment.LearningLog.LearningLog = modifiedData.Assignment.LearningLog.LearningLog + 1;
 
         const tagData = {
@@ -212,10 +262,9 @@ app.post('/submitlearninglog', (req, res) => {
           "timeSubmitted": new Date().toLocaleString().toString().slice(0, 24)
         }
         modifiedData.Assignment.LearningLog[tagName] = tagData;
-      } else if (!findStudent == null || !findStudent == "null" || !findStudent == undefined || !findStudent == "undefined" || !findStudent == "") {
+      } else {
         modifiedData = findStudent;
 
-        const tagName = "LearningLog " + modifiedData.Assignment.LearningLog.LearningLog.toString();
         modifiedData.Assignment.LearningLog.LearningLog = modifiedData.Assignment.LearningLog.LearningLog + 1;
 
         const tagData = {
@@ -225,11 +274,11 @@ app.post('/submitlearninglog', (req, res) => {
         }
         modifiedData.Assignment.LearningLog[tagName] = tagData;
       }
-      writeUserDataToFile(modifiedData, './src/studentinformation/assignmentslist.json');
+      await writeToDatabase(modifiedData, "assignmentslist");
     }
   } catch (err) {
     res.send({ error: err.message });
-  }
+  }*/
 });
 
 //Logout
@@ -324,7 +373,9 @@ app.post('/checkLoggedIn', (req, res) => {
   try {
     const data = req.body.DataID;
 
-    if (!data) {
+    console.log("/checkLoggedIn: " + data);
+    if (data == "Error" || data == "null") {
+      console.log("No DataID");
       res.sendStatus(401);
       return;
     }
@@ -335,6 +386,7 @@ app.post('/checkLoggedIn', (req, res) => {
 
     const dataNumber = jsonArray.findIndex(obj => obj.dataIDNum === unencryptedData);
 
+    console.log(dataNumber);
     if (dataNumber === -1) {
       res.sendStatus(401);
       return;
@@ -393,6 +445,7 @@ passport.deserializeUser(function (obj, cb) {
 
 //Google Authentication Page
 import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth';
+import { send } from 'process';
 
 // Google OAuth Credentials
 const GOOGLE_CLIENT_ID = process.env.CLIENT_ID;
@@ -446,78 +499,77 @@ app.post('/announcements', (req, res) => {
 
 app.get('/auth/google',
   passport.authenticate('google', { scope: ['profile', 'email'] }));
-  app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/error' }), async function (req, res) {
-    // Checks if the user is using an auhsd email
-    if (userProfile._json.hd === "student.auhsd.us" || userProfile._json.hd === "auhsd.us") {
-      const randomNumber = generateRandomNumber(64);
-      const newDate = new Date();
-      const currentDate = newDate.toString().slice(0, 24);
-      newDate.setDate(newDate.getDate() + 7);
-      const updatedDate = newDate.toString().slice(0, 24);
-  
-      let JSONdata;
-  
-      const fileData = await getItemsFromDatabase("students").then(data => JSON.parse(data)).catch(console.error);
-  
-      const numberFound = fileData?.findIndex(item => item.email === userProfile.emails[0].value);
-  
-      if (numberFound === null) {
-        JSONdata = {
-          displayName: userProfile.displayName,
-          firstName: userProfile.name.givenName,
-          lastName: userProfile.name.familyName,
-          email: userProfile.emails[0].value,
-          profilePicture: userProfile.photos[0].value,
-          hd: userProfile._json.hd,
-          hasAccessTo: [
-            { name: "CSD", hasAccess: false },
-            { name: "CSP", hasAccess: false },
-            { name: "CSA", hasAccess: false },
-            { name: "MobileAppDev", hasAccess: false },
-            { name: "AdminPanel", hasAccess: false }
-          ],
-          unchangeableSettings: {
-            isLoggedin: true,
-            latestTimeLoggedIn: currentDate,
-            dayToLogOut: updatedDate,
-            isStudent: true,
-            isStaff: false,
-            latestIPAddress: encryptIP(req.socket.remoteAddress),
-            isLockedOut: false
-          },
-          dataIDNum: randomNumber
-        };
-        tempDataID = randomNumber;
-        await writeToDatabase(JSONdata, "students").catch(console.error);
-      } else {
-        JSONdata = {
-          displayName: fileData[numberFound].displayName,
-          firstName: fileData[numberFound].firstName,
-          lastName: fileData[numberFound].lastName,
-          email: fileData[numberFound].email,
-          profilePicture: fileData[numberFound].profilePicture,
-          hd: fileData[numberFound].hd,
-          hasAccessTo: fileData[numberFound].hasAccessTo.map(item => ({ name: item.name, hasAccess: item.hasAccess })),
-          unchangeableSettings: {
-            isLoggedin: true,
-            latestTimeLoggedIn: currentDate,
-            dayToLogOut: updatedDate,
-            isStudent: fileData[numberFound].unchangeableSettings.isStudent,
-            isStaff: fileData[numberFound].unchangeableSettings.isStaff,
-            latestIPAddress: encryptIP(req.socket.remoteAddress),
-            isLockedOut: fileData[numberFound].unchangeableSettings.isLockedOut
-          },
-          dataIDNum: randomNumber
-        };
-        tempDataID = randomNumber;
-        await modifyInDatabase({ email: fileData[numberFound].email }, JSONdata, "students").catch(console.error);
-      }
-  
-      loggedIn = true;
-      res.redirect('/');
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/error' }), async function (req, res) {
+  // Checks if the user is using an auhsd email
+  if (userProfile._json.hd === "student.auhsd.us" || userProfile._json.hd === "auhsd.us") {
+    const randomNumber = generateRandomNumber(64);
+    const newDate = new Date();
+    const currentDate = newDate.toString().slice(0, 24);
+    newDate.setDate(newDate.getDate() + 7);
+    const updatedDate = newDate.toString().slice(0, 24);
+
+    let JSONdata;
+
+    const fileData = await getItemsFromDatabase("students").then(data => JSON.parse(data)).catch(console.error);
+
+    const numberFound = fileData?.findIndex(item => item.email === userProfile.emails[0].value);
+
+    if (numberFound === null) {
+      JSONdata = {
+        displayName: userProfile.displayName,
+        firstName: userProfile.name.givenName,
+        lastName: userProfile.name.familyName,
+        email: userProfile.emails[0].value,
+        profilePicture: userProfile.photos[0].value,
+        hd: userProfile._json.hd,
+        hasAccessTo: [
+          { name: "CSD", hasAccess: false },
+          { name: "CSP", hasAccess: false },
+          { name: "CSA", hasAccess: false },
+          { name: "MobileAppDev", hasAccess: false },
+          { name: "AdminPanel", hasAccess: false }
+        ],
+        unchangeableSettings: {
+          isLoggedin: true,
+          latestTimeLoggedIn: currentDate,
+          dayToLogOut: updatedDate,
+          isStudent: true,
+          isStaff: false,
+          latestIPAddress: encryptIP(req.socket.remoteAddress),
+          isLockedOut: false
+        },
+        dataIDNum: randomNumber
+      };
+      tempDataID = randomNumber;
+      await writeToDatabase(JSONdata, "students").catch(console.error);
     } else {
-      // Redirect to the login page if unsuccessful or not a student
-      res.redirect('/User/Authentication/Log-In').send("You are not a student");
+      JSONdata = {
+        displayName: fileData[numberFound].displayName,
+        firstName: fileData[numberFound].firstName,
+        lastName: fileData[numberFound].lastName,
+        email: fileData[numberFound].email,
+        profilePicture: fileData[numberFound].profilePicture,
+        hd: fileData[numberFound].hd,
+        hasAccessTo: fileData[numberFound].hasAccessTo.map(item => ({ name: item.name, hasAccess: item.hasAccess })),
+        unchangeableSettings: {
+          isLoggedin: true,
+          latestTimeLoggedIn: currentDate,
+          dayToLogOut: updatedDate,
+          isStudent: fileData[numberFound].unchangeableSettings.isStudent,
+          isStaff: fileData[numberFound].unchangeableSettings.isStaff,
+          latestIPAddress: encryptIP(req.socket.remoteAddress),
+          isLockedOut: fileData[numberFound].unchangeableSettings.isLockedOut
+        },
+        dataIDNum: randomNumber
+      };
+      tempDataID = randomNumber;
+      await modifyInDatabase({ email: fileData[numberFound].email }, JSONdata, "students").catch(console.error);
     }
-  });
-  
+
+    loggedIn = true;
+    res.redirect('/');
+  } else {
+    // Redirect to the login page if unsuccessful or not a student
+    res.redirect('/User/Authentication/Log-In').send("You are not a student");
+  }
+});

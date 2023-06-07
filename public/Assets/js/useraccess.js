@@ -11,6 +11,10 @@ async function Elements() {
 
     const response = await fetch('/sidebarget', sidebarDataGet);
     const data = await response.json();
+    if (data.error) {
+        checkLoggedIn();
+        return;
+    }
     const dataParsed = JSON.parse(data.studentData);
     const sidebarParse = JSON.parse(data.sidebarJSON);
 
