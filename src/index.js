@@ -34,6 +34,10 @@ var userProfile;
 var tempDataID;
 var loggedIn = true; // Keep this at false for testing, real use keep false
 
+// Retrieve and parse the JSON data only once (during server initialization or when data is updated)
+var jsonData = getItemsFromDatabase("students");
+
+
 //Agenda Write Permissions
 app.post('/agenda/permission', (req, res) => {
   let dataID = decryptSessionID(req.body.dataID);
@@ -41,7 +45,7 @@ app.post('/agenda/permission', (req, res) => {
   //let existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
   let existingJSON = getItemsFromDatabase("students", dataID);
 
-  console.log("/agenda/permission: " + existingJSON);
+  //console.log("/agenda/permission: " + existingJSON);
 
   let findData;
 
@@ -65,7 +69,7 @@ app.post('/agenda/write', (req, res) => {
 
   let agendaJSON = getItemsFromDatabase("agenda");
 
-  console.log("/agenda/write: " + agendaJSON);
+  //console.log("/agenda/write: " + agendaJSON);
 
   for (let i = 0; i < agendaJSON.length; i++) {
     if (agendaJSON[i].filePath == content.filePath) {
@@ -88,32 +92,24 @@ app.post('/console', (req, res) => {
   }
 });
 
-//Get sidebar data
 app.post('/sidebarget', async function (req, res) {
   try {
     const data = req.body;
     const dataID = decryptSessionID(data.dataID);
-    let existingJSON;
 
-    console.log("Before getItemsFromDatabase");
-    existingJSON = await getItemsFromDatabase("students", dataID);
-    console.log("After getItemsFromDatabase");
-    console.log("existingJSON:", existingJSON);
-
-    console.log("Here 3");
+    const existingJSON = await getItemsFromDatabase("students", dataID);
 
     const sidebarJSON = await getItemsFromDatabase("classesavailable");
 
-    console.log("Here 1");
-    const parsedData = JSON.parse(existingJSON);
-    console.log(parsedData);
-    console.log(sidebarJSON);
-    console.log("Here 2");
+    let studentData;
+    try {
+      const parsedData = JSON.parse(existingJSON);
+      studentData = JSON.stringify(parsedData[0].hasAccessTo);
+    } catch (err) {
+      throw new Error("Invalid JSON data");
+    }
 
-    let hasAccessTo = parsedData[0].hasAccessTo;
-    let studentData = JSON.stringify(hasAccessTo);
-
-    if (hasAccessTo && sidebarJSON) {
+    if (studentData && sidebarJSON) {
       res.send({ studentData, sidebarJSON });
     } else {
       res.send({ error: "User not found" });
@@ -122,6 +118,7 @@ app.post('/sidebarget', async function (req, res) {
     res.send({ error: err.message });
   }
 });
+
 
 
 
@@ -167,7 +164,7 @@ app.post('/submitlearninglog', (req, res) => {
     } else {
       let StudentLearningLogJSON = getItemsFromDatabase("assignmentslist");
 
-      console.log("/submitlearninglog: " + StudentLearningLogJSON);
+      //console.log("/submitlearninglog: " + StudentLearningLogJSON);
 
       //let StudentLearningLogJSON
       /*if (!StudentLearningLogData == "") {
@@ -243,7 +240,7 @@ app.post('/logout', (req, res) => {
 
     let existingJSON = getItemsFromDatabase("students", dataID);
 
-    console.log("/logout: " + existingJSON);
+    //console.log("/logout: " + existingJSON);
 
     let findData;
 
@@ -269,21 +266,10 @@ app.post('/logout', (req, res) => {
 });
 
 
-
 //User Access
 app.post('/getstudentaccess', (req, res) => {
   try {
-    // Read the JSON file
     const dataID = req.body.dataID;
-
-    let jsonData = getItemsFromDatabase("students");
-
-    console.log("/getstudentaccess: " + jsonData);
-
-    if (err) {
-      console.error('Error reading the file:', err);
-      return;
-    }
 
     try {
       let studentDataIDUnencrypted = decryptSessionID(dataID);
@@ -310,106 +296,82 @@ app.post('/getstudentaccess', (req, res) => {
 
 app.post('/getData', async function (req, res) {
   try {
-
-    console.log("/getData 1: " + req.body.dataID)
-
-    userProfile = "";
-
     // Read the encrypted ID from the request body
     let encryptedKey = req.body.dataID;
     let decryptedKey = decryptSessionID(encryptedKey);
 
-    // Iterate over the array to find the matching data based on the decrypted ID
+    // Retrieve the data from the database
     let jsonArray = await getItemsFromDatabase("students", decryptedKey);
-
-    await getItemsFromDatabase("students", decryptedKey).then((data) => {
-      jsonArray = data;
-    });
-    
-    // Parse the JSON string into an array of objects
-    const data = JSON.parse(jsonArray);
-    
-    // Iterate over the array and remove the "dataIDNum" property
-    data.forEach(obj => delete obj.dataIDNum);
-
-    // Convert the updated array back into a JSON string
-    const updatedJsonString = JSON.stringify(data[0]);
-
-    if (updatedJsonString) {
-      res.send(updatedJsonString); // Send the retrieved data as the response
-    } else {
-      res.send({ error: 'Data not found' }); // Handle the case when no matching data is found
+    if (jsonArray.length === 0) {
+      res.send({ error: 'Data not found' });
+      return;
     }
+
+    // Get the first object from the retrieved array
+    let data = JSON.parse(jsonArray)[0];
+
+    // Remove the "dataIDNum" property
+    delete data.dataIDNum;
+
+    res.send(data); // Send the retrieved data as the response
   } catch (err) {
     res.send({ error: 'Invalid data' }); // Handle the case when the data is invalid
   }
 });
 
-//Checks if User is Logged In
+
 app.post('/checkLoggedIn', (req, res) => {
   try {
-    let loggedIn;
+    const data = req.body.DataID;
 
-    let data = req.body.DataID;
-
-    if (data == null) {
-      loggedIn = false;
+    if (!data) {
       res.sendStatus(401);
-    } else if (data != null) {
-      jsonArray = getDataByDataId(data, "students");
+      return;
+    }
 
-      console.log("/checkLoggedIn: " + jsonArray);
+    const jsonArray = getDataByDataId(data, "students");
 
-      let unencryptedData = decryptSessionID(data);
+    const unencryptedData = decryptSessionID(data);
 
-      let dataNumber = 0;
-      for (let i = 0; i < jsonArray.length; i++) {
-        if (jsonArray[i].dataIDNum == unencryptedData) {
-          dataNumber = i;
-        } else if (jsonArray[i].dataIDNum != unencryptedData) {
-          loggedIn = false;
-        }
-      }
+    const dataNumber = jsonArray.findIndex(obj => obj.dataIDNum === unencryptedData);
 
-      const expiraryDate = new Date(jsonArray[dataNumber].unchangeableSettings.dayToLogOut.toString())
+    if (dataNumber === -1) {
+      res.sendStatus(401);
+      return;
+    }
 
-      const currentDate = new Date()
+    const expiraryDate = new Date(jsonArray[dataNumber].unchangeableSettings.dayToLogOut);
+    const currentDate = new Date();
 
-      if (expiraryDate < currentDate) {
-        loggedIn = false;
-        res.sendStatus(401);
-        jsonArray[dataNumber].unchangeableSettings.isLoggedin = false;
-        writeToDatabase(jsonArray[dataNumber], "students");
-      } else if (!expiraryDate < currentDate) {
-        if (jsonArray[dataNumber].unchangeableSettings.isLoggedin == true) {
-          loggedIn = true;
-          res.sendStatus(200);
-        } else {
-          loggedIn = false;
-          res.sendStatus(401);
-        }
-      }
+    if (expiraryDate < currentDate) {
+      jsonArray[dataNumber].unchangeableSettings.isLoggedin = false;
+      writeToDatabase(jsonArray[dataNumber], "students");
+      res.sendStatus(401);
+    } else if (jsonArray[dataNumber].unchangeableSettings.isLoggedin) {
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(401);
     }
   } catch (err) {
-    res.send({ error: 'Invalid data' }); // Handle the case when the data is invalid
+    res.send({ error: 'Invalid data' });
   }
 });
 
-//Sends Encrypted Session ID to Client
+
 app.get('/api/GetMain', (req, res) => {
   try {
-    if (loggedIn == true) {
-      let newSessionID = encryptSessionID(tempDataID);
+    if (loggedIn) {
+      const newSessionID = encryptSessionID(tempDataID);
 
-      // Send the sessionID as the response
       res.send({ newSessionID });
-    } else if (loggedIn == false) {
-      res.redirect('/User/Authentication/Log-In');
+    } else {
+      res.status(302).redirect('/User/Authentication/Log-In');
     }
   } catch (err) {
-    res.send({ error: err.message }); // Handle the case when the data is invalid
+    res.status(500).send({ error: err.message });
   }
 });
+
 
 
 
@@ -455,7 +417,7 @@ app.post('/announcements', (req, res) => {
   // Read the existing JSON data from the file
   let jsonArray = getItemsFromDatabase("announcements");
 
-  console.log("/announcements: " + jsonArray);
+  //console.log("/announcements: " + jsonArray);
 
   // Iterate through each object in the array
   for (let i = 0; i < jsonArray.length; i++) {
@@ -484,226 +446,78 @@ app.post('/announcements', (req, res) => {
 
 app.get('/auth/google',
   passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-app.get('/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/error' }),
-  async function (req, res) {
+  app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/error' }), async function (req, res) {
     // Checks if the user is using an auhsd email
-    if (userProfile._json.hd == "student.auhsd.us" || userProfile._json.hd == "auhsd.us") {
-      let JSONdata;
-
+    if (userProfile._json.hd === "student.auhsd.us" || userProfile._json.hd === "auhsd.us") {
       const randomNumber = generateRandomNumber(64);
-      if (userProfile._json.hd == "student.auhsd.us") {
-        let newDate = new Date();
-
-        // Create a Date object for the current date
-        let currentDate = newDate.toString().slice(0, 24);
-
-        // Get the day of the month
-        let day = newDate.getDate();
-
-        // Add a day to the date
-        newDate.setDate(day + 7);
-
-        // Convert the updated date to a formatted string
-        let updatedDate = newDate.toString().slice(0, 24);
-
-        let fileData = null;
-
-        await getItemsFromDatabase("students").then((data) => {
-          fileData = JSON.parse(data); // Parse the JSON string to an object
-        });
-
-        let numberFound = null;
-        if (fileData !== null) {
-          for (let i = 0; i < fileData.length; i++) {
-            if (fileData[i].email === userProfile.emails[0].value) {
-              numberFound = i;
-              break; // Exit the loop if a match is found
-            }
-          }
-        }
-
-        console.log("Number Found: " + numberFound);
-
-        let jsonArray = JSON.stringify(fileData);
-        jsonArray = JSON.parse(jsonArray);
-        console.log("JSON Array: " + jsonArray);
-
-        console.log("JSON Array Num:" + jsonArray[numberFound].hasAccessTo[0].hasAccess);
-        if (numberFound == null) {
-
-          // Create a Date object for the current date
-          let newDate = new Date();
-
-          // Create a Date object for the current date
-          let currentDate = newDate.toString().slice(0, 24);
-
-          // Get the day of the month
-          let day = newDate.getDate();
-
-          // Add a day to the date
-          newDate.setDate(day + 7);
-
-          // Convert the updated date to a formatted string
-          let updatedDate = newDate.toString().slice(0, 24);
-
-          JSONdata = {
-            "displayName": userProfile.displayName,
-            "firstName": userProfile.name.givenName,
-            "lastName": userProfile.name.familyName,
-            "email": userProfile.emails[0].value,
-            "profilePicture": userProfile.photos[0].value,
-            "hd": userProfile._json.hd,
-            "hasAccessTo": [
-              {
-                "name": "CSD",
-                "hasAccess": false
-              },
-              {
-                "name": "CSP",
-                "hasAccess": false
-              },
-              {
-                "name": "CSA",
-                "hasAccess": false
-              },
-              {
-                "name": "MobileAppDev",
-                "hasAccess": false
-              },
-              {
-                "name": "AdminPanel",
-                "hasAccess": false
-              }
-            ],
-            "unchangeableSettings": {
-              "isLoggedin": true,
-              "latestTimeLoggedIn": currentDate,
-              "dayToLogOut": updatedDate,
-              "isStudent": true,
-              "isStaff": false,
-              "latestIPAddress": encryptIP(req.socket.remoteAddress),
-              "isLockedOut": false
-            },
-            "dataIDNum": randomNumber
-          };
-          tempDataID = randomNumber;
-
-          writeToDatabase(JSONdata, "students").catch(console.error);;
-
-        } else if (numberFound != null) {
-          JSONdata = {
-            "displayName": jsonArray[numberFound].displayName,
-            "firstName": jsonArray[numberFound].firstName,
-            "lastName": jsonArray[numberFound].lastName,
-            "email": jsonArray[numberFound].email,
-            "profilePicture": jsonArray[numberFound].profilePicture,
-            "hd": jsonArray[numberFound].hd,
-            "hasAccessTo": [
-              {
-                "name": "CSD",
-                "hasAccess": jsonArray[numberFound].hasAccessTo[0].hasAccess
-              },
-              {
-                "name": "CSP",
-                "hasAccess": jsonArray[numberFound].hasAccessTo[1].hasAccess
-              },
-              {
-                "name": "CSA",
-                "hasAccess": jsonArray[numberFound].hasAccessTo[2].hasAccess
-              },
-              {
-                "name": "MobileAppDev",
-                "hasAccess": jsonArray[numberFound].hasAccessTo[3].hasAccess
-              },
-              {
-                "name": "AdminPanel",
-                "hasAccess": jsonArray[numberFound].hasAccessTo[4].hasAccess
-              }
-            ],
-            "unchangeableSettings": {
-              "isLoggedin": true,
-              "latestTimeLoggedIn": currentDate,
-              "dayToLogOut": updatedDate,
-              "isStudent": jsonArray[numberFound].unchangeableSettings.isStudent,
-              "isStaff": jsonArray[numberFound].unchangeableSettings.isStaff,
-              "latestIPAddress": encryptIP(req.socket.remoteAddress),
-              "isLockedOut": jsonArray[numberFound].unchangeableSettings.isLockedOut
-            },
-            "dataIDNum": randomNumber
-          };
-
-
-          tempDataID = randomNumber;
-
-          modifyInDatabase({ email: jsonArray[numberFound].email }, JSONdata, "students");
-        } else if (userProfile._json.hd == "auhsd.us" || userProfile._json.hs == "frc4079.org" || userProfile._json.hd == "gmail.com") {
-          // Create a Date object for the current date
-          let newDate = new Date();
-
-          // Create a Date object for the current date
-          let currentDate = newDate.toString().slice(0, 24);
-
-          // Get the day of the month
-          let day = newDate.getDate();
-
-          // Add a day to the date
-          newDate.setDate(day + 7);
-
-          // Convert the updated date to a formatted string
-          let updatedDate = newDate.toString().slice(0, 24);
-
-          JSONdata = {
-            "displayName": userProfile.displayName,
-            "firstName": userProfile.name.givenName,
-            "lastName": userProfile.name.familyName,
-            "email": userProfile.emails[0].value,
-            "profilePicture": userProfile.photos[0].value,
-            "hd": userProfile._json.hd,
-            "hasAccessTo": [
-              {
-                "name": "CSD",
-                "hasAccess": true
-              },
-              {
-                "name": "CSP",
-                "hasAccess": true
-              },
-              {
-                "name": "CSA",
-                "hasAccess": true
-              },
-              {
-                "name": "MobileAppDev",
-                "hasAccess": true
-              },
-              {
-                "name": "AdminPanel",
-                "hasAccess": true
-              }
-            ],
-            "unchangeableSettings": {
-              "isLoggedin": true,
-              "latestTimeLoggedIn": currentDate,
-              "dayToLogOut": updatedDate,
-              "isStudent": false,
-              "isStaff": true,
-              "latestIPAddress": encryptIP(req.socket.remoteAddress),
-              "isLockedOut": false
-            },
-            "dataIDNum": randomNumber,
-          };
-          tempDataID = randomNumber;
+      const newDate = new Date();
+      const currentDate = newDate.toString().slice(0, 24);
+      newDate.setDate(newDate.getDate() + 7);
+      const updatedDate = newDate.toString().slice(0, 24);
+  
+      let JSONdata;
+  
+      const fileData = await getItemsFromDatabase("students").then(data => JSON.parse(data)).catch(console.error);
+  
+      const numberFound = fileData?.findIndex(item => item.email === userProfile.emails[0].value);
+  
+      if (numberFound === null) {
+        JSONdata = {
+          displayName: userProfile.displayName,
+          firstName: userProfile.name.givenName,
+          lastName: userProfile.name.familyName,
+          email: userProfile.emails[0].value,
+          profilePicture: userProfile.photos[0].value,
+          hd: userProfile._json.hd,
+          hasAccessTo: [
+            { name: "CSD", hasAccess: false },
+            { name: "CSP", hasAccess: false },
+            { name: "CSA", hasAccess: false },
+            { name: "MobileAppDev", hasAccess: false },
+            { name: "AdminPanel", hasAccess: false }
+          ],
+          unchangeableSettings: {
+            isLoggedin: true,
+            latestTimeLoggedIn: currentDate,
+            dayToLogOut: updatedDate,
+            isStudent: true,
+            isStaff: false,
+            latestIPAddress: encryptIP(req.socket.remoteAddress),
+            isLockedOut: false
+          },
+          dataIDNum: randomNumber
         };
-        writeToDatabase(JSONdata, "students").catch(console.error);;
-
-        //console.log(tempDataID);
-        loggedIn = true;
-        res.redirect('/');
+        tempDataID = randomNumber;
+        await writeToDatabase(JSONdata, "students").catch(console.error);
       } else {
-        // Redirect to the login page if unsuccessful or not a student
-        res.redirect('/User/Authentication/Log-In').send("You are not a student");
+        JSONdata = {
+          displayName: fileData[numberFound].displayName,
+          firstName: fileData[numberFound].firstName,
+          lastName: fileData[numberFound].lastName,
+          email: fileData[numberFound].email,
+          profilePicture: fileData[numberFound].profilePicture,
+          hd: fileData[numberFound].hd,
+          hasAccessTo: fileData[numberFound].hasAccessTo.map(item => ({ name: item.name, hasAccess: item.hasAccess })),
+          unchangeableSettings: {
+            isLoggedin: true,
+            latestTimeLoggedIn: currentDate,
+            dayToLogOut: updatedDate,
+            isStudent: fileData[numberFound].unchangeableSettings.isStudent,
+            isStaff: fileData[numberFound].unchangeableSettings.isStaff,
+            latestIPAddress: encryptIP(req.socket.remoteAddress),
+            isLockedOut: fileData[numberFound].unchangeableSettings.isLockedOut
+          },
+          dataIDNum: randomNumber
+        };
+        tempDataID = randomNumber;
+        await modifyInDatabase({ email: fileData[numberFound].email }, JSONdata, "students").catch(console.error);
       }
-    };
+  
+      loggedIn = true;
+      res.redirect('/');
+    } else {
+      // Redirect to the login page if unsuccessful or not a student
+      res.redirect('/User/Authentication/Log-In').send("You are not a student");
+    }
   });
+  

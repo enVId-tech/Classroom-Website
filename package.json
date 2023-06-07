@@ -26,5 +26,5 @@
     "passport-google-oauth": "^2.0.0",
     "passport-google-oauth2": "^0.2.0"
   },
-  "type":"module"
+  "type": "module"
 }

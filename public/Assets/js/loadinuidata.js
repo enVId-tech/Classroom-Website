@@ -1,26 +1,23 @@
-document.addEventListener("DOMContentLoaded", function () {
-    async function waitForUserData() {
-        while (!userData) {
-            await new Promise((resolve) => setTimeout(resolve, 500));
-        }
+document.addEventListener("DOMContentLoaded", async function () {
+    await waitForUserData();
+  
+    const namePlate = document.getElementById("NamePlate");
+    if (namePlate && namePlate.innerHTML.includes("!")) {
+      namePlate.innerHTML = "Welcome " + userData.firstName + "!";
     }
-
-    (async () => {
-        await waitForUserData();
-        /*
-        if (userData.firstName == "" || userData.firstName == undefined || userData.firstName == null) {
-            //window.location.href = "/User/Authentication/Log-In"
-            if (document.cookie) {
-                document.cookie = "dataID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            }
-        }*/
-
-        if (document.getElementById("NamePlate")) {
-            if (document.getElementById("NamePlate").innerHTML.includes("!")) {
-                document.getElementById("NamePlate").innerHTML = "Welcome " + userData.firstName + "!";
-            }
+    document.getElementById("Loggedinas").innerHTML = "Logged in as " + userData.displayName;
+    document.getElementById("ProfilePicture").src = userData.profilePicture;
+  
+  });
+  
+  function waitForUserData() {
+    return new Promise((resolve) => {
+      const interval = setInterval(() => {
+        if (userData) {
+          clearInterval(interval);
+          resolve();
         }
-        document.getElementById("Loggedinas").innerHTML = "Logged in as " + userData.displayName;
-        document.getElementById("ProfilePicture").src = userData.profilePicture;
-    })();
-});
+      }, 1); // Check every millisecond to see if userData is defined
+    });
+  }
+  

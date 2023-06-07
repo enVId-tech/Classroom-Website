@@ -1,106 +1,65 @@
-import { MongoClient, ServerApiVersion } from 'mongodb';
+import { MongoClient } from 'mongodb';
 
 const clientDB = "MrWaiDB";
 const uri = "mongodb+srv://etran1:MydatabasePassword1422@mrwaidb.c4zt2hc.mongodb.net/?retryWrites=true&w=majority";
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-    }
-});
+const client = new MongoClient(uri);
 
-async function run() {
-    try {
-        await client.connect();
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
-    } catch (error) {
-        console.error(error);
-    } finally {
-        await client.close();
-    }
-
+async function connectToDatabase() {
+  try {
+    await client.connect();
+    console.log("Connected to MongoDB successfully!");
+  } catch (error) {
+    console.error("Error connecting to MongoDB:", error);
+    throw error;
+  }
 }
 
-
-run().catch(console.dir);
-
 async function writeToDatabase(data, collectionName) {
-    try {
-        await client.connect();
-        const database = client.db(clientDB);
-        const collection = database.collection(collectionName);
+  await connectToDatabase();
 
-        const result = await collection.insertOne(data);
+  const database = client.db(clientDB);
+  const collection = database.collection(collectionName);
 
-        console.log("Inserted document with _id:", result.insertedId);
-        return "Inserted document with _id:", result.insertedId;
-    } catch (error) {
-        console.dir(error);
-    } finally {
-        if (client) {
-            await client.close();
-        }
-    }
+  const result = await collection.insertOne(data);
+
+  console.log("Inserted document with _id:", result.insertedId);
+  return result.insertedId;
 }
 
 async function modifyInDatabase(filter, update, collectionName) {
-    try {
-        await client.connect();
-        const database = client.db(clientDB);
-        const collection = database.collection(collectionName);
+  await connectToDatabase();
 
-        const { _id, ...updateData } = update; // Exclude the _id field from the update
+  const database = client.db(clientDB);
+  const collection = database.collection(collectionName);
 
-        const result = await collection.updateOne(filter, { $set: updateData });
+  const { _id, ...updateData } = update;
 
-        console.log("Modified", result.modifiedCount, "document(s)");
-        return result.modifiedCount;
-    } catch (error) {
-        console.dir(error);
-    } finally {
-        if (client) {
-            await client.close();
-        }
-    }
+  const result = await collection.updateOne(filter, { $set: updateData });
+
+  console.log("Modified", result.modifiedCount, "document(s)");
+  return result.modifiedCount;
 }
-
-
 
 async function getItemsFromDatabase(collectionName, dataId) {
-    let client; // Declare the client variable outside the try-catch block
+  await connectToDatabase();
 
-    try {
-        client = await MongoClient.connect(uri); // Connect to the MongoDB server
+  const database = client.db(clientDB);
+  const collection = database.collection(collectionName);
+  const projection = { _id: 0 };
+  let items;
 
-        const database = client.db(clientDB);
-        const collection = database.collection(collectionName);
-        const projection = { _id: 0 };
-        let items;
+  if (!dataId) {
+    items = await collection.find({}, { projection }).toArray();
+  } else {
+    console.log("Searching for dataId:", dataId);
+    items = await collection.find({ dataIDNum: dataId }, { projection }).toArray();
+  }
 
-        if (!dataId) {
-            items = await collection.find({}, { projection }).toArray();
-        } else {
-            console.log("Searching for dataId:", dataId);
-
-            items = await collection.find({ dataIDNum: dataId }, { projection }).toArray();
-        }
-
-        return JSON.stringify(items);
-    } catch (error) {
-        console.error("Error occurred while searching for dataId:", error);
-        throw error; // Rethrow the error to be caught in the calling function
-    } finally {
-        if (client) {
-            client.close(); // Close the MongoDB connection in the finally block
-        }
-    }
+  return JSON.stringify(items);
 }
 
-
 export {
-    writeToDatabase,
-    modifyInDatabase,
-    getItemsFromDatabase
+  writeToDatabase,
+  modifyInDatabase,
+  getItemsFromDatabase
 };
