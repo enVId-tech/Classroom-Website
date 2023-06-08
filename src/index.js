@@ -39,37 +39,31 @@ var jsonData = getItemsFromDatabase("students");
 
 
 //Agenda Write Permissions
-app.post('/agenda/permission', (req, res) => {
-  let dataID = decryptSessionID(req.body.dataID);
+app.post('/agenda/permission', async function (req, res) {
+  try {
+    let dataID = decryptSessionID(req.body.dataID);
 
-  //let existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
-  let existingJSON = getItemsFromDatabase("students", dataID);
+    //let existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
+    let existingJSON = JSON.parse(await getItemsFromDatabase("students", dataID));
 
-  //console.log("/agenda/permission: " + existingJSON);
+    console.log(existingJSON);
 
-  let findData;
-
-  for (let i = 0; i < existingJSON.length; i++) {
-    if (existingJSON[i].dataIDNum == dataID) {
-      findData = existingJSON[i];
-      break;
+    if (existingJSON.isStaff == true) {
+      res.send({ hasPermission: true });
+    } else {
+      res.send({ hasPermission: false });
     }
-  }
-
-  if (findData.isStaff == true) {
-    res.send({ hasPermission: true });
-  } else {
-    res.send({ hasPermission: false });
+  } catch (err) {
+    console.log(err);
+    res.send({ error: err.message });
   }
 });
 
-//Write to agenda
-app.post('/agenda/write', (req, res) => {
+// Write to agenda
+app.post('/agenda/write', async (req, res) => {
   const content = req.body;
 
-  let agendaJSON = getItemsFromDatabase("agenda");
-
-  //console.log("/agenda/write: " + agendaJSON);
+  let agendaJSON = await getItemsFromDatabase("agenda");
 
   for (let i = 0; i < agendaJSON.length; i++) {
     if (agendaJSON[i].filePath == content.filePath) {
@@ -80,6 +74,7 @@ app.post('/agenda/write', (req, res) => {
 
   res.send(content);
 });
+
 
 //Console Commands
 app.post('/console', (req, res) => {
@@ -147,47 +142,45 @@ app.post('/submitlearninglog', async (req, res) => {
   try {
     const data = req.body;
     const dataID = decryptSessionID(data.dataID);
-    const existingData = await getItemsFromDatabase("students", dataID);
-    const existingJSON = JSON.parse(existingData);
+    const studentDatabaseData = JSON.parse(await getItemsFromDatabase("students", dataID));
 
-    if (existingJSON.length === 0) {
+    if (studentDatabaseData.length === 0) {
       res.send({ error: 'User not found' });
       return;
     }
 
-    const StudentLearningLogJSON = await getItemsFromDatabase("assignmentslist");
+    let studentLogData = JSON.parse(await getItemsFromDatabase("assignmentslist"));
 
-    console.log(StudentLearningLogJSON);
+    if (studentLogData.length === 0) {
+      studentLogData = null;
+    }
 
-    if (!StudentLearningLogJSON === 0) {
-      for (let i = 0; i < StudentLearningLogJSON.length; i++) {
-        if (StudentLearningLogJSON[i].Email === existingJSON[0].email) {
-          let findStudent = StudentLearningLogJSON[i];
+    let sendData;
+    if (studentLogData != null) {
+      for (let i = 0; i < studentLogData.length; i++) {
+        if (studentLogData[i].Email == studentDatabaseData[0].email) {
+          sendData = studentLogData[i];
 
-          let modifiedData = findStudent;
+          sendData.Assignment.LearningLog.LearningLog = sendData.Assignment.LearningLog.LearningLog + 1;
 
-          modifiedData.Assignment.LearningLog.LearningLog = modifiedData.Assignment.LearningLog.LearningLog + 1;
-          
-          const tagName = "LearningLog " + modifiedData.Assignment.LearningLog.LearningLog.toString();
+          const learningLogName = "LearningLog " + sendData.Assignment.LearningLog.LearningLog.toString();
 
-          const tagData = {
+          const learningLogData = {
             "text": data.text,
             "date": data.date,
             "timeSubmitted": new Date().toLocaleString().toString().slice(0, 24)
           }
-          modifiedData.Assignment.LearningLog[tagName] = tagData;
 
-          await modifyInDatabase({ Email: existingJSON[0].email }, modifiedData, "assignmentslist");
+          sendData.Assignment.LearningLog[learningLogName] = learningLogData;
+
+          await modifyInDatabase({ Email: studentDatabaseData[0].email }, sendData, "assignmentslist");
           break;
         }
       }
-    } else {
-
-      let data;
-
-      data = {
-        "Name": StudentLearningLogJSON.firstName + " " + StudentLearningLogJSON.lastName,
-        "Email": StudentLearningLogJSON.email,
+    } else if (studentLogData == null) {
+      sendData = {
+        "Name": studentData[0].firstName + " " + studentData[0].lastName,
+        "Email": studentData[0].email,
         "Period": data.period,
         "Assignment": {
           "LearningLog": {
@@ -197,88 +190,26 @@ app.post('/submitlearninglog', async (req, res) => {
         "Class": data.Class,
         "dataIDNum": dataID,
       }
-    }
 
-    await writeToDatabase(data, "assignmentslist"); // Write the data to the database
+      sendData.Assignment.LearningLog.LearningLog = sendData.Assignment.LearningLog.LearningLog + 1;
+
+      const learningLogName = "LearningLog " + sendData.Assignment.LearningLog.LearningLog.toString();
+
+      const learningLogData = {
+        "text": data.text,
+        "date": data.date,
+        "timeSubmitted": new Date().toLocaleString().toString().slice(0, 24)
+      }
+
+      sendData.Assignment.LearningLog[learningLogName] = learningLogData;
+
+      await writeToDatabase(sendData, "assignmentslist"); // Write the data to the database
+
+    }
   } catch (err) {
+    console.log(err);
     res.send({ error: err.message });
   }
-
-  /*
-  try {
-    const data = req.body;
-    const dataID = decryptSessionID(data.dataID);
-    const existingJSON = await getItemsFromDatabase("students", dataID);
-
-    let findData;
-
-    for (let i = 0; i < existingJSON.length; i++) {
-      if (existingJSON[i].dataIDNum == dataID) {
-        findData = existingJSON[i];
-        break;
-      }
-    }
-
-    if (!findData) {
-      res.send({ error: "User not found" });
-    } else {
-      let StudentLearningLogJSON = await getItemsFromDatabase("assignmentslist");
-
-      let findStudent;
-
-      for (let i = 0; i < StudentLearningLogJSON.length; i++) {
-        if (StudentLearningLogJSON[i].Email === findData.email) {
-          findStudent = StudentLearningLogJSON[i];
-          break;
-        }
-      }
-
-      if (!findStudent) {
-        findStudent = "null";
-      }
-
-      let modifiedData;
-      const tagName = "LearningLog " + modifiedData.Assignment.LearningLog.LearningLog.toString();
-      
-      if (findStudent == "null" || findStudent == null || findStudent == undefined || findStudent == "undefined" || findStudent == "") {
-        modifiedData = {
-          "Name": findData.firstName + " " + findData.lastName,
-          "Email": findData.email,
-          "Period": data.period,
-          "Assignment": {
-            "LearningLog": {
-              "LearningLog": 0,
-            }
-          },
-          "Class": data.Class,
-          "dataIDNum": dataID,
-        }
-
-        modifiedData.Assignment.LearningLog.LearningLog = modifiedData.Assignment.LearningLog.LearningLog + 1;
-
-        const tagData = {
-          "text": data.text,
-          "date": data.date,
-          "timeSubmitted": new Date().toLocaleString().toString().slice(0, 24)
-        }
-        modifiedData.Assignment.LearningLog[tagName] = tagData;
-      } else {
-        modifiedData = findStudent;
-
-        modifiedData.Assignment.LearningLog.LearningLog = modifiedData.Assignment.LearningLog.LearningLog + 1;
-
-        const tagData = {
-          "text": data.text,
-          "date": data.date,
-          "timeSubmitted": new Date().toLocaleString().toString().slice(0, 24)
-        }
-        modifiedData.Assignment.LearningLog[tagName] = tagData;
-      }
-      await writeToDatabase(modifiedData, "assignmentslist");
-    }
-  } catch (err) {
-    res.send({ error: err.message });
-  }*/
 });
 
 //Logout
