@@ -36,17 +36,17 @@ var loggedIn = true; // Keep this at false for testing, real use keep false
 
 // Retrieve and parse the JSON data only once (during server initialization or when data is updated)
 var jsonData = getItemsFromDatabase("students");
-
+var existingJSON;
 
 //Agenda Write Permissions
 app.post('/agenda/permission', async function (req, res) {
   try {
     let dataID = decryptSessionID(req.body.dataID);
 
-    //let existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
-    let existingJSON = JSON.parse(await getItemsFromDatabase("students", dataID));
-
-    console.log(existingJSON);
+    if (!existingJSON) {
+      //let existingData = fs.readFileSync('./src/studentinformation/studentinformation.json', 'utf8');
+      existingJSON = JSON.parse(await getItemsFromDatabase("students", dataID));
+    }
 
     if (existingJSON.isStaff == true) {
       res.send({ hasPermission: true });
@@ -61,18 +61,23 @@ app.post('/agenda/permission', async function (req, res) {
 
 // Write to agenda
 app.post('/agenda/write', async (req, res) => {
-  const content = req.body;
+  const dataID = req.body.dataID;
 
-  let agendaJSON = await getItemsFromDatabase("agenda");
+  const content = req.body.content;
+
+  const windowURL = req.body.windowURL;
+
+  let agendaJSON = await getItemsFromDatabase("agenda", dataID);
 
   for (let i = 0; i < agendaJSON.length; i++) {
-    if (agendaJSON[i].filePath == content.filePath) {
-      agendaJSON[i].content = content.content;
+    if (agendaJSON[i].url === windowURL) {
+      agendaJSON[i].Calendar += content.content;
+      await modifyInDatabase({ url: windowURL }, agendaJSON, "agenda");
       break;
     }
   }
 
-  res.send(content);
+  res.send(agendaJSON);
 });
 
 
@@ -432,7 +437,7 @@ app.get('/auth/google',
   passport.authenticate('google', { scope: ['profile', 'email'] }));
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/error' }), async function (req, res) {
   // Checks if the user is using an auhsd email
-  if (userProfile._json.hd === "student.auhsd.us" || userProfile._json.hd === "auhsd.us") {
+  if (userProfile._json.hd === "student.auhsd.us" || userProfile._json.hd === "auhsd.us" || userProfile._json.hd === "frc4079.org") {
     const randomNumber = generateRandomNumber(64);
     const newDate = new Date();
     const currentDate = newDate.toString().slice(0, 24);
@@ -440,12 +445,10 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
     const updatedDate = newDate.toString().slice(0, 24);
 
     let JSONdata;
-
     const fileData = await getItemsFromDatabase("students").then(data => JSON.parse(data)).catch(console.error);
-
     const numberFound = fileData?.findIndex(item => item.email === userProfile.emails[0].value);
 
-    if (numberFound === null) {
+    if (numberFound === "null" || numberFound === -1) {
       JSONdata = {
         displayName: userProfile.displayName,
         firstName: userProfile.name.givenName,
@@ -501,6 +504,6 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
     res.redirect('/');
   } else {
     // Redirect to the login page if unsuccessful or not a student
-    res.redirect('/User/Authentication/Log-In').send("You are not a student");
+    res.redirect('/User/Authentication/Log-In');
   }
 });

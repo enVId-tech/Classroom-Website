@@ -117,26 +117,25 @@ document.addEventListener("DOMContentLoaded", function () {
   function saveContentToServer(content) {
     // Make an AJAX request or use fetch to see content to the server
     // Replace the URL below with your server int
-    var url = '/agenda/write';
-    var data = { content: content }; // Adjustdata format as per your server requirements
+    
+    const dataID = document.cookie.split("=")[1];
 
-    fetch(url, {
+    const windowURL = window.location.pathname;
+
+    const data = {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data),
-    })
-      .then(function (response) {
-        if (response.ok) {
-          console.log('Content saved successfully');
-        } else {
-          console.error('Failed to save content');
-        }
-      })
-      .catch(function (error) {
-        console.error('Error:', error);
-      });
+      body: JSON.stringify({ dataID, content, windowURL })
+    }
+
+    fetch('/agenda/write', data)
+      .then(response => response.json())
+      .then(data => {
+        console.log('Success:', data);
+      }
+    );
   }
 
   // Function to get the weekday label based on the day of the week index
@@ -148,15 +147,16 @@ document.addEventListener("DOMContentLoaded", function () {
   // Function to check user's permission (replace with server-side implementation)
   async function checkUserPermission() {
     // Implement the necessary permission check on the server-side and return the result
-    
-    let dataID = document.cookie.split("=")[1];
 
-    let data = {
+    const dataID = document.cookie.split("=")[1];
+
+    const windowURL = window.location.pathname;
+    const data = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ dataID })
+      body: JSON.stringify({ dataID, windowURL })
     }
 
     fetch('/agenda/permission', data)

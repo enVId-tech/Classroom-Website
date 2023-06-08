@@ -1,11 +1,11 @@
-window.addEventListener('DOMContentLoaded', (event) => {
-    AnnouncementsGet();
+document.addEventListener('DOMContentLoaded', function () {
+    Announcements();
 });
 
-function AnnouncementsGet() {
-    let url = window.location.pathname;
+async function Announcements() {
+    const url = window.location.pathname;
 
-    let fetchData = {
+    const fetchData = {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -13,14 +13,14 @@ function AnnouncementsGet() {
         body: JSON.stringify({ url: url }),
     }
 
-    fetch('/announcements/get', fetchData)
+    await fetch('/announcements/get', fetchData)
         .then(response => response.json())
         .then(data => {
             console.log(data);
             AnnouncementsAdd(data.announcements);
         }
     );
-}
+};
 
 function AnnouncementsAdd(announcements) {
     for (let i = 0; i < announcements.length; i++) {
@@ -34,7 +34,7 @@ function AnnouncementsAdd(announcements) {
         let announcementSelectionTitle = document.createElement('h1');
         announcementSelectionTitle.innerHTML = announcement.title;
         announcementSelectionTitle.className = i + " AnnouncementsSelection";
-        announcementSelectionTitle.onclick = function() {AnnouncementsHideShow(i)};
+        announcementSelectionTitle.onclick = function () { AnnouncementsHideShow(i) };
         announcementSelectionTitle.id = "AnnouncementNameSelect";
         announcementSelection.appendChild(announcementSelectionTitle);
 
@@ -44,7 +44,7 @@ function AnnouncementsAdd(announcements) {
         announcementContentDiv.id = i;
         announcementContentDiv.className = "AnnouncementsContent";
         announcementSelectionContentSidebar.appendChild(announcementContentDiv);
-        
+
         let announcementSelectionContentTitle = document.createElement('h1');
         announcementSelectionContentTitle.innerHTML = announcement.title;
         announcementSelectionContentTitle.id = "AnnouncementTitle";
