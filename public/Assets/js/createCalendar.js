@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded", function () {
       body: JSON.stringify({ dataID, content, windowURL })
     }
 
-    fetch('/agenda/write', data)
+    fetch('/class/agenda/write', data)
       .then(response => response.json())
       .then(data => {
         console.log('Success:', data);
@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", function () {
       body: JSON.stringify({ dataID, windowURL })
     }
 
-    fetch('/agenda/permission', data)
+    fetch('/class/agenda/permission', data)
       .then(response => response.json())
       .then(data => {
         hasPermission = data.hasPermission;

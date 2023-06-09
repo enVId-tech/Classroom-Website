@@ -1,8 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
-    Announcements();
-});
-
-async function Announcements() {
+document.addEventListener('DOMContentLoaded', async function () {
     const url = window.location.pathname;
 
     const fetchData = {
@@ -13,14 +9,13 @@ async function Announcements() {
         body: JSON.stringify({ url: url }),
     }
 
-    await fetch('/announcements/get', fetchData)
+    await fetch('/class/announcements/get', fetchData)
         .then(response => response.json())
         .then(data => {
-            console.log(data);
             AnnouncementsAdd(data.announcements);
         }
     );
-};
+});
 
 function AnnouncementsAdd(announcements) {
     for (let i = 0; i < announcements.length; i++) {

@@ -9,7 +9,7 @@ async function Elements() {
         body: JSON.stringify({ dataID })
     };
 
-    const response = await fetch('/sidebarget', sidebarDataGet);
+    const response = await fetch('/student/sidebar/get', sidebarDataGet);
     const data = await response.json();
     if (data.error) {
         checkLoggedIn();

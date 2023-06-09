@@ -4,8 +4,7 @@
   "description": "MrWai.com experimental website",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "error": "error: no test specified"
+    "start": "node src/index.js"
   },
   "keywords": [
     "testing",

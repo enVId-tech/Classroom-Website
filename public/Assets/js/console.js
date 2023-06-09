@@ -63,7 +63,7 @@ async function sendConsoleDataToServer(input) {
   if (input === "") {
     return;
   } else {
-    const response = await fetch("/console", {
+    const response = await fetch("/class/console/process", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ input })
