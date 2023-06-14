@@ -294,8 +294,6 @@ app.post('/student/assignments/summary/get', async function (req, res) {
 
     let studentAssignmentData = JSON.parse(await getItemsFromDatabase("assignmentslist"));
 
-    console.log(studentAssignmentData);
-
     if (studentAssignmentData.length === 0) {
       studentAssignmentData = null;
     }
@@ -337,7 +335,7 @@ app.post('/student/learninglog/submit', async (req, res) => {
     }
 
     // Retrieve the student data from the database and parse it
-    const studentLogData = JSON.parse(await getItemsFromDatabase("assignmentslist"));
+    let studentLogData = JSON.parse(await getItemsFromDatabase("assignmentslist"));
 
     // If the student data is not found, then set it to null
     if (studentLogData.length === 0) {
@@ -382,8 +380,8 @@ app.post('/student/learninglog/submit', async (req, res) => {
     } else if (studentLogData == null) {
       // Create a JSON variable to store the learning log data
       sendData = {
-        "Name": studentData[0].firstName + " " + studentData[0].lastName,
-        "Email": studentData[0].email,
+        "Name": studentDatabaseData[0].firstName + " " + studentDatabaseData[0].lastName,
+        "Email": studentDatabaseData[0].email,
         "Period": data.period,
         "Assignment": {
           "LearningLog": {
