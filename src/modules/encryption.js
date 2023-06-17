@@ -3,7 +3,7 @@ import crypto from 'crypto';
 
 //Generates Random Session Key
 
-function generateRandomNumber(NumberofDigits) {
+async function generateRandomNumber(NumberofDigits) {
   let randomNumber = '';
   let digits = '0123456789';
 
@@ -17,28 +17,34 @@ function generateRandomNumber(NumberofDigits) {
 
 //Random encryption key and iv
 const encryptionKey = crypto.randomBytes(32); // 256 bytes for AES-256
-
 const iv = crypto.randomBytes(16); // 128 bytes for AES-256-CBC
 
 //Encrypts Session ID
-function encryptSessionID(newSessionID) {
-  try {  // Create an AES cipher object
-    const cipher = crypto.createCipheriv('aes-256-cbc', encryptionKey, iv);
+async function encryptData(newSessionID) {
+  try {  
+    // Create an AES cipher object
+    const cipher = crypto.createCipheriv('aes-256-gcm', encryptionKey, iv);
 
     // Encrypt the data
     let encryptedData = cipher.update(newSessionID, 'utf8', 'hex');
     encryptedData += cipher.final('hex');
 
-    return encryptedData;
+    // Get the authentication tag
+    const authTag = cipher.getAuthTag();
+
+    return { encryptedData, authTag };
   } catch (err) {
-    return "Error";
+    return err;
   }
 }
 
 //Decrypts Encrypted Session ID
-function decryptSessionID(encryptedData) {
+async function decryptData(encryptedData, authTag) {
   try {
-    const decipher = crypto.createDecipheriv('aes-256-cbc', encryptionKey, iv);
+    const decipher = crypto.createDecipheriv('aes-256-gcm', encryptionKey, iv);
+
+    // Set the authentication tag
+    decipher.setAuthTag(authTag);
 
     // Decrypt the data
     let decryptedData = decipher.update(encryptedData, 'hex', 'utf8');
@@ -46,9 +52,10 @@ function decryptSessionID(encryptedData) {
 
     return decryptedData;
   } catch (err) {
-    return "Error";
+    return err;
   }
 }
+
 
 //IP Encryption
 function encryptIP(ip) {
@@ -75,7 +82,7 @@ function encryptIP(ip) {
 
 export {
   generateRandomNumber, 
-  encryptSessionID, 
-  decryptSessionID, 
+  encryptData, 
+  decryptData, 
   encryptIP 
 };

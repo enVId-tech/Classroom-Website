@@ -15,6 +15,7 @@
     <link rel="stylesheet" type="text/css" href="/Assets/css/sidebar.css">
     <link rel="stylesheet" type="text/css" href="/Assets/css/selectiontabs.css">
     <link rel="stylesheet" type="text/css" href="/Assets/css/sidescrollbar.css">
+    <link rel="stylesheet" type="text/css" href="/Assets/css/settings.css">
 
     <!-- External CSS -->
     <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:wght@100&display=swap' rel='stylesheet' type='text/css'>
@@ -29,16 +30,10 @@
 
     <script type="text/javascript" src="/Assets/js/LoadInStudentData.js"></script>
     <script type="text/javascript" src="/Assets/js/keeploggedout.js"></script>
+    <script type="text/javascript" src="/Assets/js/UserSettingsProfile.js"></script>
 </head>
 
 <body>
-    <!-- Top Nav Bar (May be removed later) -->
-    <nav class="desktoptopnav">
-        <div id="NameDropdown">
-            <button id="Profile" onclick="window.location.replace('/');">Back</button>
-        </div>
-    </nav>
-
     <!-- Sidebar -->
     <section class="sidebar" id="sidebar">
         <div class="sidebardiv" id="sidebardiv">
@@ -89,6 +84,38 @@
                   <button class="nav-link" id="appointments-tab" onclick="window.location.replace('/User/profile-settings/profile')">Profile</button>
                 </li>
               </ul>
+
+              <div id="Settings">
+                    <h1 id="firstName">
+                        First Name: <input type="text" id="firstn" name="username" value="Placeholder" disabled>
+                    </h1>
+                    <br>
+                    <h1 id="lastName">
+                        Last Name: <input type="text" id="lastn" name="username" value="Placeholder" disabled>
+                    </h1>
+                    <br>
+                    <h2 id="Email">
+                        Email: <input type="text" id="email" name="username" value="Placeholder" disabled>
+                    </h2>
+                    <br>
+                    <br>
+                    <h2 id="userName">
+                        Username: <input type="text" id="username" name="username" value="">
+                    </h2>
+                    <br>
+                    <h2 id="passWord">
+                        Password: <input type="password" id="password" name="password" value="">
+                    </h2>
+                    <br>
+                    <h2 id="passWordConfirm">
+                        Confirm Password: <input type="password" id="passwordconfirm" name="passwordconfirm" value="">
+                    </h2>
+                    <br><br><br><br>
+                    <h1 id="Error"></h1>
+                    <button id="Save">
+                        <h1 id="SaveLabel">Save</h1>
+                    </button>
+              </div>
         </section>
     </center>
 </body>

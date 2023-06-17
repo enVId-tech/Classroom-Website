@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", async function () {
+document.addEventListener("DOMContentLoaded", async() => {
     const dataID = await getDataIDFromServer();
     const userInformation = await getUserDataFromServer(dataID);
     setUserInfoValues(userInformation);
@@ -22,9 +22,9 @@ async function getDataIDFromServer() {
         }
     });
     const data = await response.json();
-    document.cookie = `dataID=${data.newSessionID}`;
+    document.cookie = `dataID=${data.encryptedData}`;
     checkLoggedIn();
-    return data.newSessionID;
+    return data.encryptedData;
 }
 
 async function getUserDataFromServer(dataID) {
@@ -35,8 +35,10 @@ async function getUserDataFromServer(dataID) {
         },
         body: JSON.stringify({ dataID })
     });
-    return response.json();
+    return await response.json();
 }
+
+
 
 async function Elements() {
     const dataID = document.cookie.split("=")[1];

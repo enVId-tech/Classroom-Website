@@ -7,7 +7,7 @@ const client = new MongoClient(uri);
 async function connectToDatabase() {
   try {
     await client.connect();
-    console.log("Connected to MongoDB successfully!");
+    //console.log("Connected to MongoDB successfully!");
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
     throw error;
@@ -15,47 +15,62 @@ async function connectToDatabase() {
 }
 
 async function writeToDatabase(data, collectionName) {
-  await connectToDatabase();
+  try {
+    await connectToDatabase();
 
-  const database = client.db(clientDB);
-  const collection = database.collection(collectionName);
+    const database = client.db(clientDB);
+    const collection = database.collection(collectionName);
 
-  const result = await collection.insertOne(data);
+    const result = await collection.insertOne(data);
 
-  console.log("Inserted document with _id:", result.insertedId);
-  return result.insertedId;
+    //console.log("Inserted document with _id:", result.insertedId);
+    return result.insertedId;
+  } catch (error) {
+    console.error("Error writing to database:", error);
+    throw error;
+  }
 }
 
 async function modifyInDatabase(filter, update, collectionName) {
-  await connectToDatabase();
+  try {
+    await connectToDatabase();
 
-  const database = client.db(clientDB);
-  const collection = database.collection(collectionName);
+    const database = client.db(clientDB);
+    const collection = database.collection(collectionName);
 
-  const { _id, ...updateData } = update;
+    const { _id, ...updateData } = update;
 
-  const result = await collection.updateOne(filter, { $set: updateData });
+    const result = await collection.updateOne(filter, { $set: updateData });
 
-  console.log("Modified", result.modifiedCount, "document(s)");
-  return result.modifiedCount;
+    console.log("Modified", result.modifiedCount, "document(s)");
+    return result.modifiedCount;
+  } catch (error) {
+    console.error("Error modifying document:", error);
+    throw error;
+  }
 }
 
 async function getItemsFromDatabase(collectionName, dataId) {
-  await connectToDatabase();
+  try {
+    await connectToDatabase();
 
-  const database = client.db(clientDB);
-  const collection = database.collection(collectionName);
-  const projection = { _id: 0 };
-  let items;
+    const database = client.db(clientDB);
+    const collection = database.collection(collectionName);
+    const projection = { _id: 0 };
+    let items;
 
-  if (!dataId) {
-    items = await collection.find({}, { projection }).toArray();
-  } else {
-    console.log("Searching for dataId:", dataId);
-    items = await collection.find({ dataIDNum: dataId }, { projection }).toArray();
+    if (!dataId) {
+      items = await collection.find({}, { projection }).toArray();
+    } else {
+      //console.log("Searching for dataId:", dataId);
+      items = await collection.find({ dataIDNum: dataId }, { projection }).toArray();
+    }
+
+    return JSON.stringify(items);
+  } catch (error) {
+    console.error("Error getting items from database:", error);
+    throw error;
   }
-
-  return JSON.stringify(items);
 }
 
 export {
