@@ -1,7 +1,10 @@
 import { MongoClient } from 'mongodb';
 
-const clientDB = "MrWaiDB";
-const uri = "mongodb+srv://etran1:MydatabasePassword1422@mrwaidb.c4zt2hc.mongodb.net/?retryWrites=true&w=majority";
+//Credentials
+import dotenv from 'dotenv';
+dotenv.config({ path: './src/credentials.env' });
+const uri = process.env.MONGODB_URI;
+const clientDB = process.env.CLIENT_DB;
 const client = new MongoClient(uri);
 
 async function connectToDatabase() {

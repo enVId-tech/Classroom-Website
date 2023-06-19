@@ -1,15 +1,4 @@
 window.addEventListener("DOMContentLoaded", async() =>{
-    async function getUserDataFromServer(dataID) {
-        const response = await fetch('/student/data', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ dataID })
-        });
-        return response.json();
-    }
-    
     if (window.location.pathname.includes("/settings")) {
         const dataID = document.cookie.split("=")[1].split(";")[0];
         const userInformation = await getUserDataFromServer(dataID);
@@ -17,13 +6,12 @@ window.addEventListener("DOMContentLoaded", async() =>{
         const firstName = document.getElementById("firstn");
         const lastName = document.getElementById("lastn");
         const email = document.getElementById("email");
-
-        console.log(dataID);
-        console.log(userInformation);
+        const username = document.getElementById("username");
 
         firstName.value = userInformation[0].firstName;
         lastName.value = userInformation[0].lastName;
         email.value = userInformation[0].email;
+        username.value = userInformation[0].email;
 
     } else if (window.location.pathname .includes("/profile")) {
 
@@ -47,8 +35,7 @@ window.addEventListener("DOMContentLoaded", async() =>{
     
         const response = await fetch('/student/data/update', sendData);
         const data = await response.json();
-        console.log(data);
-
+        
         if (data.error) {
             document.getElementById("Error").innerHTML = data.error;
             setTimeout(() => {

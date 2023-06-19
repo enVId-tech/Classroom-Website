@@ -1,11 +1,12 @@
 //Imports
 import crypto from 'crypto';
+import bcrypt from 'bcrypt';
 
 //Generates Random Session Key
 
-async function generateRandomNumber(NumberofDigits) {
+function generateRandomNumber(NumberofDigits) {
   let randomNumber = '';
-  let digits = '0123456789';
+  const digits = '0123456789';
 
   for (let i = 0; i < NumberofDigits; i++) {
     const randomIndex = Math.floor(Math.random() * digits.length);
@@ -19,9 +20,31 @@ async function generateRandomNumber(NumberofDigits) {
 const encryptionKey = crypto.randomBytes(32); // 256 bytes for AES-256
 const iv = crypto.randomBytes(16); // 128 bytes for AES-256-CBC
 
+async function encryptPassword(myPlaintextPassword, saltRounds) {
+  try {
+    const hash = await bcrypt.hash(myPlaintextPassword, saltRounds);
+    return hash;
+  } catch (err) {
+    console.log(err);
+    return err;
+  }
+}
+
+
+
+async function comparePassword(password, hashedPassword) {
+  try {
+    return bcrypt.compare(password, hashedPassword);
+  } catch (err) {
+    console.log(err);
+    return err;
+  }
+}
+
+
 //Encrypts Session ID
 async function encryptData(newSessionID) {
-  try {  
+  try {
     // Create an AES cipher object
     const cipher = crypto.createCipheriv('aes-256-gcm', encryptionKey, iv);
 
@@ -34,6 +57,7 @@ async function encryptData(newSessionID) {
 
     return { encryptedData, authTag };
   } catch (err) {
+    console.log(err);
     return err;
   }
 }
@@ -52,6 +76,7 @@ async function decryptData(encryptedData, authTag) {
 
     return decryptedData;
   } catch (err) {
+    console.log(err);
     return err;
   }
 }
@@ -81,8 +106,10 @@ function encryptIP(ip) {
 }
 
 export {
-  generateRandomNumber, 
-  encryptData, 
-  decryptData, 
-  encryptIP 
+  generateRandomNumber,
+  encryptPassword,
+  comparePassword,
+  encryptData,
+  decryptData,
+  encryptIP
 };

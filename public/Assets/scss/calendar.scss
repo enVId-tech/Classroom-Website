@@ -1,0 +1,77 @@
+/* CSS styles for the calendar */
+.slider {
+    height: 65vh;
+    overflow-x: auto;
+    margin-left: 50px;
+    margin-right: 175px;
+    scrollbar-width: thin;
+    scrollbar-color: #888888 #383838;
+    // Customize scrollbar appearance
+    &::-webkit-scrollbar {
+        width: 6px;
+        height: 80%;
+    }
+    &::-webkit-scrollbar-track {
+        background: #383838;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: #888888;
+        border-radius: 100px;
+    }
+    &-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    &-content {
+        display: flex;
+        gap: 10px;
+        scroll-snap-type: x mandatory;
+    }
+}
+
+.tab {
+    padding: 10px;
+    background-color: transparent;
+    cursor: pointer;
+    border-width: 3px;
+    border-style: solid;
+    border-color: transparent;
+    &.active {
+        border: 3px solid #6b6b6b;
+        border-radius: 10px;
+    }
+}
+
+.month {
+    width: 100%;
+    scroll-snap-align: start;
+    &:not(&.active) {
+        display: none;
+    }
+}
+
+.day {
+    text-align: left;
+    background-color: transparent;
+    padding: 10px;
+    height: 200px;
+    border-radius: 5px;
+    border-width: 1px;
+    border-style: solid;
+    &.current-day {
+        border-color: lightgreen;
+        border-width: 2px;
+    }
+}
+
+.days {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    grid-gap: 2px;
+}
+
+.edit-icon {
+    float: right;
+}

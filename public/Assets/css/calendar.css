@@ -1,86 +1,78 @@
 /* CSS styles for the calendar */
 .slider {
-    height: 65vh;
-    overflow-x: auto;
-    margin-left: 50px;
-    margin-right: 175px;
-    scrollbar-width: thin;
-    scrollbar-color: #888888 #383838;
+  height: 65vh;
+  overflow-x: auto;
+  margin-left: 50px;
+  margin-right: 175px;
+  scrollbar-width: thin;
+  scrollbar-color: #888888 #383838;
 }
-
-/* Customize scrollbar appearance */
 .slider::-webkit-scrollbar {
-    width: 6px;
-    height: 80%;
+  width: 6px;
+  height: 80%;
 }
-
 .slider::-webkit-scrollbar-track {
-    background: #383838;
+  background: #383838;
 }
-
 .slider::-webkit-scrollbar-thumb {
-    background-color: #888888;
-    border-radius: 100px;
+  background-color: #888888;
+  border-radius: 100px;
 }
-
 .slider-tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
 }
-
 .slider-content {
-    display: flex;
-    gap: 10px;
-    scroll-snap-type: x mandatory;
+  display: flex;
+  gap: 10px;
+  scroll-snap-type: x mandatory;
 }
 
 .tab {
-    padding: 10px;
-    background-color: transparent;
-    cursor: pointer;
-    border-width: 3px;
-    border-style: solid;
-    border-color: transparent;
+  padding: 10px;
+  background-color: transparent;
+  cursor: pointer;
+  border-width: 3px;
+  border-style: solid;
+  border-color: transparent;
 }
-
 .tab.active {
-    border: 3px solid #6b6b6b;
-    border-radius: 10px;
+  border: 3px solid #6b6b6b;
+  border-radius: 10px;
 }
 
 .month {
-    width: 100%;
-    scroll-snap-align: start;
+  width: 100%;
+  scroll-snap-align: start;
 }
-
-.days {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 5px;
-    grid-gap: 2px;
+.month:not(.month.active) {
+  display: none;
 }
 
 .day {
-    text-align: left;
-    background-color: transparent;
-    padding: 10px;
-    height: 200px;
-    border-radius: 5px;
-    border-width: 1px;
-    border-style: solid;
+  text-align: left;
+  background-color: transparent;
+  padding: 10px;
+  height: 200px;
+  border-radius: 5px;
+  border-width: 1px;
+  border-style: solid;
 }
-
 .day.current-day {
-    border-color: lightgreen;
-    border-width: 2px;
+  border-color: lightgreen;
+  border-width: 2px;
 }
 
-.month:not(.month.active) {
-    display: none;
-
+.days {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+  grid-gap: 2px;
 }
 
 .edit-icon {
-    float: right;
+  float: right;
 }
+
+/*# sourceMappingURL=calendar.css.map */

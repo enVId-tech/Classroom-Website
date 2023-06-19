@@ -1,0 +1,73 @@
+$align: center;
+$justify-content: space-between;
+$display: flex;
+$AssignmentsMarginHor: 75px;
+$AssignmentsMarginVer: 40px;
+
+#Assignments {
+    font-family: 'Work Sans', sans-serif;
+    background-color: rgb(26, 26, 26);
+    border-radius: 5px;
+    opacity: 0.7;
+    width: 65%;
+    padding-top: 1px;
+    height: 80%;
+    margin-top: $AssignmentsMarginVer;
+    margin-bottom: $AssignmentsMarginVer;
+    margin-left: $AssignmentsMarginHor;
+    margin-right: $AssignmentsMarginHor;
+    height: 60%;
+    min-height: 550px;
+}
+
+.assignment {
+    display: $display;
+    width: 96%;
+    height: 75px;
+    background-color: rgb(70, 70, 70);
+    padding-left: 25px;
+    padding-right: 25px;
+    margin-top: 15px;
+    border-radius: 5px;
+    justify-content: justify-content;
+    align-items: $align;
+    align-content: $align;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+.AssignmentDate {
+    display: $display;
+    float: right;
+    font-size: 35px;
+}
+
+#AssignmentSummary {
+    display: $display;
+    justify-content: justify-content;
+    align-items: $align;
+    align-content: $align;
+    flex-wrap: wrap;
+    flex-direction: row;
+    font-family: 'Work Sans', sans-serif;
+    background-color: rgb(26, 26, 26);
+    border-radius: 5px;
+    opacity: 0.7;
+    width: 35%;
+    padding-top: 1px;
+    height: 80%;
+    margin-top: $AssignmentsMarginVer;
+    margin-bottom: $AssignmentsMarginVer;
+    margin-left: $AssignmentsMarginHor;
+    margin-right: $AssignmentsMarginHor;
+    height: 60%;
+    min-height: 550px; /* Optional: Set a minimum width for responsiveness */
+}
+
+.AssignmentBar {
+    display: $display;
+}
+
+#Placeholder {
+    display: none;
+}

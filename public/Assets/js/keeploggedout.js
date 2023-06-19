@@ -8,7 +8,7 @@ async function logOut() {
     body: JSON.stringify({ dataID: document.cookie.split("=")[1] })
   };
 
-  await fetch('/student/logout', logoutData);
+  await fetch('/student/data/logout', logoutData);
 
   // Redirect to the login page
   window.location.replace("/User/Authentication/Log-Out");
@@ -18,17 +18,21 @@ async function logOut() {
 // Check if the user is logged in
 async function checkLoggedIn() {
   const dataID = document.cookie.split("=")[1];
-  const checkLoggedIndata = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ dataID: dataID || null })
-  };
+  if (dataID || dataID !== "undefined" || dataID !== "null") {
+    const checkLoggedIndata = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ dataID: dataID || null })
+    };
 
-  const response = await fetch('/student/logout/check', checkLoggedIndata);
+    const response = await fetch('/student/data/logout/check', checkLoggedIndata);
 
-  if (response.status !== 200) {
+    if (response.status !== 200) {
+      window.location.href = "/User/Authentication/Log-In";
+    }
+  } else {
     window.location.href = "/User/Authentication/Log-In";
   }
 };

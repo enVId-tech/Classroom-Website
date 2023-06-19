@@ -1,2 +1,5 @@
 node_modules/
-src/credentials.env
+/src/credentials.env
+/node_modules
+/compact.bat
+/start.bat

@@ -21,7 +21,9 @@ async function getDataIDFromServer() {
             'Content-Type': 'application/json'
         }
     });
-    const data = await response.json();
+    const data = await response.json().catch((err) => {
+        window.location.replace("/User/Authentication/Log-In");
+    });
     document.cookie = `dataID=${data.encryptedData}`;
     checkLoggedIn();
     return data.encryptedData;
@@ -37,8 +39,6 @@ async function getUserDataFromServer(dataID) {
     });
     return await response.json();
 }
-
-
 
 async function Elements() {
     const dataID = document.cookie.split("=")[1];
@@ -99,7 +99,7 @@ async function Elements() {
                 sidebarItem.removeChild(sidebarDropdown);
             }
         } else {
-            console.log("No Access");
+            //console.log("No Access");
         }
     }
 

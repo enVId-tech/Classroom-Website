@@ -5,7 +5,7 @@ import session from 'express-session';
 import passport from 'passport';
 import _ from 'lodash';
 import { processCommand } from './modules/consolecommands.js';
-import { generateRandomNumber, encryptData, decryptData, encryptIP } from './modules/encryption.js';
+import { generateRandomNumber, encryptPassword, comparePassword, encryptData, decryptData, encryptIP } from './modules/encryption.js';
 import { writeToDatabase, modifyInDatabase, getItemsFromDatabase } from './modules/mongoDB.js';
 import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth';
 
@@ -38,7 +38,7 @@ app.listen(port, () => console.log('App listening on port ' + 3000));
 //Global Variables
 var userProfile;
 var tempDataID;
-var loggedIn = true; // Keep this at false for testing, real use keep false
+var loggedIn = false;
 var existingJSON;
 var mainServerAuthTag;
 
@@ -70,92 +70,104 @@ passport.use(new GoogleStrategy({
 
 //Google Login
 
-app.get('/auth/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] }));
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/error' }), async (req, res) => {
-  // Checks if the user is using an auhsd email
-  if (userProfile._json.hd === "student.auhsd.us" || userProfile._json.hd === "auhsd.us" || userProfile._json.hd === "frc4079.org") {
-    const randomNumber = generateRandomNumber(64);
-    const newDate = new Date();
-    const currentDate = newDate.toString().slice(0, 24);
-    newDate.setDate(newDate.getDate() + 7);
-    const updatedDate = newDate.toString().slice(0, 24);
+  try {
+    // Set the userProfile to the user's profile
+    const userProfile = req.user; 
 
-    let JSONdata;
-    const fileData = await getItemsFromDatabase("students").then(data => JSON.parse(data)).catch(console.error);
-    const numberFound = fileData?.findIndex(item => item.email === userProfile.emails[0].value);
+    // Check if the user is using a valid email domain
+    const validEmailDomains = ["student.auhsd.us", "auhsd.us", "frc4079.org"];
+    if (validEmailDomains.includes(userProfile._json.hd)) {
+      // Generate a random 64 integer number for the data ID
+      const randomNumber = await generateRandomNumber(64);
+      // Creates a variable to store the current date and time
+      const currentDate = new Date().toString().slice(0, 24);
+      const newDate = new Date();
+      // Sets the date to 7 days from the current date
+      newDate.setDate(newDate.getDate() + 7);
+      const updatedDate = newDate.toString().slice(0, 24);
 
-    if (numberFound === "null" || numberFound === -1) {
-      JSONdata = {
-        displayName: userProfile.displayName,
-        firstName: userProfile.name.givenName,
-        lastName: userProfile.name.familyName,
-        email: userProfile.emails[0].value,
-        profilePicture: userProfile.photos[0].value,
-        hd: userProfile._json.hd,
-        hasAccessTo: [
-          { name: "CSD", hasAccess: false },
-          { name: "CSP", hasAccess: false },
-          { name: "CSA", hasAccess: false },
-          { name: "MobileAppDev", hasAccess: false },
-          { name: "AdminPanel", hasAccess: false }
-        ],
-        siteUsername: null,
-        sitePassword: null,
-        authTag: null,
-        unchangeableSettings: {
-          isLoggedin: true,
-          latestTimeLoggedIn: currentDate,
-          dayToLogOut: updatedDate,
-          isStudent: true,
-          isStaff: false,
-          latestIPAddress: encryptIP(req.socket.remoteAddress),
-          isLockedOut: false
-        },
-        dataIDNum: randomNumber
-      };
-      tempDataID = randomNumber;
-      await writeToDatabase(JSONdata, "students").catch(console.error);
+      // Retrieves database data from the database
+      const fileData = JSON.parse(await getItemsFromDatabase("students"));
+      // Finds the index of the user's email in the database
+      const numberFound = fileData.findIndex(item => item.email === userProfile.emails[0].value);
+
+      // Creates a variable to store the JSON data
+      let JSONdata;
+      // If the numberFound variable is -1, then run the code below
+      if (numberFound === -1) {
+        // Create a JSON object to store the newly created user data
+        JSONdata = {
+          displayName: userProfile.displayName,
+          firstName: userProfile.name.givenName,
+          lastName: userProfile.name.familyName,
+          email: userProfile.emails[0].value,
+          profilePicture: userProfile.photos[0].value,
+          hd: userProfile._json.hd,
+          hasAccessTo: [
+            { name: "CSD", hasAccess: false },
+            { name: "CSP", hasAccess: false },
+            { name: "CSA", hasAccess: false },
+            { name: "MobileAppDev", hasAccess: false },
+            { name: "AdminPanel", hasAccess: false }
+          ],
+          siteUsername: null,
+          sitePassword: null,
+          unchangeableSettings: {
+            isLoggedin: true,
+            latestTimeLoggedIn: currentDate,
+            dayToLogOut: updatedDate,
+            isStudent: true,
+            isStaff: false,
+            latestIPAddress: encryptIP(req.socket.remoteAddress),
+            isLockedOut: false
+          },
+          dataIDNum: randomNumber
+        };
+
+        // Sets a global variable to the data ID
+        tempDataID = randomNumber;
+        // Write the data to the database
+        await writeToDatabase(JSONdata, "students").catch(console.error);
+      } else {
+        // Sets the JSONdata variable to the data in the database based off of the index
+        JSONdata = fileData[numberFound];
+        // Sets properties in the JSONdata variable
+        JSONdata.unchangeableSettings.isLoggedin = true;
+        JSONdata.unchangeableSettings.latestTimeLoggedIn = currentDate;
+        JSONdata.unchangeableSettings.dayToLogOut = updatedDate;
+        JSONdata.unchangeableSettings.latestIPAddress = encryptIP(req.socket.remoteAddress);
+        JSONdata.dataIDNum = randomNumber;
+
+        // Sets a global variable to the data ID
+        tempDataID = randomNumber;
+        // Modify the data in the database based off of the user's email
+        await modifyInDatabase({ email: fileData[numberFound].email }, JSONdata, "students").catch(console.error);
+      }
+
+      // Sets true to the loggedIn variable
+      loggedIn = true;
+      // Redirect to the home page
+      res.redirect('/');
     } else {
-      JSONdata = {
-        displayName: fileData[numberFound].displayName,
-        firstName: fileData[numberFound].firstName,
-        lastName: fileData[numberFound].lastName,
-        email: fileData[numberFound].email,
-        profilePicture: fileData[numberFound].profilePicture,
-        hd: fileData[numberFound].hd,
-        hasAccessTo: fileData[numberFound].hasAccessTo.map(item => ({ name: item.name, hasAccess: item.hasAccess })),
-        siteUsername: fileData[numberFound].siteUsername,
-        sitePassword: fileData[numberFound].sitePassword,
-        authTag: null,
-        unchangeableSettings: {
-          isLoggedin: true,
-          latestTimeLoggedIn: currentDate,
-          dayToLogOut: updatedDate,
-          isStudent: fileData[numberFound].unchangeableSettings.isStudent,
-          isStaff: fileData[numberFound].unchangeableSettings.isStaff,
-          latestIPAddress: encryptIP(req.socket.remoteAddress),
-          isLockedOut: fileData[numberFound].unchangeableSettings.isLockedOut
-        },
-        dataIDNum: randomNumber
-      };
-      tempDataID = randomNumber;
-      await modifyInDatabase({ email: fileData[numberFound].email }, JSONdata, "students").catch(console.error);
+      // Redirect to the login page if unsuccessful or not a student
+      res.redirect('/User/Authentication/Log-In');
     }
-
-    loggedIn = true;
-    res.redirect('/');
-  } else {
-    // Redirect to the login page if unsuccessful or not a student
-    res.redirect('/User/Authentication/Log-In');
+  } catch (error) {
+    console.error(error);
+    res.redirect('/error');
   }
 });
+
+
+//Requests for classes
 
 //Permission to write to agenda in the database
 app.post('/class/agenda/permission', async (req, res) => {
   try {
     // Retrieve the data ID number from the request body
-    const dataID = decryptData(req.body.dataID, mainServerAuthTag);
+    const dataID = await decryptData(req.body.dataID, mainServerAuthTag);
 
     //If the global variable existingJSON is not defined, then read the data from the database
     if (!existingJSON) {
@@ -250,12 +262,14 @@ app.post('/class/console/process', (req, res) => {
   }
 });
 
+
+// Requests for students
+
 // On loading any page, get sidebar data from the database
 app.post('/student/sidebar/get', async (req, res) => {
   try {
     // Retrieve the data ID number from the request body
-    const dataID = decryptData(req.body.dataID, mainServerAuthTag);
-    console.log(dataID);
+    const dataID = await decryptData(req.body.dataID, mainServerAuthTag);
     // Read the student data from the file and return it using the student data ID, and makes it into an object after
     const existingJSON = JSON.parse(await getItemsFromDatabase("students", dataID));
 
@@ -268,7 +282,8 @@ app.post('/student/sidebar/get', async (req, res) => {
       studentData = JSON.stringify(existingJSON[0].hasAccessTo);
     } catch (err) {
       // Send an error message if there is an error
-      throw new Error("Invalid JSON data");
+      console.log(err);
+      res.send({ error: err.message });
     }
 
     // Send the student data and sidebar JSON data to the client if they are defined
@@ -287,11 +302,12 @@ app.post('/student/sidebar/get', async (req, res) => {
 });
 
 // Get student assignment data from the database
-// Write the comments for this after completing it.
+
+// Work on getting assignments here
 app.post('/student/assignments/summary/get', async (req, res) => {
   try {
     let URL = req.body.url;
-    let dataID = decryptData(req.body.dataID, mainServerAuthTag);
+    let dataID = await decryptData(req.body.dataID, mainServerAuthTag);
 
     let studentData = JSON.parse(await getItemsFromDatabase("students", dataID));
 
@@ -332,7 +348,7 @@ app.post('/student/learninglog/submit', async (req, res) => {
     // Retrieve the data from the request body and puts it in a constant variable
     const data = req.body;
     // Decrypt the data ID
-    const dataID = decryptData(data.dataID, mainServerAuthTag);
+    const dataID = await decryptData(data.dataID, mainServerAuthTag);
     // Retrieve the student data from the database, get the data based off of the student's data ID and parse it
     const studentDatabaseData = JSON.parse(await getItemsFromDatabase("students", dataID));
 
@@ -427,10 +443,10 @@ app.post('/student/learninglog/submit', async (req, res) => {
 });
 
 // Logs the user out
-app.post('/student/logout', async (req, res) => {
+app.post('/student/data/logout', async (req, res) => {
   try {
     // Retrieve the data ID from the request body
-    const dataID = decryptData(req.body.dataID, mainServerAuthTag);
+    const dataID = await decryptData(req.body.dataID, mainServerAuthTag);
 
     // Retrieve the student data from the database, get the data based off of the student's data ID
     const existingJSON = JSON.parse(await getItemsFromDatabase("students", dataID));
@@ -455,6 +471,7 @@ app.post('/student/logout', async (req, res) => {
 
       // If the userData variable has a returned value of success, then redirect the user to the login page
       if (userData == "Success") {
+        loggedIn = false;
         res.redirect('/User/Authentication/Log-Out');
       } else {
         // Send an error message if there is an error
@@ -468,16 +485,20 @@ app.post('/student/logout', async (req, res) => {
 });
 
 // Checks if the user is logged out
-app.post('/student/logout/check', async (req, res) => {
+app.post('/student/data/logout/check', async (req, res) => {
   try {
     // Retrieve the data ID from the request body
 
-    console.log(req.body.dataID);
-    console.log(mainServerAuthTag);
-    const dataID = decryptData(req.body.dataID, mainServerAuthTag);
+    const dataID = await decryptData(req.body.dataID, mainServerAuthTag);
 
     // If the data ID is null, then send an error message
     if (dataID == null) {
+      res.sendStatus(401);
+      return;
+    }
+
+    // If loggedIn is false, then send an error message
+    if (loggedIn == false) {
       res.sendStatus(401);
       return;
     }
@@ -487,6 +508,7 @@ app.post('/student/logout/check', async (req, res) => {
 
     // If the existingJSON array is empty, then send an error message
     if (existingJSON.length === 0) {
+      loggedIn = false;
       res.sendStatus(401);
       return;
     }
@@ -497,20 +519,23 @@ app.post('/student/logout/check', async (req, res) => {
 
     // If the expirary date is less than the current date, then set the isLoggedin property to false
     if (expiraryDate < currentDate) {
+      loggedIn = false;
       existingJSON[0].unchangeableSettings.isLoggedin = false;
       writeToDatabase(jsonArray[dataNumber], "students");
       res.sendStatus(401);
 
       // If the isLoggedin property is true and the expirary date is greater than the current date, then send a status of 200
-    } else if (existingJSON[0].unchangeableSettings.isLoggedin == true /*&& expiraryDate > currentDate*/) {
+    } else if (existingJSON[0].unchangeableSettings.isLoggedin == true /*&&  expiraryDate > currentDate*/) {
       //Sends status of 200 to client
       res.sendStatus(200);
     } else {
       // Sends status of 401 to client
+      loggedIn = false;
       res.sendStatus(401);
     }
   } catch (err) {
     // Send an error message if there is an error
+    loggedIn = false;
     console.log(err);
     res.send({ err });
   }
@@ -519,8 +544,14 @@ app.post('/student/logout/check', async (req, res) => {
 // Gets student data from the database
 app.post('/student/data', async (req, res) => {
   try {
+    // Check if req.body.dataID or mainServerAuthTag is undefined
+    if (!req.body.dataID || !mainServerAuthTag) {
+      res.send({ error: 'Invalid data or authentication tag' });
+      return;
+    }
+
     // Retrieve the data ID from the request body
-    const dataID = decryptData(req.body.dataID, mainServerAuthTag);
+    const dataID = await decryptData(req.body.dataID, mainServerAuthTag);
 
     // Retrieve the data from the database
     const jsonArray = JSON.parse(await getItemsFromDatabase("students", dataID));
@@ -533,6 +564,8 @@ app.post('/student/data', async (req, res) => {
 
     // Remove the "dataIDNum" property
     delete jsonArray.dataIDNum;
+    delete jsonArray.siteUsername;
+    delete jsonArray.sitePassword;
 
     // Send the data to the client
     res.send(jsonArray);
@@ -546,35 +579,36 @@ app.post('/student/data', async (req, res) => {
 // Updates student username and password in database
 app.post('/student/data/update', async (req, res) => {
   try {
+    // Retrieve the data from the request body
     const data = req.body;
+    // If the username, password, or passwordconfirm is empty, then send an error message
     if (data.username == "" || data.password == "" || data.passwordconfirm == "") {
       res.send({ error: "Please fill out all fields" });
     } else {
+      // If the password and passwordconfirm match, then run the code below
       if (data.password == data.passwordconfirm) {
         try {
-          const existingJSON = JSON.parse(await getItemsFromDatabase("students", decryptData(data.dataIDNum, mainServerAuthTag)));
+          // Retrieve the student data from the database, get the data based off of the student's data ID
+          const existingJSON = JSON.parse(await getItemsFromDatabase("students", await decryptData(data.dataIDNum, mainServerAuthTag)));
           const modifiedData = existingJSON[0];
 
-          console.log(data.password)
+          // Encrypt the password
+          const encryptData = await encryptPassword(data.password, 10);
 
-          const { encryptedData, authTag } = await encryptData(data.password);
-
-          console.log(encryptedData, authTag)
-
+          // Set the siteUsername and sitePassword properties in the modifiedData variable
           modifiedData.siteUsername = data.username;
-          modifiedData.sitePassword = encryptedData;
-          modifiedData.authTag = authTag;
-
-          console.log(modifiedData);
-          console.log(existingJSON[0]);
+          modifiedData.sitePassword = encryptData;
+          // Write the data to the database
           await modifyInDatabase({ email: existingJSON[0].email }, modifiedData, "students");
 
-          res.send({ success: "Success" });
+          // Send a success message if there is no error
+          res.send({ success: encryptData });
         } catch (err) {
           // Send an error message if there is an error
           console.log(err);
           res.send({ error: "Server Side Error: " + err });
         }
+        // If the password and passwordconfirm do not match, then send an error message
       } else {
         res.send({ error: "Passwords do not match" });
       }
@@ -583,6 +617,86 @@ app.post('/student/data/update', async (req, res) => {
     // Send an error message if there is an error
     console.log(err);
     res.send({ err });
+  }
+});
+
+// Logs the user in on the login page instead of the google login page
+app.post('/student/data/login', async (req, res) => {
+  try {
+    // Retrieve the username and password from the request body
+    const username = req.body.username;
+    const password = req.body.password;
+
+    // Retrieve the student data from the database
+    const existingJSON = JSON.parse(await getItemsFromDatabase("students"));
+
+    // If the existingJSON array is empty, then send an error message
+    if (existingJSON.length === 0) {
+      res.send({ error: "No users currently available in database" });
+    }
+
+    // Create a variable to store if the user is found
+    let userFound = false;
+
+    // Runs for the length of the existingJSON array
+    for (let i = 0; i < existingJSON.length; i++) {
+      // If the username matches the username in the JSON object, then run the code below
+      if (existingJSON[i].siteUsername == username) {
+
+        // Decrypt the password
+        const decryptedPassword = await comparePassword(password, existingJSON[i].sitePassword, existingJSON[i].authTag);
+
+        // If the decryptedPassword variable is true, then run the code below
+        if (decryptedPassword) {
+          // Sets the userFound variable to true
+          userFound = true;
+
+          // Generate a random 64 integer number for the data ID
+          const randomNumber = await generateRandomNumber(64);
+          // Creates a variable to store the current date and time
+          const newDate = new Date();
+          const currentDate = newDate.toString().slice(0, 24);
+          // Sets the date to 7 days from the current date
+          newDate.setDate(newDate.getDate() + 7);
+          const updatedDate = newDate.toString().slice(0, 24);
+
+          // Sets properties in the modifiedData variable
+          const modifiedData = existingJSON[i];
+          // Sets properties in the modifiedData variable
+          modifiedData.unchangeableSettings.isLoggedin = true;
+          modifiedData.unchangeableSettings.latestTimeLoggedIn = currentDate;
+          modifiedData.unchangeableSettings.dayToLogOut = updatedDate;
+          modifiedData.unchangeableSettings.latestIPAddress = encryptIP(req.socket.remoteAddress);
+          modifiedData.dataIDNum = randomNumber;
+
+          // Sets a global variable to the data ID
+          tempDataID = randomNumber;
+          // Sets true to the loggedIn variable
+          loggedIn = true;
+
+          // Write the data to the database
+          await modifyInDatabase({ email: existingJSON[i].email }, modifiedData, "students");
+          // Send a success message if there is no error
+          res.send({ success: "Success" });
+          // Breaks out of the loop
+          break;
+        } else {
+          // Send an error message if there is an error
+          res.send({ error: "Incorrect Password" });
+          // Breaks out of the loop
+          break;
+        }
+      }
+    }
+    
+    // If the userFound variable is false, then send an error message
+    if (!userFound) {
+      res.send({ error: "Incorrect Username" });
+    }
+  } catch (err) {
+    // Send an error message if there is an error
+    console.log(err);
+    res.send({ error: err });
   }
 });
 

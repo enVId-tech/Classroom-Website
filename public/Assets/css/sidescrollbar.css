@@ -3,18 +3,16 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #888888 #383838;
 }
-
-/* Customize scrollbar appearance */
 body::-webkit-scrollbar {
   width: 6px;
   height: 80%;
 }
-
 body::-webkit-scrollbar-track {
   background: #383838;
 }
-
 body::-webkit-scrollbar-thumb {
   background-color: #888888;
   border-radius: 100px;
 }
+
+/*# sourceMappingURL=sidescrollbar.css.map */

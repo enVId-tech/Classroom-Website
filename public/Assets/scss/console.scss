@@ -6,30 +6,30 @@
   color: #fff;
   padding: 10px;
   margin-top: 2.5%;
-  display: grid;
+  display:grid;
   width: 70%;
   font-family: monospace;
   height: 500px; /* Set the desired height of the console */
   overflow: auto; /* Enable vertical scrolling */
   overflow-x: hidden; /* Disable horizontal scrolling */
   white-space: pre-wrap;
-}
-#console::-webkit-scrollbar {
-  width: 0.5em;
-}
-#console::-webkit-scrollbar-track {
-  background: transparent;
-}
-#console::-webkit-scrollbar-thumb {
-  background-color: #888;
-  border-radius: 100px;
+  &::-webkit-scrollbar {
+    width: 0.5em;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 100px;
+  }
 }
 
 #output {
   height: 450px;
-}
-#output div {
-  float: left;
+  div {
+    float: left;
+  }
 }
 
 .output-line {
@@ -48,5 +48,3 @@
   width: 58.5%;
   outline: none;
 }
-
-/*# sourceMappingURL=console.css.map */
