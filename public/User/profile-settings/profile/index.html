@@ -12,6 +12,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
     <!-- Internal CSS-->
+    <link rel="stylesheet" type="text/css" href="/Assets/css/profile.css">
     <link rel="stylesheet" type="text/css" href="/Assets/css/sidebar.css">
     <link rel="stylesheet" type="text/css" href="/Assets/css/selectiontabs.css">
     <link rel="stylesheet" type="text/css" href="/Assets/css/sidescrollbar.css">
@@ -26,9 +27,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <!-- Internal JS -->
-
     <script type="text/javascript" src="/Assets/js/LoadInStudentData.js"></script>
     <script type="text/javascript" src="/Assets/js/keeploggedout.js"></script>
+    <script type="text/javascript" src="/Assets/js/UserSettingsProfile.js"></script>
 </head>
 
 <body>
@@ -81,6 +82,18 @@
                   <button class="nav-link enabled" id="appointments-tab" onclick="window.location.replace('/User/profile-settings/profile')">Profile</button>
                 </li>
               </ul>
+              <div id="ProfileSettings">
+                <br><br><br>
+                <span>
+                    
+                    <h1><img class="profilepicture"> <input type="text" id="display" class="display" name="display" value=""></h1>
+                </span>
+                <br><br><br><br>
+                <h1 id="Error"></h1>
+                <button id="Save">
+                    <h1 id="SaveLabel">Save</h1>
+                </button>
+            </div>
         </section>
     </center>
 </body>

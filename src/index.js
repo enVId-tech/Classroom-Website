@@ -4,6 +4,8 @@ const app = express();
 import session from 'express-session';
 import passport from 'passport';
 import _ from 'lodash';
+import Filter from 'bad-words';
+const filter = new Filter();
 import { processCommand } from './modules/consolecommands.js';
 import { generateRandomNumber, encryptPassword, comparePassword, encryptData, decryptData, encryptIP } from './modules/encryption.js';
 import { writeToDatabase, modifyInDatabase, getItemsFromDatabase } from './modules/mongoDB.js';
@@ -74,7 +76,7 @@ app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'em
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/error' }), async (req, res) => {
   try {
     // Set the userProfile to the user's profile
-    const userProfile = req.user; 
+    const userProfile = req.user;
 
     // Check if the user is using a valid email domain
     const validEmailDomains = ["student.auhsd.us", "auhsd.us", "frc4079.org"];
@@ -564,7 +566,9 @@ app.post('/student/data', async (req, res) => {
 
     // Remove the "dataIDNum" property
     delete jsonArray.dataIDNum;
+    // Remove the "siteUsername" property
     delete jsonArray.siteUsername;
+    // Remove the "sitePassword" property
     delete jsonArray.sitePassword;
 
     // Send the data to the client
@@ -581,36 +585,54 @@ app.post('/student/data/update', async (req, res) => {
   try {
     // Retrieve the data from the request body
     const data = req.body;
-    // If the username, password, or passwordconfirm is empty, then send an error message
-    if (data.username == "" || data.password == "" || data.passwordconfirm == "") {
-      res.send({ error: "Please fill out all fields" });
-    } else {
-      // If the password and passwordconfirm match, then run the code below
-      if (data.password == data.passwordconfirm) {
-        try {
-          // Retrieve the student data from the database, get the data based off of the student's data ID
-          const existingJSON = JSON.parse(await getItemsFromDatabase("students", await decryptData(data.dataIDNum, mainServerAuthTag)));
-          const modifiedData = existingJSON[0];
-
-          // Encrypt the password
-          const encryptData = await encryptPassword(data.password, 10);
-
-          // Set the siteUsername and sitePassword properties in the modifiedData variable
-          modifiedData.siteUsername = data.username;
-          modifiedData.sitePassword = encryptData;
-          // Write the data to the database
-          await modifyInDatabase({ email: existingJSON[0].email }, modifiedData, "students");
-
-          // Send a success message if there is no error
-          res.send({ success: encryptData });
-        } catch (err) {
-          // Send an error message if there is an error
-          console.log(err);
-          res.send({ error: "Server Side Error: " + err });
-        }
-        // If the password and passwordconfirm do not match, then send an error message
+    if (data.URL.includes("/settings/")) {
+      // If the username, password, or passwordconfirm is empty, then send an error message
+      if (data.username == "" || data.password == "" || data.passwordconfirm == "") {
+        res.send({ error: "Please fill out all fields" });
       } else {
-        res.send({ error: "Passwords do not match" });
+        // If the password and passwordconfirm match, then run the code below
+        if (data.password == data.passwordconfirm) {
+          try {
+            // Retrieve the student data from the database, get the data based off of the student's data ID
+            const existingJSON = JSON.parse(await getItemsFromDatabase("students", await decryptData(data.dataIDNum, mainServerAuthTag)));
+            const modifiedData = existingJSON[0];
+
+            // Encrypt the password
+            const encryptData = await encryptPassword(data.password, 10);
+
+            // Set the siteUsername and sitePassword properties in the modifiedData variable
+            modifiedData.siteUsername = existingJSON[0].email;
+            modifiedData.sitePassword = encryptData;
+            // Write the data to the database
+            await modifyInDatabase({ email: existingJSON[0].email }, modifiedData, "students");
+
+            // Send a success message if there is no error
+            res.send({ success: "Success" });
+          } catch (err) {
+            // Send an error message if there is an error
+            console.log(err);
+            res.send({ error: "Server Side Error: " + err });
+          }
+          // If the password and passwordconfirm do not match, then send an error message
+        } else {
+          res.send({ error: "Passwords do not match" });
+        }
+      }
+    } else if (data.URL.includes("/profile/")) {
+      // Retrieve the student data from the database, get the data based off of the student's data ID
+      const existingJSON = JSON.parse(await getItemsFromDatabase("students", await decryptData(data.dataIDNum, mainServerAuthTag)));
+      const modifiedData = existingJSON[0];
+      if (filter.isProfane(data.displayName)) {
+        res.send({ error: "Please do not use profanity:" + filter.clean(data.displayName) });
+      } else {
+        // Set the profilePicture property in the modifiedData variable
+        modifiedData.profilePicture = data.profilePicture;
+        modifiedData.displayName = data.displayName;
+        // Write the data to the database
+        await modifyInDatabase({ email: existingJSON[0].email }, modifiedData, "students");
+
+        // Send a success message if there is no error
+        res.send({ success: "Success" });
       }
     }
   } catch (err) {
@@ -688,7 +710,7 @@ app.post('/student/data/login', async (req, res) => {
         }
       }
     }
-    
+
     // If the userFound variable is false, then send an error message
     if (!userFound) {
       res.send({ error: "Incorrect Username" });
@@ -701,7 +723,7 @@ app.post('/student/data/login', async (req, res) => {
 });
 
 // Gets the student's randomly generated dataID
-app.get('/student/ID', async (req, res) => {
+app.get('/student/data/ID', async (req, res) => {
   try {
     // If the tempDataID variable is not defined, then send an error message
     if (loggedIn === true) {

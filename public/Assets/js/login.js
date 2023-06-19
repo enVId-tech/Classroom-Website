@@ -1,3 +1,4 @@
+/*
 window.addEventListener('DOMContentLoaded', () => {
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
@@ -30,7 +31,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
+*/
 
 async function LogCheck() {
     const usernameInput = document.getElementById('username');

@@ -15,7 +15,7 @@ async function setUserInfoValues(userInformation) {
 };
 
 async function getDataIDFromServer() {
-    const response = await fetch('/student/ID', {
+    const response = await fetch('/student/data/ID', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

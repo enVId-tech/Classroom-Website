@@ -134,6 +134,14 @@ footer {
   color: red;
 }
 
+#LogoutTitle {
+  font-size: 30px;
+  font-weight: 100;
+  font-family: "Work Sans", sans-serif;
+  margin-top: 20px;
+  margin-bottom: 5px;
+}
+
 /*
 .placeholder-move-up {
     animation: moveUp 0.3s forwards;
