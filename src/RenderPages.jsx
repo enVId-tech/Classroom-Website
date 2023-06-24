@@ -31,6 +31,7 @@ import ClassHome from './pages/classes/classhome.jsx';
 import LearningLog from './pages/classes/learninglog.jsx';
 import AssignmentList from './pages/classes/assignmentlist';
 import Calendar from './pages/classes/agenda';
+import Announcements from './pages/classes/announcements';
 
 const Render = () => {
     const PagesArray = [
@@ -107,6 +108,7 @@ const Render = () => {
                     <Route path="learninglog/*" element={<LearningLog {...CSD} />} />
                     <Route path="assignments/*" element={<AssignmentList {...CSD} />} />
                     <Route path="calendar/*" element={<Calendar {...CSD} />} />
+                    <Route path="announcements/*" element={<Announcements {...CSD} />} />
                     <Route
                         path="x-icon"
                         element={
@@ -122,6 +124,7 @@ const Render = () => {
                     <Route path="learninglog/*" element={<LearningLog {...APCSP} />} />
                     <Route path="assignments/*" element={<AssignmentList {...APCSP} />} />
                     <Route path="calendar/*" element={<Calendar {...APCSP} />} />
+                    <Route path="announcements/*" element={<Announcements {...APCSP} />} />
                     <Route
                         path="x-icon"
                         element={
@@ -137,6 +140,7 @@ const Render = () => {
                     <Route path="learninglog/*" element={<LearningLog {...APCSA} />} />
                     <Route path="assignments/*" element={<AssignmentList {...APCSA} />} />
                     <Route path="calendar/*" element={<Calendar {...APCSA} />} />
+                    <Route path="announcements/*" element={<Announcements {...APCSA} />} />
                     <Route
                         path="x-icon"
                         element={
@@ -152,6 +156,7 @@ const Render = () => {
                     <Route path={`learninglog/*`} element={<LearningLog {...MAD}/>} />
                     <Route path={`assignments/*`} element={<AssignmentList {...MAD} />} />
                     <Route path={`calendar/*`} element={<Calendar {...MAD} />} />
+                    <Route path={`announcements/*`} element={<Announcements {...MAD} />} />
                     <Route
                         path="x-icon"
                         element={
