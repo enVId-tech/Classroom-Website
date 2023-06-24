@@ -4,7 +4,7 @@
 // React libraries
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import reportWebVitals from './reportWebVitals';
+import reportWebVitals from './reportWebVitals.js';
 
 // JSX Files
 import Render from './RenderPages.jsx';

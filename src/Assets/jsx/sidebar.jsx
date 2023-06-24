@@ -16,7 +16,7 @@ const Sidebar = () => {
                     <button className='sidebar-label' onClick={() => window.location.replace("/")}>Home</button>
                 </div>
                 <div className='sidebar-item'>
-                    <button className='sidebar-label' onClick={() => window.location.replace("/connections")}>Connections</button>
+                    <button className='sidebar-label' onClick={() => window.location.replace("/connections/home")}>Connections</button>
                     <div className='sidebar-dropdown'>
                         <div className='sidebar-item extras'>
                             <button className='sidebar-item extras' onClick={() => window.location.replace("/connections/appointmentView")}>View Appointments</button>

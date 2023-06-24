@@ -3,7 +3,6 @@ html {
 }
 html body {
   background-color: #383838;
-  color: white;
 }
 
 footer {
@@ -59,11 +58,13 @@ footer {
   display: block;
 }
 .sidebar-label {
+  color: white;
   display: block;
   padding: 10px;
   background-color: #222222;
   border-left-width: 0;
   border-right-width: 0;
+  font-size: 14px;
   cursor: pointer;
 }
 .sidebar-dropdown {

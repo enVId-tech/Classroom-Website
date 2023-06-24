@@ -7,9 +7,9 @@ const AssignmentList = ({ Pages, PagesArrayNumber, path, ClassNum }) => {
         <div className="connections">
             <Sidebar />
             <section className="content">
-                <h1 id="NamePlate">{path} | Assignments</h1>
+                <h1 id="NamePlate">{Pages[0][ClassNum]} | Assignments</h1>
                 <ul className="nav nav-tabs" role="tablist">
-                    <SelectionBar props={Pages} propActiveNumber={PagesArrayNumber} windowpath={path} />
+                    <SelectionBar props={Pages} propActiveNumber={PagesArrayNumber} pageName={path} classNum={ClassNum} />
                 </ul>
                 <span className="AssignmentBar">
                     <div id="Assignments">

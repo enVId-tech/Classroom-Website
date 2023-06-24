@@ -8,7 +8,7 @@ const RequestConnections = (Pages, PagesArrayNumber, path) => {
             <Sidebar />
             <center>
                 <section className="content">
-                    <h1 id="NamePlate">Request Connections</h1>
+                    <h1 id="NamePlate">View Existing Appointments</h1>
                     <SelectionBar props={Pages} propActiveNumber={PagesArrayNumber} windowpath={path}/>
                 </section>
             </center>

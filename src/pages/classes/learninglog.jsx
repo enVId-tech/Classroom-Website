@@ -3,7 +3,7 @@ import Sidebar from "../../Assets/jsx/sidebar";
 import SelectionBar from "../../Assets/jsx/selectionbar";
 import { SubmitData } from '../../Assets/js/learninglog.js'
 
-const LearningLog = ({ Pages, PagesArrayNumber, path }) => {
+const LearningLog = ({ Pages, PagesArrayNumber, path, ClassNum }) => {
     const periodOptions = [];
     for (let i = 0; i < 8; i++) {
         periodOptions.push(<option key={`period-${i}`}>Period {i + 1}</option>);
@@ -19,9 +19,9 @@ const LearningLog = ({ Pages, PagesArrayNumber, path }) => {
             <Sidebar />
             <center>
                 <section className="content">
-                    <h1 id="NamePlate">{path} | Learning Log</h1>
+                    <h1 id="NamePlate">{Pages[0][ClassNum]} | Learning Log</h1>
                     <ul className="nav nav-tabs" role="tablist">
-                        <SelectionBar props={Pages} propActiveNumber={PagesArrayNumber} windowpath={path} />
+                        <SelectionBar props={Pages} propActiveNumber={PagesArrayNumber} pageName={path} classNum={ClassNum} />
                     </ul>
                     <br />
                     <div className="PeriodSelection">

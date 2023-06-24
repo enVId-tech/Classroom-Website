@@ -3,7 +3,6 @@ html {
 
     body {
         background-color: #383838;
-        color: white;
     }
 }
 
@@ -67,11 +66,13 @@ footer {
     }
 
     &-label {
+        color: white;
         display: block;
         padding: 10px;
         background-color: #222222;
         border-left-width: $dimensionszero;
         border-right-width: $dimensionszero;
+        font-size: 14px;
         cursor: pointer;
     }
 
