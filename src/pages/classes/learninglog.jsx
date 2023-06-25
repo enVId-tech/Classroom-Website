@@ -4,6 +4,14 @@ import SelectionBar from "../../Assets/jsx/selectionbar";
 import { SubmitData } from '../../Assets/js/learninglog.js'
 
 const LearningLog = ({ Pages, PagesArrayNumber, path, ClassNum }) => {
+    const periodOptions = [];
+    const dateOptions = [];
+
+    for (let i = 0; i < 8; i++) {
+        periodOptions.push(<option value={i+1}>{i+1}</option>);
+        dateOptions.push(<option value={i}>{i}</option>);
+    }
+
     return (
         <div className="learninglog">
             <Sidebar />

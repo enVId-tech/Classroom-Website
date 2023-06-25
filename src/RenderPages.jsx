@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Bootstrap
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -109,14 +109,6 @@ const Render = () => {
                     <Route path="assignments/*" element={<AssignmentList {...CSD} />} />
                     <Route path="calendar/*" element={<Calendar {...CSD} />} />
                     <Route path="announcements/*" element={<Announcements {...CSD} />} />
-                    <Route
-                        path="x-icon"
-                        element={
-                            <Link to={`/Classes/${PagesPathArray[2][0][0]}/home`}>
-                                <img src="path/to/icon-image.png" alt="Icon for Class 3" />
-                            </Link>
-                        }
-                    />
                 </Route>
 
                 <Route path={`/Classes/${PagesArray[2][0][1]}/*`}>
@@ -125,14 +117,6 @@ const Render = () => {
                     <Route path="assignments/*" element={<AssignmentList {...APCSP} />} />
                     <Route path="calendar/*" element={<Calendar {...APCSP} />} />
                     <Route path="announcements/*" element={<Announcements {...APCSP} />} />
-                    <Route
-                        path="x-icon"
-                        element={
-                            <Link to={`/Classes/${PagesPathArray[2][0][0]}/home`}>
-                                <img src="path/to/icon-image.png" alt="Icon for Class 3" />
-                            </Link>
-                        }
-                    />
                 </Route>
 
                 <Route path={`/Classes/${PagesArray[2][0][2]}/*`}>
@@ -141,14 +125,6 @@ const Render = () => {
                     <Route path="assignments/*" element={<AssignmentList {...APCSA} />} />
                     <Route path="calendar/*" element={<Calendar {...APCSA} />} />
                     <Route path="announcements/*" element={<Announcements {...APCSA} />} />
-                    <Route
-                        path="x-icon"
-                        element={
-                            <Link to={`/Classes/${PagesPathArray[2][0][2]}/home`}>
-                                <img src="Assets/images/CodeorgLogo.png" alt="Icon for Class 3" />
-                            </Link>
-                        }
-                    />
                 </Route>
 
                 <Route path={`/Classes/${PagesArray[2][0][3]}/*`}>
@@ -157,14 +133,6 @@ const Render = () => {
                     <Route path={`assignments/*`} element={<AssignmentList {...MAD} />} />
                     <Route path={`calendar/*`} element={<Calendar {...MAD} />} />
                     <Route path={`announcements/*`} element={<Announcements {...MAD} />} />
-                    <Route
-                        path="x-icon"
-                        element={
-                            <Link to={`/Classes/${PagesPathArray[2][0][2]}/home`}>
-                                <img src="../images/AndroidStudio.webp" alt="Icon for Class 3" />
-                            </Link>
-                        }
-                    />
                 </Route>
             </Routes>
         </BrowserRouter>

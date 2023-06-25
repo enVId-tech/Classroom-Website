@@ -17,10 +17,10 @@ app.set('trust proxy', true);
 
 //Credentials
 import dotenv from 'dotenv';
-dotenv.config({ path: './src/credentials.env' });
+dotenv.config({ path: './node/credentials.env' });
 
 //Website Pages Setup //DO NOT REMOVE THIS
-app.use(express.static('public'));
+app.use(express.static('./build'));
 
 //DO NOT REMOVE 
 app.use(session({
@@ -34,7 +34,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 // DO NOT REMOVE
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3001;
 app.listen(port, () => console.log('App listening on port ' + port));
 
 //Global Variables

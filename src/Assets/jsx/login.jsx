@@ -58,14 +58,31 @@ const LogCheck = () => {
     };
 
     return (
-        <div>
-            {error && <p>{error}</p>}
-            <form onSubmit={handleSubmit}>
-                <input type="text" value={username} onChange={handleUsernameChange} placeholder="Username" />
-                <input type="password" value={password} onChange={handlePasswordChange} placeholder="Password" />
-                <button type="submit">Log In</button>
-            </form>
+        <div className='LoginContainer'>
+            <span id="BackgroundImage">
+                <br /><br /><br />
+                <h1 id="CopyrightedMaterial">© MrWai.com</h1>
+            </span>
+            <p id="LoginLabel">Login</p>
+            <br/><br />
+            <input type="text" placeholder='Username' id="username" spellCheck="false" onChange={handleUsernameChange} />
+            <br/><br />
+            <input type="password" placeholder='Password' id="password" spellCheck="false" onChange={handlePasswordChange} />
+            <br/><br />
+            <h1 id="Error">{error}</h1>
+            <button type="submit" id="LoginButton" onClick={handleSubmit}>Login</button>
+            <br/><br />
+            <a href="/auth/google" class="googlesignin"><span ckass="fa fa-google" />Register/Sign In with Google</a>
         </div>
+        
+    //    <div>
+    //        {error && <p>{error}</p>}
+    //        <form onSubmit={handleSubmit}>
+    //            <input type="text" value={username} onChange={handleUsernameChange} placeholder="Username" />
+    //            <input type="password" value={password} onChange={handlePasswordChange} placeholder="Password" />
+    //            <button type="submit">Log In</button>
+    //        </form>
+    //    </div>
     );
 };
 

@@ -35,7 +35,7 @@ async function checkLoggedIn() {
   }
 }
 
-function MyComponent() {
+function LoggedOut() {
   useEffect(() => {
     (async () => {
       await checkLoggedIn();
@@ -52,3 +52,5 @@ function MyComponent() {
     </div>
   );
 }
+
+export { LoggedOut, logOut, checkLoggedIn };

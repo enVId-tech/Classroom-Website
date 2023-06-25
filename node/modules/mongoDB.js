@@ -2,7 +2,7 @@ import { MongoClient } from 'mongodb';
 
 //Credentials
 import dotenv from 'dotenv';
-dotenv.config({ path: './src/credentials.env' });
+dotenv.config({ path: './node/credentials.env' });
 const uri = process.env.MONGODB_URI;
 const clientDB = process.env.CLIENT_DB;
 const client = new MongoClient(uri);

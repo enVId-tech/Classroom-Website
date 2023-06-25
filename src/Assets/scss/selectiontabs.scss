@@ -1,5 +1,7 @@
-$transparent-border: transparent;
+$border: 0.25px solid;
+$border-radius: 7.5px;
 $transparent-background: transparent;
+$transparent-border: transparent;
 
 #NamePlate {
     $margins: 20px;
@@ -12,40 +14,44 @@ $transparent-background: transparent;
 
 .nav.nav-tabs {
     border-color: black;
+    border-bottom-width: 0.25px;
 }
 
 .nav-item button {
-    $border: 0.1px solid;
-    $border-radius: 7.5px;
-
     font-family: 'Work Sans', sans-serif;
     background-color: $transparent-background;
-    border: none;
-    border-bottom: 0.25px solid black;
+    border-top: $border black;
+    border-right: $border black;
+    border-left: $border black;
+    border-bottom: 0.25px solid transparent;
     padding: 0 20px;
     width: 100%;
     height: 50px;
-    border-top-right-radius: $border-radius;
-    border-top-left-radius: $border-radius;
-    border-top: $border $transparent-border;
-    border-right: $border $transparent-border;
-    border-left: $border $transparent-border;
     font-size: large;
     color: white;
-    margin-left: 25px; /* Adjust margin-left as needed */
-    &:hover(:not(.nav-item button.enabled)) {
-        $borders: $border rgb(75, 75, 75);
-        border-top: $borders;
-        border-right: $borders;
-        border-left: $borders;
-    }
-    &.enabled {
-        $borders: $border rgb(0,0,0);
-        background-color: $transparent-background;
-        border-bottom-color: #383838;
-        border-top: $borders;
-        border-right: $borders;
-        border-left: $borders;
+    margin-left: 25px;
+
+    &:hover {
+        border-bottom: transparent;
+        border-top: $border rgb(75, 75, 75);
+        border-right: $border rgb(75, 75, 75);
+        border-left: $border rgb(75, 75, 75);
         color: white;
+    }
+
+    &.enabled {
+        background-color: #383838;
+        border-bottom: transparent;
+        border-top: $border black;
+        border-right: $border black;
+        border-left: $border black;
+        color: white;
+        &:hover {
+            border-top: $border black;
+            border-right: $border black;
+            border-left: $border black;
+            color: white;
+            opacity: 1;
+        }
     }
 }
