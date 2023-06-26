@@ -20,7 +20,7 @@ import dotenv from 'dotenv';
 dotenv.config({ path: './node/credentials.env' });
 
 //Website Pages Setup //DO NOT REMOVE THIS
-app.use(express.static('./build'));
+//app.use(express.static('./build'));
 
 //DO NOT REMOVE 
 app.use(session({
@@ -294,9 +294,9 @@ app.post('/student/sidebar/get', async (req, res) => {
     if (studentData && sidebarJSON) {
       // Send the student data and sidebar JSON data to the client
       res.send({ studentData, sidebarJSON });
-    } else {
-      // Send an error message if there is an error
-      res.send({ error: "User not found" });
+    }
+    if (!studentData || !sidebarJSON) {
+      res.send({ error: "Error: Student data or sidebar JSON data is not defined" });
     }
   } catch (err) {
     // Send an error message if there is an error

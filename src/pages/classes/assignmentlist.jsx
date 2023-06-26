@@ -9,9 +9,7 @@ const AssignmentList = ({ Pages, PagesArrayNumber, path, ClassNum }) => {
             <section className="content">
                 <center>
                     <h1 id="NamePlate">{Pages[0][ClassNum]} | Assignments</h1>
-                    <ul className="nav nav-tabs" role="tablist">
-                        <SelectionBar props={Pages} propActiveNumber={PagesArrayNumber} pageName={path} classNum={ClassNum} />
-                    </ul>
+                    <SelectionBar props={Pages} propActiveNumber={PagesArrayNumber} pageName={path} classNum={ClassNum} />
                     <span className="AssignmentBar">
                         <div id="Assignments">
                             <div className="assignment">

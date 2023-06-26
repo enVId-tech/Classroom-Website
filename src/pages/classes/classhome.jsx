@@ -20,9 +20,7 @@ const ClassHome = ({ Pages, PagesArrayNumber, path, ClassNum }) => {
         <section className="content">
           <center>
             <h1 id="NamePlate">{pageTitle}</h1>
-            <ul className="nav nav-tabs" role="tablist">
-              <SelectionBar props={Pages} propActiveNumber={PagesArrayNumber} pageName={path} classNum={ClassNum} />
-            </ul>
+            <SelectionBar props={Pages} propActiveNumber={PagesArrayNumber} pageName={path} classNum={ClassNum} />
             <br /><br />
             <h1>{summary} <br /><br /><br /><br /> Feel free to explore MrWai.com to find any resources that may help you.</h1>
           </center>

@@ -2,18 +2,18 @@ import React from "react";
 import Sidebar from "../Assets/jsx/sidebar";
 import SelectionBar from "../Assets/jsx/selectionbar";
 
-const ActiveConnections = (Pages, PagesArrayNumber, path) => {
+const RequestConnections = ({ Pages, PagesArrayNumber, path }) => {
     return (
         <div className="connections">
             <Sidebar />
             <center>
                 <section className="content">
-                    <h1 id="NamePlate">Request an appointment</h1>
-                    <SelectionBar props={Pages} propActiveNumber={PagesArrayNumber} windowpath={path}/>
+                    <h1 id="NamePlate">Request Appointments</h1>
+                    <SelectionBar props={Pages} propActiveNumber={PagesArrayNumber} pageName={path} />
                 </section>
             </center>
         </div>
     )
 }
 
-export default ActiveConnections;
+export default RequestConnections;

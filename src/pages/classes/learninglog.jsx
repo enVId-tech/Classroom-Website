@@ -18,9 +18,7 @@ const LearningLog = ({ Pages, PagesArrayNumber, path, ClassNum }) => {
             <center>
                 <section className="content">
                     <h1 id="NamePlate">{Pages[0][ClassNum]} | Learning Log</h1>
-                    <ul className="nav nav-tabs" role="tablist">
-                        <SelectionBar props={Pages} propActiveNumber={PagesArrayNumber} pageName={path} classNum={ClassNum} />
-                    </ul>
+                    <SelectionBar props={Pages} propActiveNumber={PagesArrayNumber} pageName={path} classNum={ClassNum} />
                     <br />
                     <div className="PeriodSelection">
                         <select className="PeriodDropdown" id="PeriodList" defaultValue={"disabled"}>

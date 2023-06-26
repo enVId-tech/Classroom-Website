@@ -18,9 +18,7 @@ function Calendar({ Pages, PagesArrayNumber, path, ClassNum }) {
         <section className="content">
           <center>
             <h1 id="NamePlate">{Pages[0][ClassNum]} | Agenda</h1>
-            <ul className="nav nav-tabs" role="tablist">
-              <SelectionBar props={Pages} propActiveNumber={PagesArrayNumber} pageName={path} classNum={ClassNum} />
-            </ul>
+            <SelectionBar props={Pages} propActiveNumber={PagesArrayNumber} pageName={path} classNum={ClassNum} />
             <br />
             <div className="slider">
               <div className="slider-tabs">{ }</div>
