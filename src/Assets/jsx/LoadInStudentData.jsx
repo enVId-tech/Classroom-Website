@@ -6,10 +6,12 @@ const LoadInStudentData = () => {
     const [profilePicture, setProfilePicture] = useState("");
     const [dataParsed, setDataParsed] = useState([]);
     const [sidebarParse, setSidebarParse] = useState([]);
+    const [firstName, setFirstName] = useState("");
 
     async function setUserInfoValues(userInformation) {
         setUserDisplayName(userInformation[0].displayName);
         setProfilePicture(userInformation[0].profilePicture);
+        setFirstName(userInformation[0].firstName);
     }
 
     async function getDataIDFromServer() {
@@ -79,6 +81,10 @@ const LoadInStudentData = () => {
     const handleSidebarContentClick = (link) => {
         window.location.replace(link);
     };
+
+    if (document.getElementById("NamePlate") && window.location.pathname === "/") {
+        document.getElementById("NamePlate").innerHTML = "Welcome" + " " + firstName + "!";
+    }
 
     return (
         <>

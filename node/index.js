@@ -77,7 +77,6 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
   try {
     // Set the userProfile to the user's profile
     const userProfile = req.user;
-
     // Check if the user is using a valid email domain
     const validEmailDomains = ["student.auhsd.us", "auhsd.us", "frc4079.org"];
     if (validEmailDomains.includes(userProfile._json.hd)) {
@@ -127,11 +126,15 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
           },
           dataIDNum: randomNumber
         };
-
-        // Sets a global variable to the data ID
-        tempDataID = randomNumber;
         // Write the data to the database
         await writeToDatabase(JSONdata, "students").catch(console.error);
+        
+        // Sets true to the loggedIn variable
+        loggedIn = true;
+        // Sets a global variable to the data ID
+        tempDataID = randomNumber;
+        // Redirect to the home page
+        res.redirect('/');
       } else {
         // Sets the JSONdata variable to the data in the database based off of the index
         JSONdata = fileData[numberFound];
@@ -141,17 +144,16 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
         JSONdata.unchangeableSettings.dayToLogOut = updatedDate;
         JSONdata.unchangeableSettings.latestIPAddress = encryptIP(req.socket.remoteAddress);
         JSONdata.dataIDNum = randomNumber;
-
-        // Sets a global variable to the data ID
-        tempDataID = randomNumber;
         // Modify the data in the database based off of the user's email
         await modifyInDatabase({ email: fileData[numberFound].email }, JSONdata, "students").catch(console.error);
+        
+        // Sets true to the loggedIn variable
+        loggedIn = true;
+        // Sets a global variable to the data ID
+        tempDataID = randomNumber;
+        // Redirect to the home page
+        res.redirect('/');
       }
-
-      // Sets true to the loggedIn variable
-      loggedIn = true;
-      // Redirect to the home page
-      res.redirect('/');
     } else {
       // Redirect to the login page if unsuccessful or not a student
       res.redirect('/User/Authentication/Log-In');
@@ -457,9 +459,9 @@ app.post('/student/data/logout', async (req, res) => {
     let findData;
 
     // Runs for the length of the existingJSON array
-    if (existingJSON[i].dataIDNum == dataID) {
+    if (existingJSON[0].dataIDNum == dataID) {
       // Sets the findData variable to the existingJSON array based off of the index
-      findData = existingJSON[i];
+      findData = existingJSON[0];
       // Sets modifiedData to the findData variable
       const modifiedData = findData;
       // Sets properties in the modifiedData variable
@@ -469,16 +471,23 @@ app.post('/student/data/logout', async (req, res) => {
       modifiedData.dataIDNum = "null";
 
       // Writes the data to the database
-      let userData = modifyInDatabase(findData, modifiedData, "students");
+      let userData = modifyInDatabase({email: existingJSON[0].email }, modifiedData, "students");
 
       // If the userData variable has a returned value of success, then redirect the user to the login page
-      if (userData == "Success") {
+      if (userData) {
+        userProfile = undefined;
+        tempDataID = undefined;
         loggedIn = false;
+        existingJSON = undefined;
+
         res.redirect('/User/Authentication/Log-Out');
       } else {
         // Send an error message if there is an error
         res.send({ error: "Error" });
       }
+    } else {
+      // Send an error message if there is an error
+      res.send({ error: "Error" });
     }
   } catch (err) {
     // Send an error message if there is an error

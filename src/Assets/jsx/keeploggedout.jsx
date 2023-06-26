@@ -10,7 +10,9 @@ async function logOut() {
   };
 
   await fetch('/student/data/logout', logoutData);
-
+  if (document.cookie.includes("dataID")) {
+    document.cookie = "dataID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  }
   window.location.replace("/User/Authentication/Log-Out");
 }
 

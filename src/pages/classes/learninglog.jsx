@@ -1,7 +1,7 @@
 import React from "react";
 import Sidebar from "../../Assets/jsx/sidebar";
 import SelectionBar from "../../Assets/jsx/selectionbar";
-import { SubmitData } from '../../Assets/js/learninglog.js'
+import { SubmitData } from '../../Assets/jsx/learninglog.jsx'
 
 const LearningLog = ({ Pages, PagesArrayNumber, path, ClassNum }) => {
     const periodOptions = [];
