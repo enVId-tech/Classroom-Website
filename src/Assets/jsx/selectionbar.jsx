@@ -4,9 +4,7 @@ import '../css/selectiontabs.css'
 const SelectionBar = ({ props, propActiveNumber, pageName, classNum }) => {
     const elements = [];
 
-    console.log({ props, propActiveNumber, pageName, classNum });
-
-    if (classNum) {
+    if ({classNum}) {
         for (let i = 0; i < props.length; i++) {
             if (i === 0 && Array.isArray(props[i])) {
                 if (i === propActiveNumber) {

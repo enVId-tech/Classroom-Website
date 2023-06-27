@@ -36,13 +36,13 @@ import GoogleCallback from './pages/google';
 
 const Render = () => {
     const PagesArray = [
-        ["Profile", "Settings"],
+        ["Settings", "Profile"],
         ["Connections", "View Appointments", "Request an Appointment"],
         [["CSD", "APCSP", "APCSA", "MAD"], "Announcements", "Assignments", "Agenda", "Learning Log"]
     ];
 
     const PagesPathArray = [
-        ["profile", "settings"],
+        ["settings", "profile" ],
         ["connections", "appointmentRequest", "appointmentView"],
         ["home", "announcements", "assignments", "agenda", "learninglog"]
     ]
@@ -91,13 +91,13 @@ const Render = () => {
 
     const profile = {
         Pages: PagesArray[0],
-        PagesArrayNumber: 0,
+        PagesArrayNumber: 1,
         path: PagesPathArray[0]
     }
 
     const settings = {
         Pages: PagesArray[0],
-        PagesArrayNumber: 1,
+        PagesArrayNumber: 0,
         path: PagesPathArray[0]
     }
 
@@ -108,10 +108,13 @@ const Render = () => {
                 <Route path="/*" element={<Navigate to="/" />} />
                 <Route path={"/connections/*"} element={<Navigate to={"/connections/home"} />} />
                 <Route path={"/connections/"} element={<Navigate to={"/connections/home"} />} />
-                <Route path={`/Classes/${PagesArray[2][0][0]}/*`} element={<Navigate to={`/Classes/${PagesArray[2][0][0]}/home`} />} />
-                <Route path={`/Classes/${PagesArray[2][0][1]}/*`} element={<Navigate to={`/Classes/${PagesArray[2][0][1]}/home`} />} />
-                <Route path={`/Classes/${PagesArray[2][0][2]}/*`} element={<Navigate to={`/Classes/${PagesArray[2][0][2]}/home`} />} />
-                <Route path={`/Classes/${PagesArray[2][0][3]}/*`} element={<Navigate to={`/Classes/${PagesArray[2][0][3]}/home`} />} />
+                <Route path={"/User/profile-settings/*"} element={<Navigate to={"/User/profile-settings/settings"} />} />
+                <Route path={`${PagesPathArray[0][0]}/`} element={<Navigate to={`/User/profile-settings/${PagesPathArray[0][0]}`} />} />
+                <Route path={`${PagesPathArray[0][1]}/`} element={<Navigate to={`/User/profile-settings/${PagesPathArray[0][1]}`} />} />
+                <Route path={`/Classes/${PagesArray[2][0][0]}/*`} element={<Navigate to={`/Classes/${PagesArray[2][0][0]}/${PagesPathArray[2][0]}`} />} />
+                <Route path={`/Classes/${PagesArray[2][0][1]}/*`} element={<Navigate to={`/Classes/${PagesArray[2][0][1]}/${PagesPathArray[2][0]}`} />} />
+                <Route path={`/Classes/${PagesArray[2][0][2]}/*`} element={<Navigate to={`/Classes/${PagesArray[2][0][2]}/${PagesPathArray[2][0]}`} />} />
+                <Route path={`/Classes/${PagesArray[2][0][3]}/*`} element={<Navigate to={`/Classes/${PagesArray[2][0][3]}/${PagesPathArray[2][0]}`} />} />
 
                 {/* Google Login */}
                 <Route path="/auth/google/callback" element={<GoogleCallback />} />
@@ -123,8 +126,8 @@ const Render = () => {
                     <Route path="Log-Out/*" element={<LogOut />} />
                 </Route>
                 <Route path="/User/profile-settings/*">
-                    <Route path={PagesPathArray[0][0]} element={<Profile {...profile} />} />
-                    <Route path={PagesPathArray[0][1]} element={<Settings {...settings} />} />
+                    <Route path={PagesPathArray[0][0]} element={<Settings {...settings} />} />
+                    <Route path={PagesPathArray[0][1]} element={<Profile {...profile} />} />
                 </Route>
                 <Route path={PagesPathArray[1][0]}>
                     <Route path="home/*" element={<Connections {...connectionsHomeCONST} />} />

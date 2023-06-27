@@ -9,16 +9,27 @@ async function logOut() {
     body: JSON.stringify({ dataID: document.cookie.split("=")[1] })
   };
 
-  await fetch('/student/data/logout', logoutData);
-  if (document.cookie.includes("dataID")) {
-    document.cookie = "dataID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  try {
+    await fetch('/student/data/logout', logoutData);
+    if (document.cookie.includes("dataID")) {
+      document.cookie = "dataID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    }
+    console.log(document.cookie.split("=")[1]);
+    window.location.replace("/User/Authentication/Log-Out");
+  } catch (error) {
+    console.log('An error occurred while logging out:', error);
+    // Handle the error - display an error message or perform other actions
   }
-  window.location.replace("/User/Authentication/Log-Out");
 }
 
-async function checkLoggedIn() {
-  const dataID = document.cookie.split("=")[1];
-  if (dataID || dataID !== "undefined" || dataID !== "null") {
+async function checkLoggedIn(dataIDNumber) {
+  let dataID;
+  if (!dataIDNumber) {
+   dataID = document.cookie.split("=")[1];
+  } else {
+    dataID = dataIDNumber;
+  }
+  if (dataID && dataID !== "undefined" && dataID !== "null") {
     const checkLoggedIndata = {
       method: 'POST',
       headers: {
@@ -27,10 +38,15 @@ async function checkLoggedIn() {
       body: JSON.stringify({ dataID: dataID || null })
     };
 
-    const response = await fetch('/student/data/logout/check', checkLoggedIndata);
+    try {
+      const response = await fetch('/student/data/logout/check', checkLoggedIndata);
 
-    if (response.status !== 200) {
-      window.location.href = "/User/Authentication/Log-In";
+      if (response.status !== 200) {
+        window.location.href = "/User/Authentication/Log-In";
+      }
+    } catch (error) {
+      console.log('An error occurred while checking login:', error);
+      // Handle the error - display an error message or perform other actions
     }
   } else {
     window.location.href = "/User/Authentication/Log-In";
@@ -45,7 +61,12 @@ function LoggedOut() {
   }, []);
 
   const handleLogout = async () => {
-    await logOut();
+    try {
+      await logOut();
+    } catch (error) {
+      console.log('An error occurred while logging out:', error);
+      // Handle the error - display an error message or perform other actions
+    }
   };
 
   return (

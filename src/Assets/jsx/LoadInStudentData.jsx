@@ -25,7 +25,7 @@ const LoadInStudentData = () => {
             window.location.replace("/User/Authentication/Log-In");
         });
         document.cookie = `dataID=${data.encryptedData}`;
-        checkLoggedIn();
+        await checkLoggedIn(data.encryptedData);
         return data.encryptedData;
     }
 
@@ -57,8 +57,8 @@ const LoadInStudentData = () => {
         const response = await fetch('/student/sidebar/get', sidebarDataGet);
         const data = await response.json();
         if (data.error) {
-            checkLoggedIn();
-            return;
+            await checkLoggedIn();
+            console.log(data.error);
         }
         const dataParsed = JSON.parse(data.studentData);
         const sidebarParse = JSON.parse(data.sidebarJSON);

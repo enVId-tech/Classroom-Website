@@ -4,7 +4,6 @@ import { Helmet } from "react-helmet";
 import Sidebar from "../../Assets/jsx/sidebar";
 import SelectionBar from "../../Assets/jsx/selectionbar";
 import Classes from "../../Assets/jsx/classes";
-import { LoggedOut, checkLoggedIn } from "../../Assets/jsx/keeploggedout";
 import "../../Assets/images/CodeorgLogo.png";
 
 const ClassHome = ({ Pages, PagesArrayNumber, path, ClassNum }) => {

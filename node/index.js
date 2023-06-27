@@ -182,9 +182,11 @@ app.post('/class/agenda/permission', async (req, res) => {
     // Check if the user has permission to write to the agenda
     if (existingJSON.isStaff == true) {
       // Send true if the user has permission
+      console.log("User has permission")
       res.send({ hasPermission: true });
     } else {
       // Send false if the user does not have permission
+      console.log("User does not have permission")
       res.send({ hasPermission: false });
     }
   } catch (err) {

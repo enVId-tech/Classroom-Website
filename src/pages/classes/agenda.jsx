@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet';
 
 import Sidebar from '../../Assets/jsx/sidebar';
 import SelectionBar from '../../Assets/jsx/selectionbar';
+import CreateCalendar from '../../Assets/jsx/createCalendar';
 import '../../Assets/css/calendar.css';
 import '../../Assets/images/CodeorgLogo.png'
 
@@ -13,17 +14,14 @@ function Calendar({ Pages, PagesArrayNumber, path, ClassNum }) {
       <Helmet>
         <link rel="icon" href="../../Assets/images/CodeorgLogo.png" type="image/png" />
       </Helmet>
-      <div className="connections">
+      <div className="agenda">
         <Sidebar />
         <section className="content">
           <center>
             <h1 id="NamePlate">{Pages[0][ClassNum]} | Agenda</h1>
             <SelectionBar props={Pages} propActiveNumber={PagesArrayNumber} pageName={path} classNum={ClassNum} />
             <br />
-            <div className="slider">
-              <div className="slider-tabs">{ }</div>
-              <div className="slider-content">{ }</div>
-            </div>
+            <CreateCalendar />
           </center>
         </section>
       </div>
