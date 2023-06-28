@@ -63,6 +63,12 @@ const LogCheck = () => {
         }
     };
 
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            handleSubmit(e);
+        }
+    });
+
     return (
         <div className='LoginContainer'>
             <span id="BackgroundImage">

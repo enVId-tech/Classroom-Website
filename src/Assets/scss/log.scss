@@ -1,5 +1,6 @@
 html {
     font-family: Arial, Helvetica, sans-serif;
+
     body {
         background-color: #1f1f1f;
         color: white;
@@ -32,15 +33,17 @@ footer {
     text-align: center;
     color: white;
     z-index: 10000;
-    padding-bottom:30px;
-    padding-top:120px;
+    padding-bottom: 30px;
+    padding-top: 120px;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
-    position: relative; /* Add position relative */
+    position: relative;
+    /* Add position relative */
 
 }
 
-#username, #password {
+#username,
+#password {
     $margin: 0;
     color: white;
     background-color: transparent;
@@ -48,14 +51,26 @@ footer {
     border-left-width: $margin;
     border-right-width: $margin;
     border-bottom-width: 2px;
+    border-radius: 0;
     width: 70%;
     position: relative;
     transition: border-bottom-color 0.1s linear;
-    &:focus {
-        outline:none;
+
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus,
+    &:-webkit-autofill:active {
+        -webkit-box-shadow: 0 0 0 30px rgb(39, 39, 39) inset !important;
+        -webkit-text-fill-color: white !important;
+        box-shadow: 0 0 0 30px rgb(39, 39, 39) inset !important;
     }
+
+    &:focus {
+        outline: none;
+    }
+
     &::selection {
-        background-color: rgb(0, 47, 255);
+        background-color: rgba(0, 116, 255, 0.8);
         width: 200px;
         height: 30px;
     }
@@ -63,7 +78,8 @@ footer {
 
 
 #BackgroundImage {
-    position: absolute; /* Add absolute positioning */
+    position: absolute;
+    /* Add absolute positioning */
     background-image: url(../images/LoginBackground.jpg);
     bottom: 75%;
     left: 0;
@@ -71,7 +87,8 @@ footer {
     height: 50%;
     background-repeat: no-repeat;
     background-size: cover;
-    z-index: 0; /* Set a higher z-index value */
+    z-index: 0;
+    /* Set a higher z-index value */
 }
 
 .googlesignin {
@@ -82,6 +99,7 @@ footer {
     margin-top: 10px;
     margin-bottom: 10px;
     font-family: 'Work Sans', sans-serif;
+
     &:hover {
         background-color: transparent;
         color: white;
@@ -93,6 +111,7 @@ footer {
     background-color: transparent;
     transition: background-color 0.1s linear;
     border-radius: 10px;
+
     &:hover {
         background-color: #00ffc3;
         color: black;
@@ -116,6 +135,7 @@ footer {
     overflow: auto;
     width: 100%;
     z-index: 10000;
+
     & button:not(.img) {
         float: left;
         text-align: center;
@@ -144,18 +164,3 @@ footer {
     margin-top: 20px;
     margin-bottom: 5px;
 }
-
-/*
-.placeholder-move-up {
-    animation: moveUp 0.3s forwards;
-}
-
-@keyframes moveUp {
-    from {
-        transform: translateY(0) scale(1);
-    }
-    to {
-        transform: translateY(-100%) scale(0.8);
-    }
-}
-*/

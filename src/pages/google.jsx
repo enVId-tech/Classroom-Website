@@ -21,9 +21,7 @@ const GoogleCallback = () => {
   }, []);
 
   return (
-    <div>
-      <p>Processing...</p>
-    </div>
+    <div></div>
   );
 };
 

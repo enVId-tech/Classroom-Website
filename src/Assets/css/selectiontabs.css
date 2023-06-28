@@ -9,8 +9,14 @@
 .nav.nav-tabs {
   border-color: black;
   border-bottom-width: 0.25px;
+  border-top-color: transparent;
 }
-
+.nav-tabs .nav-link:hover {
+  border-bottom-color: transparent;
+  border-top-color: rgba(204, 204, 204, 0.5);
+  border-left-color: rgba(204, 204, 204, 0.5);
+  border-right-color: rgba(204, 204, 204, 0.5);
+}
 .nav-item button {
   font-family: "Work Sans", sans-serif;
   background-color: transparent;
@@ -26,7 +32,7 @@
   margin-left: 25px;
 }
 .nav-item button:hover {
-  border-bottom: transparent;
+  border-bottom: 0.25px solid transparent;
   border-top: 0.25px solid rgb(75, 75, 75);
   border-right: 0.25px solid rgb(75, 75, 75);
   border-left: 0.25px solid rgb(75, 75, 75);
@@ -44,6 +50,7 @@
   border-top: 0.25px solid black;
   border-right: 0.25px solid black;
   border-left: 0.25px solid black;
+  border-bottom: transparent;
   color: white;
   opacity: 1;
 }

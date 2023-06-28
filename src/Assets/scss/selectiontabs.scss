@@ -12,46 +12,59 @@ $transparent-border: transparent;
     font-family: 'Open Sans', sans-serif;
 }
 
-.nav.nav-tabs {
-    border-color: black;
-    border-bottom-width: 0.25px;
-}
-
-.nav-item button {
-    font-family: 'Work Sans', sans-serif;
-    background-color: $transparent-background;
-    border-top: $border black;
-    border-right: $border black;
-    border-left: $border black;
-    border-bottom: 0.25px solid transparent;
-    padding: 0 20px;
-    width: 100%;
-    height: 50px;
-    font-size: large;
-    color: white;
-    margin-left: 25px;
-
-    &:hover {
-        border-bottom: transparent;
-        border-top: $border rgb(75, 75, 75);
-        border-right: $border rgb(75, 75, 75);
-        border-left: $border rgb(75, 75, 75);
-        color: white;
+.nav {
+    &.nav-tabs {
+        border-color: black;
+        border-bottom-width: 0.25px;
+        border-top-color: transparent;
     }
 
-    &.enabled {
-        background-color: #383838;
-        border-bottom: transparent;
+    &-tabs .nav-link:hover {
+        $bordercolor: rgb(204, 204, 204, 0.5);
+        border-bottom-color: transparent;
+        border-top-color: $bordercolor;
+        border-left-color: $bordercolor;
+        border-right-color: $bordercolor;
+    }
+
+    &-item button {
+        font-family: 'Work Sans', sans-serif;
+        background-color: $transparent-background;
         border-top: $border black;
         border-right: $border black;
         border-left: $border black;
+        border-bottom: 0.25px solid transparent;
+        padding: 0 20px;
+        width: 100%;
+        height: 50px;
+        font-size: large;
         color: white;
+        margin-left: 25px;
+
         &:hover {
+            border-bottom: 0.25px solid transparent;
+            border-top: $border rgb(75, 75, 75);
+            border-right: $border rgb(75, 75, 75);
+            border-left: $border rgb(75, 75, 75);
+            color: white;
+        }
+
+        &.enabled {
+            background-color: #383838;
+            border-bottom: transparent;
             border-top: $border black;
             border-right: $border black;
             border-left: $border black;
             color: white;
-            opacity: 1;
+
+            &:hover {
+                border-top: $border black;
+                border-right: $border black;
+                border-left: $border black;
+                border-bottom: transparent;
+                color: white;
+                opacity: 1;
+            }
         }
     }
 }

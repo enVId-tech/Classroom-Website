@@ -20,7 +20,7 @@ import dotenv from 'dotenv';
 dotenv.config({ path: './node/credentials.env' });
 
 //Website Pages Setup //DO NOT REMOVE THIS
-app.use(express.static('./build'));
+//app.use(express.static('./build'));
 
 //DO NOT REMOVE 
 app.use(session({
@@ -182,9 +182,11 @@ app.post('/class/agenda/permission', async (req, res) => {
     // Check if the user has permission to write to the agenda
     if (existingJSON.isStaff == true) {
       // Send true if the user has permission
+      console.log("User has permission")
       res.send({ hasPermission: true });
     } else {
       // Send false if the user does not have permission
+      console.log("User does not have permission")
       res.send({ hasPermission: false });
     }
   } catch (err) {
@@ -294,9 +296,9 @@ app.post('/student/sidebar/get', async (req, res) => {
     if (studentData && sidebarJSON) {
       // Send the student data and sidebar JSON data to the client
       res.send({ studentData, sidebarJSON });
-    } else {
-      // Send an error message if there is an error
-      res.send({ error: "User not found" });
+    }
+    if (!studentData || !sidebarJSON) {
+      res.send({ error: "Error: Student data or sidebar JSON data is not defined" });
     }
   } catch (err) {
     // Send an error message if there is an error
@@ -398,8 +400,12 @@ app.post('/student/learninglog/submit', async (req, res) => {
           sendData.Assignment.LearningLog[learningLogName] = learningLogData;
 
           // Write the data to the database
-          await modifyInDatabase({ Email: studentDatabaseData[0].email }, sendData, "assignmentslist");
+          const modify = await modifyInDatabase({ Email: studentDatabaseData[0].email }, sendData, "assignmentslist");
 
+          // Send a success message if there is no error
+          if (modify) {
+            res.send({ success: "Success" });
+          }
           // Breaks out of the loop
           break;
         }
@@ -437,7 +443,12 @@ app.post('/student/learninglog/submit', async (req, res) => {
       sendData.Assignment.LearningLog[learningLogName] = learningLogData;
 
       // Write the data to the database
-      await writeToDatabase(sendData, "assignmentslist"); // Write the data to the database
+      const modify = await writeToDatabase(sendData, "assignmentslist"); // Write the data to the database
+
+      // Send a success message if there is no error
+      if (modify) {
+        res.send({ success: "Success" });
+      }
     }
   } catch (err) {
     // Send an error message if there is an error

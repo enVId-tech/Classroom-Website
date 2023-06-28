@@ -1,6 +1,5 @@
 import React from 'react';
 import '../css/sidebar.css'
-import { logOut } from './keeploggedout';
 import LoadInStudentData from './LoadInStudentData';
 
 const Sidebar = () => {

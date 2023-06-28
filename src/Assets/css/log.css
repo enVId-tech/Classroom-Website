@@ -36,31 +36,46 @@ footer {
   padding-top: 120px;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
-  position: relative; /* Add position relative */
+  position: relative;
+  /* Add position relative */
 }
 
-#username, #password {
+#username,
+#password {
   color: white;
   background-color: transparent;
   border-top-width: 0;
   border-left-width: 0;
   border-right-width: 0;
   border-bottom-width: 2px;
+  border-radius: 0;
   width: 70%;
   position: relative;
   transition: border-bottom-color 0.1s linear;
 }
-#username:focus, #password:focus {
+#username:-webkit-autofill, #username:-webkit-autofill:hover, #username:-webkit-autofill:focus, #username:-webkit-autofill:active,
+#password:-webkit-autofill,
+#password:-webkit-autofill:hover,
+#password:-webkit-autofill:focus,
+#password:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px rgb(39, 39, 39) inset !important;
+  -webkit-text-fill-color: white !important;
+  box-shadow: 0 0 0 30px rgb(39, 39, 39) inset !important;
+}
+#username:focus,
+#password:focus {
   outline: none;
 }
-#username::selection, #password::selection {
-  background-color: rgb(0, 47, 255);
+#username::selection,
+#password::selection {
+  background-color: rgba(0, 116, 255, 0.8);
   width: 200px;
   height: 30px;
 }
 
 #BackgroundImage {
-  position: absolute; /* Add absolute positioning */
+  position: absolute;
+  /* Add absolute positioning */
   background-image: url(../images/LoginBackground.jpg);
   bottom: 75%;
   left: 0;
@@ -68,7 +83,8 @@ footer {
   height: 50%;
   background-repeat: no-repeat;
   background-size: cover;
-  z-index: 0; /* Set a higher z-index value */
+  z-index: 0;
+  /* Set a higher z-index value */
 }
 
 .googlesignin {
@@ -141,20 +157,5 @@ footer {
   margin-top: 20px;
   margin-bottom: 5px;
 }
-
-/*
-.placeholder-move-up {
-    animation: moveUp 0.3s forwards;
-}
-
-@keyframes moveUp {
-    from {
-        transform: translateY(0) scale(1);
-    }
-    to {
-        transform: translateY(-100%) scale(0.8);
-    }
-}
-*/
 
 /*# sourceMappingURL=log.css.map */

@@ -25,8 +25,8 @@ import Login from './pages/login.jsx';
 import Profile from './pages/profile.jsx';
 import Settings from './pages/settings.jsx';
 import Connections from './pages/connections.jsx';
-import ActiveConnections from './pages/appointmentRequest.jsx';
-import RequestConnections from './pages/appointmentView.jsx';
+import ActiveConnections from './pages/appointmentView.jsx';
+import RequestConnections from './pages/appointmentRequest.jsx';
 import ClassHome from './pages/classes/classhome.jsx';
 import LearningLog from './pages/classes/learninglog.jsx';
 import AssignmentList from './pages/classes/assignmentlist';
@@ -36,43 +36,69 @@ import GoogleCallback from './pages/google';
 
 const Render = () => {
     const PagesArray = [
-        ["Profile", "Settings"],
+        ["Settings", "Profile"],
         ["Connections", "View Appointments", "Request an Appointment"],
-        [["CSD", "APCSP", "APCSA", "MAD"], "Announcements", "Assignments", "Calendar", "Learning Log"]
+        [["CSD", "APCSP", "APCSA", "MAD"], "Announcements", "Assignments", "Agenda", "Learning Log"]
     ];
 
     const PagesPathArray = [
-        ["profile", "settings"],
+        ["settings", "profile" ],
         ["connections", "appointmentRequest", "appointmentView"],
-        ["home", "announcements", "assignments", "calendar", "learninglog"]
+        ["home", "announcements", "assignments", "agenda", "learninglog"]
     ]
 
     const CSD = {
         Pages: PagesArray[2],
-        PagesArrayNumber: 0,
         ClassNum: 0,
         path: PagesPathArray[2]
     };
 
     const APCSP = {
         Pages: PagesArray[2],
-        PagesArrayNumber: 0,
         ClassNum: 1,
         path: PagesPathArray[2]
     }
 
     const APCSA = {
         Pages: PagesArray[2],
-        PagesArrayNumber: 0,
         ClassNum: 2,
         path: PagesPathArray[2]
     }
 
     const MAD = {
         Pages: PagesArray[2],
-        PagesArrayNumber: 0,
         ClassNum: 3,
         path: PagesPathArray[2]
+    }
+
+    const connectionsHomeCONST = {
+        Pages: PagesArray[1],
+        PagesArrayNumber: 0,
+        path: PagesPathArray[1]
+    }
+
+    const appointmentViewCONST = {
+        Pages: PagesArray[1],
+        PagesArrayNumber: 1,
+        path: PagesPathArray[1]
+    }
+
+    const appointmentRequestCONST = {
+        Pages: PagesArray[1],
+        PagesArrayNumber: 2,
+        path: PagesPathArray[1]
+    }
+
+    const profile = {
+        Pages: PagesArray[0],
+        PagesArrayNumber: 1,
+        path: PagesPathArray[0]
+    }
+
+    const settings = {
+        Pages: PagesArray[0],
+        PagesArrayNumber: 0,
+        path: PagesPathArray[0]
     }
 
     return (
@@ -82,10 +108,13 @@ const Render = () => {
                 <Route path="/*" element={<Navigate to="/" />} />
                 <Route path={"/connections/*"} element={<Navigate to={"/connections/home"} />} />
                 <Route path={"/connections/"} element={<Navigate to={"/connections/home"} />} />
-                <Route path={`/Classes/${PagesArray[2][0][0]}/*`} element={<Navigate to={`/Classes/${PagesArray[2][0][0]}/home`} />} />
-                <Route path={`/Classes/${PagesArray[2][0][1]}/*`} element={<Navigate to={`/Classes/${PagesArray[2][0][1]}/home`} />} />
-                <Route path={`/Classes/${PagesArray[2][0][2]}/*`} element={<Navigate to={`/Classes/${PagesArray[2][0][2]}/home`} />} />
-                <Route path={`/Classes/${PagesArray[2][0][3]}/*`} element={<Navigate to={`/Classes/${PagesArray[2][0][3]}/home`} />} />
+                <Route path={"/User/profile-settings/*"} element={<Navigate to={"/User/profile-settings/settings"} />} />
+                <Route path={`${PagesPathArray[0][0]}/`} element={<Navigate to={`/User/profile-settings/${PagesPathArray[0][0]}`} />} />
+                <Route path={`${PagesPathArray[0][1]}/`} element={<Navigate to={`/User/profile-settings/${PagesPathArray[0][1]}`} />} />
+                <Route path={`/Classes/${PagesArray[2][0][0]}/*`} element={<Navigate to={`/Classes/${PagesArray[2][0][0]}/${PagesPathArray[2][0]}`} />} />
+                <Route path={`/Classes/${PagesArray[2][0][1]}/*`} element={<Navigate to={`/Classes/${PagesArray[2][0][1]}/${PagesPathArray[2][0]}`} />} />
+                <Route path={`/Classes/${PagesArray[2][0][2]}/*`} element={<Navigate to={`/Classes/${PagesArray[2][0][2]}/${PagesPathArray[2][0]}`} />} />
+                <Route path={`/Classes/${PagesArray[2][0][3]}/*`} element={<Navigate to={`/Classes/${PagesArray[2][0][3]}/${PagesPathArray[2][0]}`} />} />
 
                 {/* Google Login */}
                 <Route path="/auth/google/callback" element={<GoogleCallback />} />
@@ -97,46 +126,46 @@ const Render = () => {
                     <Route path="Log-Out/*" element={<LogOut />} />
                 </Route>
                 <Route path="/User/profile-settings/*">
-                    <Route path={PagesPathArray[0][0]} element={<Profile Pages={PagesArray[0]} PagesArrayNumber={0} path={PagesPathArray[0]} />} />
-                    <Route path={PagesPathArray[0][1]} element={<Settings Pages={PagesArray[0]} PagesArrayNumber={1} path={PagesPathArray[0]} />} />
+                    <Route path={PagesPathArray[0][0]} element={<Settings {...settings} />} />
+                    <Route path={PagesPathArray[0][1]} element={<Profile {...profile} />} />
                 </Route>
                 <Route path={PagesPathArray[1][0]}>
-                    <Route path="home/*" element={<Connections Pages={PagesArray[1]} PagesArrayNumber={0} path={PagesPathArray[1]} />} />
-                    <Route path={PagesPathArray[1][1]} element={<ActiveConnections Pages={PagesArray[1]} PagesArrayNumber={1} path={PagesPathArray[2]} />} />
-                    <Route path={PagesPathArray[1][2]} element={<RequestConnections />} />
+                    <Route path="home/*" element={<Connections {...connectionsHomeCONST} />} />
+                    <Route path={PagesPathArray[1][1]} element={<ActiveConnections {...appointmentViewCONST} />} />
+                    <Route path={PagesPathArray[1][2]} element={<RequestConnections {...appointmentRequestCONST} />} />
                 </Route>
 
                 {/* Classes */}
                 <Route path={`/Classes/${PagesArray[2][0][0]}/*`}>
-                    <Route path="home/*" element={<ClassHome {...CSD} />} />
-                    <Route path="learninglog/*" element={<LearningLog {...CSD} />} />
-                    <Route path="assignments/*" element={<AssignmentList {...CSD} />} />
-                    <Route path="calendar/*" element={<Calendar {...CSD} />} />
-                    <Route path="announcements/*" element={<Announcements {...CSD} />} />
+                    <Route path={`${PagesPathArray[2][0]}`} element={<ClassHome {...CSD} PagesArrayNumber={0} />} />
+                    <Route path={`${PagesPathArray[2][1]}`} element={<Announcements {...CSD} PagesArrayNumber={1} />} />
+                    <Route path={`${PagesPathArray[2][2]}`} element={<AssignmentList {...CSD} PagesArrayNumber={2} />} />
+                    <Route path={`${PagesPathArray[2][3]}`} element={<Calendar {...CSD} PagesArrayNumber={3} />} />
+                    <Route path={`${PagesPathArray[2][4]}`} element={<LearningLog {...CSD} PagesArrayNumber={4} />} />
                 </Route>
 
                 <Route path={`/Classes/${PagesArray[2][0][1]}/*`}>
-                    <Route path="home/*" element={<ClassHome {...APCSP} />} />
-                    <Route path="learninglog/*" element={<LearningLog {...APCSP} />} />
-                    <Route path="assignments/*" element={<AssignmentList {...APCSP} />} />
-                    <Route path="calendar/*" element={<Calendar {...APCSP} />} />
-                    <Route path="announcements/*" element={<Announcements {...APCSP} />} />
+                    <Route path={`${PagesPathArray[2][0]}`} element={<ClassHome {...APCSP} PagesArrayNumber={0} />} />
+                    <Route path={`${PagesPathArray[2][1]}`} element={<Announcements {...APCSP} PagesArrayNumber={1} />} />
+                    <Route path={`${PagesPathArray[2][2]}`} element={<AssignmentList {...APCSP} PagesArrayNumber={2} />} />
+                    <Route path={`${PagesPathArray[2][3]}`} element={<Calendar {...APCSP} PagesArrayNumber={3} />} />
+                    <Route path={`${PagesPathArray[2][4]}`} element={<LearningLog {...APCSP} PagesArrayNumber={4} />} />
                 </Route>
 
                 <Route path={`/Classes/${PagesArray[2][0][2]}/*`}>
-                    <Route path="home/*" element={<ClassHome {...APCSA} />} />
-                    <Route path="learninglog/*" element={<LearningLog {...APCSA} />} />
-                    <Route path="assignments/*" element={<AssignmentList {...APCSA} />} />
-                    <Route path="calendar/*" element={<Calendar {...APCSA} />} />
-                    <Route path="announcements/*" element={<Announcements {...APCSA} />} />
+                    <Route path={`${PagesPathArray[2][0]}`} element={<ClassHome {...APCSA} PagesArrayNumber={0} />} />
+                    <Route path={`${PagesPathArray[2][1]}`} element={<Announcements {...APCSA} PagesArrayNumber={1} />} />
+                    <Route path={`${PagesPathArray[2][2]}`} element={<AssignmentList {...APCSA} PagesArrayNumber={2} />} />
+                    <Route path={`${PagesPathArray[2][3]}`} element={<Calendar {...APCSA} PagesArrayNumber={3} />} />
+                    <Route path={`${PagesPathArray[2][4]}`} element={<LearningLog {...APCSA} PagesArrayNumber={4} />} />
                 </Route>
 
                 <Route path={`/Classes/${PagesArray[2][0][3]}/*`}>
-                    <Route path="home/*" element={<ClassHome {...MAD} />} />
-                    <Route path={`learninglog/*`} element={<LearningLog {...MAD}/>} />
-                    <Route path={`assignments/*`} element={<AssignmentList {...MAD} />} />
-                    <Route path={`calendar/*`} element={<Calendar {...MAD} />} />
-                    <Route path={`announcements/*`} element={<Announcements {...MAD} />} />
+                    <Route path={`${PagesPathArray[2][0]}`} element={<ClassHome {...MAD} PagesArrayNumber={0} />} />
+                    <Route path={`${PagesPathArray[2][1]}`} element={<Announcements {...MAD} PagesArrayNumber={1} />} />
+                    <Route path={`${PagesPathArray[2][2]}`} element={<AssignmentList {...MAD} PagesArrayNumber={2} />} />
+                    <Route path={`${PagesPathArray[2][3]}`} element={<Calendar {...MAD} PagesArrayNumber={3} />} />
+                    <Route path={`${PagesPathArray[2][4]}`} element={<LearningLog {...MAD} PagesArrayNumber={4} />} />
                 </Route>
             </Routes>
         </BrowserRouter>

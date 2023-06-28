@@ -1,35 +1,36 @@
 import React from 'react';
-import { Helmet } from 'react-helmet';
+import { HelmetProvider } from 'react-helmet-async';
 
 import Sidebar from '../../Assets/jsx/sidebar';
 import SelectionBar from '../../Assets/jsx/selectionbar';
+import CreateCalendar from '../../Assets/jsx/createCalendar';
+import ClassHelmet from '../../Assets/jsx/pagehead';
 import '../../Assets/css/calendar.css';
 import '../../Assets/images/CodeorgLogo.png'
 
 function Calendar({ Pages, PagesArrayNumber, path, ClassNum }) {
 
+  const ClassTitle = {
+    page: "class",
+    classType: Pages[0][ClassNum],
+    classPage: "agenda"
+  }
+
   return (
-    <>
-      <Helmet>
-        <link rel="icon" href="../../Assets/images/CodeorgLogo.png" type="image/png" />
-      </Helmet>
-      <div className="connections">
+    <HelmetProvider>
+      <ClassHelmet {...ClassTitle} />
+      <div className="agenda">
         <Sidebar />
         <section className="content">
           <center>
             <h1 id="NamePlate">{Pages[0][ClassNum]} | Agenda</h1>
-            <ul className="nav nav-tabs" role="tablist">
-              <SelectionBar props={Pages} propActiveNumber={PagesArrayNumber} pageName={path} classNum={ClassNum} />
-            </ul>
+            <SelectionBar props={Pages} propActiveNumber={PagesArrayNumber} pageName={path} classNum={ClassNum} />
             <br />
-            <div className="slider">
-              <div className="slider-tabs">{ }</div>
-              <div className="slider-content">{ }</div>
-            </div>
+            <CreateCalendar />
           </center>
         </section>
       </div>
-    </>
+    </HelmetProvider>
   );
 }
 
