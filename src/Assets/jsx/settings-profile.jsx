@@ -1,6 +1,7 @@
 import React from 'react';
 
 const User = ({type}) => {
+    /* eslint-disable */
     if (type === "settings") {
         return (
             <div id="Settings">
@@ -42,12 +43,13 @@ const User = ({type}) => {
                     <br /><br /><br />
                     <span>
                         <h1>
-                            <img class="profilepicture"></img>
+                            <img class="profilepicture" alt=""></img>
                             <input type="text" id="display" class="display" name="display" value="" />
                         </h1>
                     </span>
                     <br /><br /><br /><br />
-                    <h1 id="Error"></h1>
+                    
+                    <h1 id="Error"></h1> 
                     <button id="Save">
                         <h1 id="SaveLabel">Save</h1>
                     </button>

@@ -5,12 +5,24 @@ const CreateCalendar = () => {
   const [activeNum, setActiveNum] = useState([]);
   const [hasPermission, setHasPermission] = useState(false);
 
-  const numberOfMonths = 11;
-
   const date = new Date();
   const currentDay = date.getDate();
   const currentMonth = date.getMonth() + 1;
   const currentYear = date.getFullYear();
+
+
+  useEffect(() => {
+    checkUserPermission();
+    const monthsArray = pushMonths();
+    setMonths(monthsArray);
+    setActiveNum([
+      currentDay,
+      currentMonth + 1,
+      currentYear,
+    ])
+  }, []);
+
+  const numberOfMonths = 11;
 
 
   const pushMonths = () => {
@@ -26,12 +38,6 @@ const CreateCalendar = () => {
 
     return monthsArray;
   };
-
-  setActiveNum([
-    currentDay,
-    currentMonth + 1,
-    currentYear,
-  ])
 
   const getDaysInMonth = (month, year) => {
     const daysInMonth = new Date(year, month, 0).getDate();
@@ -63,12 +69,6 @@ const CreateCalendar = () => {
     return monthNames[month - 1];
   }
 
-  useEffect(() => {
-    checkUserPermission();
-    const monthsArray = pushMonths();
-    setMonths(monthsArray);
-  }, []);
-
   async function checkUserPermission() {
     const dataID = document.cookie.split("=")[1];
     const windowURL = window.location.pathname;
@@ -91,50 +91,46 @@ const CreateCalendar = () => {
 
   }
 
-  try {
-    const setActive = (index) => {
-      const tabElements = document.getElementsByClassName("tab");
-      for (let i = 0; i < tabElements.length; i++) {
-        tabElements[i].classList.remove("active");
-      }
-      tabElements[index].classList.add("active");
+  const setActive = (index) => {
+    const tabElements = document.getElementsByClassName("tab");
+    
+    for (let i = 0; i < tabElements.length; i++) {
+      tabElements[i].classList.remove("active");
     }
-    return (
-      <>
-        <div className="slider-tabs">
-          {
-            months.map((month, index) => {
-              return (
-                <div className={`tab ${index === 0 ? 'active' : ''}`} onClick={() => setActive(index)}>
-                  {
-                    getMonthLabel(parseInt(month.split(" ")[0]))
-                  }
-                </div>
-              );
-            })
-          }
-        </div>
-        <div className="slider-content">
-          {
-            months.map((month) => {
-              let days = getDaysInMonth(month.split(" ")[0], month.split(" ")[1]);
-              return days.map((day, index) => (
-                <div className={`day ${day === activeNum[0] ? 'active' : ''}`} key={index}>
-                  <div className="day-number">
-                    {day}
-                  </div>
-                  <div className="weekday-label">
-                    {getDayLabel(index)}
-                  </div>
-                </div>
-              ));
-            })
-          }
-        </div>
-      </>
-    )
-  } catch (error) {
-    console.log(error);
+    tabElements[index].classList.add("active");
   }
+  return (
+    <>
+      <div className="slider-tabs">
+        {
+          months.map((month, index) => {
+            const monthLabel = getMonthLabel(parseInt(month.split(" ")[0]));
+            return (
+              <div className={`tab ${index === 0 ? 'active' : ''}`} onClick={() => setActive(index)}>
+                {monthLabel}
+              </div>
+            );
+          })
+        }
+      </div>
+      <div className="slider-content">
+        {
+          months.map((month) => {
+            let days = getDaysInMonth(month.split(" ")[0], month.split(" ")[1]);
+            return days.map((day, index) => (
+              <div className={`day ${day === activeNum[0] ? 'active' : ''}`} key={index}>
+                <div className="day-number">
+                  {day}
+                </div>
+                <div className="weekday-label">
+                  {getDayLabel(index)}
+                </div>
+              </div>
+            ));
+          })
+        }
+      </div>
+    </>
+  )
 }
 export default CreateCalendar;

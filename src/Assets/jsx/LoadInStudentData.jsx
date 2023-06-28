@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { LoggedOut, logOut, checkLoggedIn } from "./keeploggedout";
+import { logOut, checkLoggedIn } from "./keeploggedout";
 
 const LoadInStudentData = () => {
     const [userDisplayName, setUserDisplayName] = useState("");
@@ -83,7 +83,7 @@ const LoadInStudentData = () => {
     };
 
     if (document.getElementById("NamePlate") && window.location.pathname === "/") {
-        document.getElementById("NamePlate").innerHTML = "Welcome" + " " + firstName + "!";
+        document.getElementById("NamePlate").innerHTML = "Welcome " + firstName + "!";
     }
 
     return (

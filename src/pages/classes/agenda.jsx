@@ -1,19 +1,24 @@
 import React from 'react';
-import { Helmet } from 'react-helmet';
+import { HelmetProvider } from 'react-helmet-async';
 
 import Sidebar from '../../Assets/jsx/sidebar';
 import SelectionBar from '../../Assets/jsx/selectionbar';
 import CreateCalendar from '../../Assets/jsx/createCalendar';
+import ClassHelmet from '../../Assets/jsx/pagehead';
 import '../../Assets/css/calendar.css';
 import '../../Assets/images/CodeorgLogo.png'
 
 function Calendar({ Pages, PagesArrayNumber, path, ClassNum }) {
 
+  const ClassTitle = {
+    page: "class",
+    classType: Pages[0][ClassNum],
+    classPage: "agenda"
+  }
+
   return (
-    <>
-      <Helmet>
-        <link rel="icon" href="../../Assets/images/CodeorgLogo.png" type="image/png" />
-      </Helmet>
+    <HelmetProvider>
+      <ClassHelmet {...ClassTitle} />
       <div className="agenda">
         <Sidebar />
         <section className="content">
@@ -25,7 +30,7 @@ function Calendar({ Pages, PagesArrayNumber, path, ClassNum }) {
           </center>
         </section>
       </div>
-    </>
+    </HelmetProvider>
   );
 }
 

@@ -400,8 +400,12 @@ app.post('/student/learninglog/submit', async (req, res) => {
           sendData.Assignment.LearningLog[learningLogName] = learningLogData;
 
           // Write the data to the database
-          await modifyInDatabase({ Email: studentDatabaseData[0].email }, sendData, "assignmentslist");
+          const modify = await modifyInDatabase({ Email: studentDatabaseData[0].email }, sendData, "assignmentslist");
 
+          // Send a success message if there is no error
+          if (modify) {
+            res.send({ success: "Success" });
+          }
           // Breaks out of the loop
           break;
         }
@@ -439,7 +443,12 @@ app.post('/student/learninglog/submit', async (req, res) => {
       sendData.Assignment.LearningLog[learningLogName] = learningLogData;
 
       // Write the data to the database
-      await writeToDatabase(sendData, "assignmentslist"); // Write the data to the database
+      const modify = await writeToDatabase(sendData, "assignmentslist"); // Write the data to the database
+
+      // Send a success message if there is no error
+      if (modify) {
+        res.send({ success: "Success" });
+      }
     }
   } catch (err) {
     // Send an error message if there is an error
