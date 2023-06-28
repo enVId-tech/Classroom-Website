@@ -1,0 +1,51 @@
+#NamePlate {
+  font-size: 100px;
+  top: 10%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-family: "Open Sans", sans-serif;
+}
+
+.nav.nav-tabs {
+  border-color: black;
+  border-bottom-width: 0.25px;
+}
+
+.nav-item button {
+  font-family: "Work Sans", sans-serif;
+  background-color: transparent;
+  border-top: 0.25px solid black;
+  border-right: 0.25px solid black;
+  border-left: 0.25px solid black;
+  border-bottom: 0.25px solid transparent;
+  padding: 0 20px;
+  width: 100%;
+  height: 50px;
+  font-size: large;
+  color: white;
+  margin-left: 25px;
+}
+.nav-item button:hover {
+  border-bottom: transparent;
+  border-top: 0.25px solid rgb(75, 75, 75);
+  border-right: 0.25px solid rgb(75, 75, 75);
+  border-left: 0.25px solid rgb(75, 75, 75);
+  color: white;
+}
+.nav-item button.enabled {
+  background-color: #383838;
+  border-bottom: transparent;
+  border-top: 0.25px solid black;
+  border-right: 0.25px solid black;
+  border-left: 0.25px solid black;
+  color: white;
+}
+.nav-item button.enabled:hover {
+  border-top: 0.25px solid black;
+  border-right: 0.25px solid black;
+  border-left: 0.25px solid black;
+  color: white;
+  opacity: 1;
+}
+
+/*# sourceMappingURL=selectiontabs.css.map */
