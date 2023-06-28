@@ -1,105 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>CS Pathway | Home</title>
-    <meta name="referrer" content="no-referrer" />
-    <link rel="shortcut icon" href="/Assets/images/HomePage.png" type="image/x-icon">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="MrWai.com, built using ReactJS" />
+  <link rel="apple-touch-icon" href="" />
+  <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+  <!--<link rel="manifest" href="%PUBLIC_URL%/manifest.json" />-->
 
-    <!-- Bootstrap CSS Elements -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <title>CS Pathway</title>
 
-    <!-- Scroll Bar Browser Compatibility -->
-    <link rel="stylesheet" href="https://unpkg.com/simplebar@latest/dist/simplebar.min.css" />
-    <script src="https://unpkg.com/simplebar@latest/dist/simplebar.min.js"></script>
-
-    <!-- Internal CSS-->
-    <link rel="stylesheet" type="text/css" href="/Assets/css/home.css">
-    <link rel="stylesheet" type="text/css" href="/Assets/css/sidebar.css">
-    <link rel="stylesheet" type="text/css" href="/Assets/css/sidescrollbar.css">
-
-    <!-- External CSS -->
-    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:wght@100&display=swap' rel='stylesheet'
-        type='text/css'>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&display=swap" rel="stylesheet"
-        type='text/css'>
-    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300&display=swap" rel="stylesheet"
-        type='text/css'>
-    <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet" type='text/css'>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <!-- Internal JS -->
-    <script type="text/javascript" src="/Assets/js/LoadInStudentData.js"></script>
-    <script type="text/javascript" src="/Assets/js/keeploggedout.js"></script>
+  <!-- External CSS -->
+  <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:wght@100&display=swap' rel='stylesheet'
+    type='text/css'>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&display=swap" rel="stylesheet"
+    type='text/css'>
+  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300&display=swap" rel="stylesheet"
+    type='text/css'>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet" type='text/css'>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <script src="http://localhost:8097"></script>
 </head>
 
-<body id="scrollable-container">
-    <!-- Sidebar -->
-    <section class="sidebar" id="sidebar">
-        <div class="sidebardiv" id="sidebardiv">
-            <div class="sidebar-item">
-                <div class="img" id="LeftImg">
-                    <img id="ProfilePicture" src="/" class="image" referrerpolicy="no-referrer">
-                    <br>
-                    <h4 id="Loggedinas">Logged in as<br>"Placeholder"</h4>
-                </div>
-            </div>
-            <div class="sidebar-item">
-                <button class="sidebar-label" onclick="window.location.replace('/');">Home</button>
-            </div>
-            <div class="sidebar-item">
-                <button class="sidebar-label" onclick="window.location.replace('/connections');">Connections</button>
-                <div class="sidebar-dropdown">
-                    <div class="sidebar-item extras">
-                        <button class="sidebar-item extras"
-                            onclick="window.location.replace('/connections/appointmentView');">View Appointments</button>
-                    </div>
-                    <div class="siderbar-item extras">
-                        <button class="sidebar-item extras"
-                            onclick="window.location.replace('/connections/appointmentRequest');">Schedule an
-                            appointment</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="Credits">
-            <h1 id="ComputerScience">Computer Science Pathway | <a id="FooterName"
-                    onclick="window.location.replace('https://www.mrwai.com')">
-                    MrWai.com
-                </a>
-            </h1>
-            <h2 id="Copyright">(Unofficial) Copyright 2010-2023; All rights reserved.</h2>
-        </div>
-    </section>
-
-    <!-- Content -->
-    <center>
-        <section class="content">
-            <center>
-                <div id="NamePlate">Welcome "Placeholder"!</div>
-                <span id="NewsOfTheDay">
-                    <span id="Prerequistes">
-                        <div id="Assignments">
-                            <h1 id="AssignmentsTitle">Assignments</h1>
-                            <p id="AssignmentsContent">This box that you see shows you pain</p>
-                        </div>
-                        <div id="Announcements">
-                            <h1 id="AnnouncementsTitle">Announcements</h1>
-                            <p id="AnnouncementsContent">Teachers yell at you constantly here</p>
-                        </div>
-                        <div id="UpcomingEvents">
-                            <h1 id="UpcomingEventsTitle">Upcoming Events</h1>
-                            <p id="UpcomingEventsContent">ASB has an aneurysm here</p>
-                        </div>
-                    </span>
-                </span>
-            </center>
-        </section>
-    </center>
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
 </body>
 
 </html>
