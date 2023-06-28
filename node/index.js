@@ -5,11 +5,16 @@ import session from 'express-session';
 import passport from 'passport';
 import _ from 'lodash';
 import Filter from 'bad-words';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
 const filter = new Filter();
 import { processCommand } from './modules/consolecommands.js';
 import { generateRandomNumber, encryptPassword, comparePassword, encryptData, decryptData, encryptIP } from './modules/encryption.js';
 import { writeToDatabase, modifyInDatabase, getItemsFromDatabase } from './modules/mongoDB.js';
 import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Library Initialization
 app.use(express.json());
@@ -20,7 +25,11 @@ import dotenv from 'dotenv';
 dotenv.config({ path: './node/credentials.env' });
 
 //Website Pages Setup //DO NOT REMOVE THIS
-//app.use(express.static('./build'));
+app.use(express.static(resolve(__dirname, '../build')));
+
+app.get('*', (req, res) => {
+  res.sendFile(resolve(__dirname, '../build', 'index.html'));
+});
 
 //DO NOT REMOVE 
 app.use(session({
