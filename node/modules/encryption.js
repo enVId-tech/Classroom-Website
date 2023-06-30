@@ -4,16 +4,39 @@ import bcrypt from 'bcrypt';
 
 //Generates Random Session Key
 
-function generateRandomNumber(NumberofDigits) {
-  let randomNumber = '';
-  const digits = '0123456789';
+function generateRandomNumber(NumberofDigits, typeofGeneration) {
+  try {
+    let randomNumber = '';
+    const digits = '0123456789';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    const alphanumeric = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-  for (let i = 0; i < NumberofDigits; i++) {
-    const randomIndex = Math.floor(Math.random() * digits.length);
-    randomNumber += digits[randomIndex];
+    if (typeofGeneration === 'number') {
+      for (let i = 0; i < NumberofDigits; i++) {
+        const randomIndex = Math.floor(Math.random() * digits.length);
+        randomNumber += digits[randomIndex];
+      }
+    } else if (typeofGeneration === 'string') {
+      for (let i = 0; i < NumberofDigits; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        randomNumber += characters[randomIndex];
+      }
+    } else if (typeofGeneration === 'alphanumeric' || typeofGeneration === 'both') {
+      for (let i = 0; i < NumberofDigits; i++) {
+        const randomIndex = Math.floor(Math.random() * alphanumeric.length);
+        randomNumber += alphanumeric[randomIndex];
+      }
+    } else {
+      return 'Invalid type of generation';
+    }
+    if (typeof randomNumber !== 'string') {
+      randomNumber = randomNumber.toString();
+    }
+    return randomNumber;
+  } catch (err) {
+    console.log(err);
+    return err;
   }
-
-  return randomNumber;
 };
 
 //Random encryption key and iv
@@ -30,6 +53,21 @@ async function encryptPassword(myPlaintextPassword, saltRounds) {
   }
 }
 
+async function permanentEncryptPassword(myPlaintextPassword) {
+  try {
+    const hash = crypto.createHash('sha256');
+
+    const data = hash.update(myPlaintextPassword, 'utf-8');
+    const gen_hash = data.digest('hex');
+    if (typeof gen_hash !== 'string') {
+      gen_hash = gen_hash.toString();
+    }
+    return gen_hash;
+  } catch (err) {
+    console.log(err);
+    return err;
+  }
+}
 
 
 async function comparePassword(password, hashedPassword) {
@@ -40,6 +78,7 @@ async function comparePassword(password, hashedPassword) {
     return err;
   }
 }
+
 
 
 //Encrypts Session ID
@@ -111,5 +150,6 @@ export {
   comparePassword,
   encryptData,
   decryptData,
-  encryptIP
+  encryptIP,
+  permanentEncryptPassword
 };

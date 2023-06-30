@@ -1,6 +1,7 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
 
+// eslint-disable-next-line react/prop-types
 const ClassHelmet = ({ page, classType, classPage }) => {
     switch (page) {
         case "login": {
@@ -99,7 +100,7 @@ const ClassHelmet = ({ page, classType, classPage }) => {
                             return (
                                 <Helmet>
                                     <title>CS Pathway - Mobile App Development</title>
-                                    <link rel="shortcut icon" href="/images/AndroidStudio.png" type="image/x-icon"></link>
+                                    <link rel="shortcut icon" href="/images/AndroidStudio.webp" type="image/x-icon"></link>
                                 </Helmet>
                             )
                         }
@@ -107,7 +108,7 @@ const ClassHelmet = ({ page, classType, classPage }) => {
                             return (
                                 <Helmet>
                                     <title>CS Pathway - Class</title>
-                                    <link rel="shortcut icon" href="/images/AndroidStudio.png" type="image/x-icon"></link>
+                                    <link rel="shortcut icon" href="/images/AndroidStudio.webp" type="image/x-icon"></link>
                                 </Helmet>
                             )
                         }
@@ -143,7 +144,7 @@ const ClassHelmet = ({ page, classType, classPage }) => {
                             return (
                                 <Helmet>
                                     <title>CS Pathway - MAD Assignments</title>
-                                    <link rel="shortcut icon" href="/images/AndroidStudio.png" type="image/x-icon"></link>
+                                    <link rel="shortcut icon" href="/images/AndroidStudio.webp" type="image/x-icon"></link>
                                 </Helmet>
                             )
                         }
@@ -151,7 +152,7 @@ const ClassHelmet = ({ page, classType, classPage }) => {
                             return (
                                 <Helmet>
                                     <title>CS Pathway - Assignments</title>
-                                    <link rel="shortcut icon" href="/images/AndroidStudio.png" type="image/x-icon"></link>
+                                    <link rel="shortcut icon" href="/images/AndroidStudio.webp" type="image/x-icon"></link>
                                 </Helmet>
                             )
                         }
@@ -187,7 +188,7 @@ const ClassHelmet = ({ page, classType, classPage }) => {
                             return (
                                 <Helmet>
                                     <title>CS Pathway - MAD Announcements</title>
-                                    <link rel="shortcut icon" href="/images/AndroidStudio.png" type="image/x-icon"></link>
+                                    <link rel="shortcut icon" href="/images/AndroidStudio.webp" type="image/x-icon"></link>
                                 </Helmet>
                             )
                         }
@@ -195,7 +196,7 @@ const ClassHelmet = ({ page, classType, classPage }) => {
                             return (
                                 <Helmet>
                                     <title>CS Pathway - Announcements</title>
-                                    <link rel="shortcut icon" href="/images/AndroidStudio.png" type="image/x-icon"></link>
+                                    <link rel="shortcut icon" href="/images/AndroidStudio.webp" type="image/x-icon"></link>
                                 </Helmet>
                             )
                         }
@@ -231,7 +232,7 @@ const ClassHelmet = ({ page, classType, classPage }) => {
                             return (
                                 <Helmet>
                                     <title>CS Pathway - MAD Agenda</title>
-                                    <link rel="shortcut icon" href="/images/AndroidStudio.png" type="image/x-icon"></link>
+                                    <link rel="shortcut icon" href="/images/AndroidStudio.webp" type="image/x-icon"></link>
                                 </Helmet>
                             )
                         }
@@ -239,7 +240,7 @@ const ClassHelmet = ({ page, classType, classPage }) => {
                             return (
                                 <Helmet>
                                     <title>CS Pathway - Agenda</title>
-                                    <link rel="shortcut icon" href="/images/AndroidStudio.png" type="image/x-icon"></link>
+                                    <link rel="shortcut icon" href="/images/AndroidStudio.webp" type="image/x-icon"></link>
                                 </Helmet>
                             )
                         }
@@ -275,7 +276,7 @@ const ClassHelmet = ({ page, classType, classPage }) => {
                             return (
                                 <Helmet>
                                     <title>CS Pathway - MAD Learning Log</title>
-                                    <link rel="shortcut icon" href="/images/AndroidStudio.png" type="image/x-icon"></link>
+                                    <link rel="shortcut icon" href="/images/AndroidStudio.webp" type="image/x-icon"></link>
                                 </Helmet>
                             )
                         }
@@ -283,7 +284,7 @@ const ClassHelmet = ({ page, classType, classPage }) => {
                             return (
                                 <Helmet>
                                     <title>CS Pathway - Learning Log</title>
-                                    <link rel="shortcut icon" href="/images/AndroidStudio.png" type="image/x-icon"></link>
+                                    <link rel="shortcut icon" href="/images/AndroidStudio.webp" type="image/x-icon"></link>
                                 </Helmet>
                             )
                         }
@@ -292,6 +293,7 @@ const ClassHelmet = ({ page, classType, classPage }) => {
                 default: break;
             }
         }
+        break;
         default: {
             return (
                 <Helmet>

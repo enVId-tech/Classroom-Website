@@ -5,6 +5,7 @@ import User from "../Assets/jsx/settings-profile";
 import { HelmetProvider } from "react-helmet-async";
 import ClassHelmet from "../Assets/jsx/pagehead";
 
+// eslint-disable-next-line react/prop-types
 const Profile = ({ Pages, PagesArrayNumber, path }) => {
     return (
         <HelmetProvider>

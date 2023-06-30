@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { logOut, checkLoggedIn } from "./keeploggedout";
+import { logOut, checkLoggedIn, refreshSessionCookie } from "./keeploggedout";
 
 const LoadInStudentData = () => {
     const [userDisplayName, setUserDisplayName] = useState("");
@@ -14,65 +14,52 @@ const LoadInStudentData = () => {
         setFirstName(userInformation[0].firstName);
     }
 
-    async function getDataIDFromServer() {
-        const response = await fetch("/student/data/ID", {
+    async function getUserDataFromServer() {
+        const response = await fetch("/student/data", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
             },
         });
-        const data = await response.json().catch((err) => {
-            window.location.replace("/User/Authentication/Log-In");
-        });
-        document.cookie = `dataID=${data.encryptedData}`;
-        await checkLoggedIn(data.encryptedData);
-        return data.encryptedData;
-    }
 
-    async function getUserDataFromServer(dataID) {
-        const response = await fetch("/student/data", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ dataID }),
-        });
+        console.log(response);
         return await response.json();
     }
 
     useEffect(() => {
         (async () => {
-          const dataID = await getDataIDFromServer();
-          const userInformation = await getUserDataFromServer(dataID);
-          setUserInfoValues(userInformation);
+            setInterval(async () => {
+                await refreshSessionCookie();
+            }, 5000);
+            const userInformation = await getUserDataFromServer();
+            setUserInfoValues(userInformation);
 
-          const sidebarDataGet = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ dataID })
-        };
-    
-        const response = await fetch('/student/sidebar/get', sidebarDataGet);
-        const data = await response.json();
-        if (data.error) {
-            await checkLoggedIn();
-            console.log(data.error);
-        }
-        const dataParsed = JSON.parse(data.studentData);
-        const sidebarParse = JSON.parse(data.sidebarJSON);
-    
+            const sidebarDataGet = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            };
 
-          // Check if the required data is present before updating the state
-          if (dataParsed && sidebarParse) {
-            setDataParsed(dataParsed);
-            setSidebarParse(sidebarParse);
-          } else {
-            //console.log("Data not present");
-          }
+            const response = await fetch('/student/sidebar/get', sidebarDataGet);
+            const data = await response.json();
+            if (data.error) {
+                await checkLoggedIn();
+                console.log(data.error);
+            }
+            const dataParsed = JSON.parse(data.studentData);
+            const sidebarParse = JSON.parse(data.sidebarJSON);
+
+
+            // Check if the required data is present before updating the state
+            if (dataParsed && sidebarParse) {
+                setDataParsed(dataParsed);
+                setSidebarParse(sidebarParse);
+            } else {
+                //console.log("Data not present");
+            }
         })();
-      }, []);
+    }, []);
 
     const handleSidebarButtonClick = (link) => {
         window.location.replace(link);

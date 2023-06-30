@@ -1,7 +1,7 @@
 import React from 'react';
 import '../css/learninglog.css'
-import { checkLoggedIn } from './keeploggedout';
 
+/* eslint-disable */
 const SubmitData = () => {
     const periodOptions = [];
     for (let i = 0; i < 8; i++) {
@@ -17,7 +17,6 @@ const SubmitData = () => {
         event.preventDefault();
 
         const data = {
-            dataID: document.cookie.split("=")[1].split(";")[0],
             text: document.getElementById("textarea").value,
             period: document.getElementById("PeriodList").value,
             date: document.getElementById("DateList").value,

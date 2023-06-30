@@ -4,6 +4,7 @@ import Sidebar from "../../Assets/jsx/sidebar";
 import SelectionBar from "../../Assets/jsx/selectionbar";
 import ClassHelmet from "../../Assets/jsx/pagehead";
 
+// eslint-disable-next-line react/prop-types
 const AssignmentList = ({ Pages, PagesArrayNumber, path, ClassNum }) => {
 
     const ClassTitle = {

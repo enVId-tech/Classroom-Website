@@ -3,14 +3,13 @@ import '../css/sidebar.css'
 import LoadInStudentData from './LoadInStudentData';
 
 const Sidebar = () => {
-
     return (
         <section className='sidebar' id='sidebar'>
             <div className='sidebardiv' id='sidebardiv'>
                 <LoadInStudentData />
             </div>
             <div id='Credits'>
-                <h1 id='ComputerScience'>Computer Science Pathway | <a id='FooterName'
+                <h1 id='ComputerScience'>Computer Science Pathway <a id='FooterName'
                     href='https://www.mrwai.com'>
                     MrWai.com
                 </a>

@@ -1,10 +1,11 @@
 import React from 'react';
 import '../css/selectiontabs.css'
 
+/* eslint-disable */
 const SelectionBar = ({ props, propActiveNumber, pageName, classNum }) => {
     const elements = [];
 
-    if ({classNum}) {
+    if (classNum) {
         for (let i = 0; i < props.length; i++) {
             if (i === 0 && Array.isArray(props[i])) {
                 if (i === propActiveNumber) {

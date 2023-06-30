@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../css/log.css';
 
 const LogCheck = () => {
     useEffect(() => {
@@ -77,12 +78,14 @@ const LogCheck = () => {
             </span>
             <p id="LoginLabel">Login</p>
             <br /><br />
-            <input type="text" placeholder='Username' id="username" spellCheck="false" onChange={handleUsernameChange} />
-            <br /><br />
-            <input type="password" placeholder='Password' id="password" spellCheck="false" onChange={handlePasswordChange} />
-            <br /><br />
-            <h1 id="Error">{error}</h1>
-            <button type="submit" id="LoginButton" onClick={handleSubmit}>Login</button>
+            <form>
+                <input type="text" autoComplete='current-password' placeholder='Username' id="username" spellCheck="false" onChange={handleUsernameChange} />
+                <br /><br />
+                <input type="password" autoComplete='current-password' placeholder='Password' id="password" spellCheck="false" onChange={handlePasswordChange} />
+                <br /><br />
+                <h1 id="Error">{error}</h1>
+                <button type="submit" id="LoginButton" onClick={handleSubmit}>Login</button>
+            </form>
             <br /><br />
             <a href='http://localhost:3001/auth/google' className="googlesignin"><span className="fa fa-google" />Register/Sign In with Google</a>
         </div>

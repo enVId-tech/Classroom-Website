@@ -7,6 +7,7 @@ import Classes from "../../Assets/jsx/classes";
 import ClassHelmet from "../../Assets/jsx/pagehead";
 import "../../Assets/images/CodeorgLogo.png";
 
+// eslint-disable-next-line react/prop-types
 const ClassHome = ({ Pages, PagesArrayNumber, path, ClassNum }) => {
   const { pageTitle, summary } = Classes(Pages[0][ClassNum]);
 

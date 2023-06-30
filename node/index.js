@@ -3,18 +3,12 @@ import express from 'express';
 const app = express();
 import session from 'express-session';
 import passport from 'passport';
-import _ from 'lodash';
 import Filter from 'bad-words';
-import { fileURLToPath } from 'url';
-import { dirname, resolve } from 'path';
 const filter = new Filter();
 import { processCommand } from './modules/consolecommands.js';
-import { generateRandomNumber, encryptPassword, comparePassword, encryptData, decryptData, encryptIP } from './modules/encryption.js';
+import { generateRandomNumber, encryptPassword, comparePassword, encryptData, decryptData, encryptIP, permanentEncryptPassword } from './modules/encryption.js';
 import { writeToDatabase, modifyInDatabase, getItemsFromDatabase } from './modules/mongoDB.js';
 import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 // Library Initialization
 app.use(express.json());
@@ -25,17 +19,14 @@ import dotenv from 'dotenv';
 dotenv.config({ path: './node/credentials.env' });
 
 //Website Pages Setup //DO NOT REMOVE THIS
-app.use(express.static(resolve(__dirname, '../build')));
-
-app.get('*', (req, res) => {
-  res.sendFile(resolve(__dirname, '../build', 'index.html'));
-});
+//app.use(express.static('./build'));
 
 //DO NOT REMOVE 
 app.use(session({
   resave: false,
-  saveUninitialized: false,
-  secret: 'SECRET'
+  saveUninitialized: true,
+  secret: permanentEncryptPassword(generateRandomNumber(256, "alphanumeric")).toString(),
+  dataID: null,
 }));
 
 
@@ -90,14 +81,7 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
     const validEmailDomains = ["student.auhsd.us", "auhsd.us", "frc4079.org"];
     if (validEmailDomains.includes(userProfile._json.hd)) {
       // Generate a random 64 integer number for the data ID
-      const randomNumber = await generateRandomNumber(64);
-      // Creates a variable to store the current date and time
-      const currentDate = new Date().toString().slice(0, 24);
-      const newDate = new Date();
-      // Sets the date to 7 days from the current date
-      newDate.setDate(newDate.getDate() + 7);
-      const updatedDate = newDate.toString().slice(0, 24);
-
+      const randomNumber = await generateRandomNumber(64, "alphanumeric");
       // Retrieves database data from the database
       const fileData = JSON.parse(await getItemsFromDatabase("students"));
       // Finds the index of the user's email in the database
@@ -126,41 +110,55 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
           sitePassword: null,
           unchangeableSettings: {
             isLoggedin: true,
-            latestTimeLoggedIn: currentDate,
-            dayToLogOut: updatedDate,
             isStudent: true,
             isStaff: false,
             latestIPAddress: encryptIP(req.socket.remoteAddress),
             isLockedOut: false
           },
-          dataIDNum: randomNumber
+          dataIDNum: randomNumber,
+          sessiontime: 30 * 1000
         };
         // Write the data to the database
         await writeToDatabase(JSONdata, "students").catch(console.error);
-        
+
         // Sets true to the loggedIn variable
         loggedIn = true;
+
         // Sets a global variable to the data ID
         tempDataID = randomNumber;
-        // Redirect to the home page
+
+        const { encryptedData, authTag } = await encryptData(tempDataID);
+
+        mainServerAuthTag = authTag;
+        req.session.dataID = encryptedData;
+        req.session.cookie.maxAge = JSONdata.sessiontime;
+
         res.redirect('/');
       } else {
         // Sets the JSONdata variable to the data in the database based off of the index
         JSONdata = fileData[numberFound];
         // Sets properties in the JSONdata variable
         JSONdata.unchangeableSettings.isLoggedin = true;
-        JSONdata.unchangeableSettings.latestTimeLoggedIn = currentDate;
-        JSONdata.unchangeableSettings.dayToLogOut = updatedDate;
         JSONdata.unchangeableSettings.latestIPAddress = encryptIP(req.socket.remoteAddress);
         JSONdata.dataIDNum = randomNumber;
         // Modify the data in the database based off of the user's email
         await modifyInDatabase({ email: fileData[numberFound].email }, JSONdata, "students").catch(console.error);
-        
+
         // Sets true to the loggedIn variable
         loggedIn = true;
         // Sets a global variable to the data ID
         tempDataID = randomNumber;
+        console.log("Data ID Num");
+        console.log(tempDataID);
+
+        const { encryptedData, authTag } = await encryptData(tempDataID);
+
+        mainServerAuthTag = authTag;
+        req.session.dataID = encryptedData;
+        req.session.cookie.maxAge = JSONdata.sessiontime;
         // Redirect to the home page
+        console.log("User already exists");
+        console.log(loggedIn, req.session.dataID, mainServerAuthTag);
         res.redirect('/');
       }
     } else {
@@ -177,10 +175,10 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
 //Requests for classes
 
 //Permission to write to agenda in the database
-app.post('/class/agenda/permission', async (req, res) => {
+app.get('/class/agenda/permission', async (req, res) => {
   try {
     // Retrieve the data ID number from the request body
-    const dataID = await decryptData(req.body.dataID, mainServerAuthTag);
+    const dataID = await decryptData(req.session.dataID, mainServerAuthTag);
 
     //If the global variable existingJSON is not defined, then read the data from the database
     if (!existingJSON) {
@@ -261,6 +259,22 @@ app.post('/class/announcements/get', async (req, res) => {
   }
 });
 
+app.get('/class/announcements/permission', async (req, res) => {
+  try {
+    // Retrieve the data ID number from the request body
+    const dataID = await decryptData(req.session.dataID, mainServerAuthTag);
+
+    //If the global variable existingJSON is not defined, then read the data from the database
+    if (!existingJSON) {
+      // Read the existing JSON data from the file
+    }
+  } catch (err) {
+    // Send an error message if there is an error
+    console.log(err);
+    res.send({ error: err.message });
+  }
+})
+
 // Process the command in the console
 app.post('/class/console/process', (req, res) => {
   try {
@@ -281,10 +295,12 @@ app.post('/class/console/process', (req, res) => {
 // Requests for students
 
 // On loading any page, get sidebar data from the database
-app.post('/student/sidebar/get', async (req, res) => {
+app.get('/student/sidebar/get', async (req, res) => {
   try {
     // Retrieve the data ID number from the request body
-    const dataID = await decryptData(req.body.dataID, mainServerAuthTag);
+    console.log("Sidebar get");
+    console.log(req.session.dataID, mainServerAuthTag);
+    const dataID = await decryptData(req.session.dataID, mainServerAuthTag);
     // Read the student data from the file and return it using the student data ID, and makes it into an object after
     const existingJSON = JSON.parse(await getItemsFromDatabase("students", dataID));
 
@@ -295,19 +311,18 @@ app.post('/student/sidebar/get', async (req, res) => {
     try {
       // Make hasAccessTo in the existingJSON JSON object into a string
       studentData = JSON.stringify(existingJSON[0].hasAccessTo);
+      // Send the student data and sidebar JSON data to the client if they are defined
+      if (studentData && sidebarJSON) {
+        // Send the student data and sidebar JSON data to the client
+        res.send({ studentData, sidebarJSON });
+      }
+      if (!studentData || !sidebarJSON) {
+        res.send({ error: "Error: Student data or sidebar JSON data is not defined" });
+      }
     } catch (err) {
       // Send an error message if there is an error
       console.log(err);
       res.send({ error: err.message });
-    }
-
-    // Send the student data and sidebar JSON data to the client if they are defined
-    if (studentData && sidebarJSON) {
-      // Send the student data and sidebar JSON data to the client
-      res.send({ studentData, sidebarJSON });
-    }
-    if (!studentData || !sidebarJSON) {
-      res.send({ error: "Error: Student data or sidebar JSON data is not defined" });
     }
   } catch (err) {
     // Send an error message if there is an error
@@ -322,7 +337,7 @@ app.post('/student/sidebar/get', async (req, res) => {
 app.post('/student/assignments/summary/get', async (req, res) => {
   try {
     let URL = req.body.url;
-    let dataID = await decryptData(req.body.dataID, mainServerAuthTag);
+    let dataID = await decryptData(req.session.dataID, mainServerAuthTag);
 
     let studentData = JSON.parse(await getItemsFromDatabase("students", dataID));
 
@@ -363,7 +378,7 @@ app.post('/student/learninglog/submit', async (req, res) => {
     // Retrieve the data from the request body and puts it in a constant variable
     const data = req.body;
     // Decrypt the data ID
-    const dataID = await decryptData(data.dataID, mainServerAuthTag);
+    const dataID = await decryptData(req.session.dataID, mainServerAuthTag);
     // Retrieve the student data from the database, get the data based off of the student's data ID and parse it
     const studentDatabaseData = JSON.parse(await getItemsFromDatabase("students", dataID));
 
@@ -467,10 +482,10 @@ app.post('/student/learninglog/submit', async (req, res) => {
 });
 
 // Logs the user out
-app.post('/student/data/logout', async (req, res) => {
+app.get('/student/data/logout', async (req, res) => {
   try {
     // Retrieve the data ID from the request body
-    const dataID = await decryptData(req.body.dataID, mainServerAuthTag);
+    const dataID = await decryptData(req.session.dataID, mainServerAuthTag);
 
     // Retrieve the student data from the database, get the data based off of the student's data ID
     const existingJSON = JSON.parse(await getItemsFromDatabase("students", dataID));
@@ -486,12 +501,10 @@ app.post('/student/data/logout', async (req, res) => {
       const modifiedData = findData;
       // Sets properties in the modifiedData variable
       modifiedData.unchangeableSettings.isLoggedin = false;
-      modifiedData.unchangeableSettings.latestTimeLoggedIn = "null";
-      modifiedData.unchangeableSettings.dayToLogOut = "null";
       modifiedData.dataIDNum = "null";
 
       // Writes the data to the database
-      let userData = modifyInDatabase({email: existingJSON[0].email }, modifiedData, "students");
+      let userData = modifyInDatabase({ email: existingJSON[0].email }, modifiedData, "students");
 
       // If the userData variable has a returned value of success, then redirect the user to the login page
       if (userData) {
@@ -499,6 +512,8 @@ app.post('/student/data/logout', async (req, res) => {
         tempDataID = undefined;
         loggedIn = false;
         existingJSON = undefined;
+
+        req.session.destroy();
 
         res.redirect('/User/Authentication/Log-Out');
       } else {
@@ -516,20 +531,28 @@ app.post('/student/data/logout', async (req, res) => {
 });
 
 // Checks if the user is logged out
-app.post('/student/data/logout/check', async (req, res) => {
+app.get('/student/data/logout/check', async (req, res) => {
   try {
     // Retrieve the data ID from the request body
 
-    const dataID = await decryptData(req.body.dataID, mainServerAuthTag);
+    if (!req.session.dataID) {
+      console.log("No session");
+      res.sendStatus(401);
+      return;
+    }
+
+    const dataID = await decryptData(req.session.dataID, mainServerAuthTag);
 
     // If the data ID is null, then send an error message
-    if (dataID == null) {
+    if (!dataID) {
+      console.log("No data ID");
       res.sendStatus(401);
       return;
     }
 
     // If loggedIn is false, then send an error message
     if (loggedIn == false) {
+      console.log("Not logged in");
       res.sendStatus(401);
       return;
     }
@@ -539,51 +562,45 @@ app.post('/student/data/logout/check', async (req, res) => {
 
     // If the existingJSON array is empty, then send an error message
     if (existingJSON.length === 0) {
+      console.log("No data");
       loggedIn = false;
       res.sendStatus(401);
       return;
     }
 
-    // Sets date variables, one for the expirary date on the student's database profile and one for the current date
-    const expiraryDate = new Date(existingJSON[0].unchangeableSettings.dayToLogOut);
-    const currentDate = new Date();
-
-    // If the expirary date is less than the current date, then set the isLoggedin property to false
-    if (expiraryDate < currentDate) {
+    if (!req.session.dataID) {
       loggedIn = false;
-      existingJSON[0].unchangeableSettings.isLoggedin = false;
-      writeToDatabase(jsonArray[dataNumber], "students");
-      res.sendStatus(401);
 
-      // If the isLoggedin property is true and the expirary date is greater than the current date, then send a status of 200
-    } else if (existingJSON[0].unchangeableSettings.isLoggedin == true /*&&  expiraryDate > currentDate*/) {
-      //Sends status of 200 to client
+      existingJSON.unchangeableSettings.isLoggedin = false;
+      existingJSON.dataIDNum = "null";
+
+      // Writes the data to the database
+      await modifyInDatabase({ email: existingJSON[0].email }, existingJSON, "students");
+
+      res.sendStatus(401);
+      return;
+    } else if (req.session.dataID != null) {
       res.sendStatus(200);
-    } else {
-      // Sends status of 401 to client
-      loggedIn = false;
-      res.sendStatus(401);
+      return;
     }
   } catch (err) {
     // Send an error message if there is an error
-    loggedIn = false;
+
     console.log(err);
     res.send({ err });
   }
 });
 
 // Gets student data from the database
-app.post('/student/data', async (req, res) => {
+app.get('/student/data', async (req, res) => {
   try {
+    // Retrieve the data ID from the request body
+    const dataID = await decryptData(req.session.dataID, mainServerAuthTag);
     // Check if req.body.dataID or mainServerAuthTag is undefined
-    if (!req.body.dataID || !mainServerAuthTag) {
+    if (!dataID || !mainServerAuthTag) {
       res.send({ error: 'Invalid data or authentication tag' });
       return;
     }
-
-    // Retrieve the data ID from the request body
-    const dataID = await decryptData(req.body.dataID, mainServerAuthTag);
-
     // Retrieve the data from the database
     const jsonArray = JSON.parse(await getItemsFromDatabase("students", dataID));
 
@@ -623,7 +640,7 @@ app.post('/student/data/update', async (req, res) => {
         if (data.password == data.passwordconfirm) {
           try {
             // Retrieve the student data from the database, get the data based off of the student's data ID
-            const existingJSON = JSON.parse(await getItemsFromDatabase("students", await decryptData(data.dataIDNum, mainServerAuthTag)));
+            const existingJSON = JSON.parse(await getItemsFromDatabase("students", await decryptData(req.session.dataID, mainServerAuthTag)));
             const modifiedData = existingJSON[0];
 
             // Encrypt the password
@@ -649,7 +666,7 @@ app.post('/student/data/update', async (req, res) => {
       }
     } else if (data.URL.includes("/profile/")) {
       // Retrieve the student data from the database, get the data based off of the student's data ID
-      const existingJSON = JSON.parse(await getItemsFromDatabase("students", await decryptData(data.dataIDNum, mainServerAuthTag)));
+      const existingJSON = JSON.parse(await getItemsFromDatabase("students", await decryptData(req.session.dataID, mainServerAuthTag)));
       const modifiedData = existingJSON[0];
       if (filter.isProfane(data.displayName)) {
         res.send({ error: "Please do not use profanity:" + filter.clean(data.displayName) });
@@ -703,20 +720,12 @@ app.post('/student/data/login', async (req, res) => {
           userFound = true;
 
           // Generate a random 64 integer number for the data ID
-          const randomNumber = await generateRandomNumber(64);
-          // Creates a variable to store the current date and time
-          const newDate = new Date();
-          const currentDate = newDate.toString().slice(0, 24);
-          // Sets the date to 7 days from the current date
-          newDate.setDate(newDate.getDate() + 7);
-          const updatedDate = newDate.toString().slice(0, 24);
+          const randomNumber = await generateRandomNumber(64, "alphanumeric");
 
           // Sets properties in the modifiedData variable
           const modifiedData = existingJSON[i];
           // Sets properties in the modifiedData variable
           modifiedData.unchangeableSettings.isLoggedin = true;
-          modifiedData.unchangeableSettings.latestTimeLoggedIn = currentDate;
-          modifiedData.unchangeableSettings.dayToLogOut = updatedDate;
           modifiedData.unchangeableSettings.latestIPAddress = encryptIP(req.socket.remoteAddress);
           modifiedData.dataIDNum = randomNumber;
 
@@ -753,26 +762,27 @@ app.post('/student/data/login', async (req, res) => {
   }
 });
 
-// Gets the student's randomly generated dataID
-app.get('/student/data/ID', async (req, res) => {
+// Refresh the session
+app.get("/student/data/refresh", async (req, res) => {
   try {
-    // If the tempDataID variable is not defined, then send an error message
-    if (loggedIn === true) {
-      // Encrypt the tempDataID variable
-      const { encryptedData, authTag } = await encryptData(tempDataID);
-
-      // Set the mainServerAuthTag variable to the authTag variable
-      mainServerAuthTag = authTag;
-
-      // Send the encrypted tempDataID variable to the client
-      res.send({ encryptedData });
+    // Checks if the session is active
+    if (req.session) {
+      // Refresh the session
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error(err);
+          res.sendStatus(500);
+        } else {
+          // Sends a success status
+          res.sendStatus(200);
+        }
+      });
     } else {
-      // Send an error message if there is an error
-      res.status(302).redirect('/User/Authentication/Log-In');
+      // Sends an error status if there is no active session
+      res.sendStatus(401);
     }
   } catch (err) {
-    // Send an error message if there is an error
     console.log(err);
-    res.status(500).send({ error: err });
+    res.send({ error: err });
   }
 });

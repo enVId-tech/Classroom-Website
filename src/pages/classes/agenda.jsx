@@ -8,6 +8,7 @@ import ClassHelmet from '../../Assets/jsx/pagehead';
 import '../../Assets/css/calendar.css';
 import '../../Assets/images/CodeorgLogo.png'
 
+// eslint-disable-next-line react/prop-types
 function Calendar({ Pages, PagesArrayNumber, path, ClassNum }) {
 
   const ClassTitle = {

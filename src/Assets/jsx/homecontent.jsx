@@ -3,7 +3,7 @@ import React from 'react';
 const HomepageContent = () => {
     return (
         <section className='content'>
-            <div id="NamePlate">Welcome "Placeholder"!</div>
+            <div id="NamePlate">Welcome Placeholder!</div>
             <span id="NewsOfTheDay">
                 <span id="Prerequistes">
                     <div id="Assignments">

@@ -7,7 +7,6 @@ function Assignments() {
 
   const AssignmentsGet = async () => {
     const url = window.location.pathname;
-    const dataID = document.cookie.split('=')[1].split(';')[0];
 
     const response = await fetch('/student/assignments/summary/get', {
       method: 'POST',

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import axios from 'axios';
 
 const GoogleCallback = () => {
@@ -14,6 +14,7 @@ const GoogleCallback = () => {
     // Example using axios
     axios.get(`/auth/google/callback?code=${code}`)
       .then(response => {
+        console.log(response);
         // Handle the response from the server
         // e.g., store user data in state or local storage, redirect to the home page, etc.
         window.location.href = '/';

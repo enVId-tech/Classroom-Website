@@ -4,6 +4,7 @@ import SelectionBar from "../Assets/jsx/selectionbar";
 import { HelmetProvider } from "react-helmet-async";
 import ClassHelmet from "../Assets/jsx/pagehead";
 
+// eslint-disable-next-line react/prop-types
 const ActiveConnections = ({ Pages, PagesArrayNumber, path }) => {
     return (
         <HelmetProvider>

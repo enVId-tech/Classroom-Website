@@ -45,14 +45,12 @@ const UserSettingsProfile = () => {
                 username: document.getElementById('username').value,
                 password: document.getElementById('password').value,
                 passwordconfirm: document.getElementById('passwordconfirm').value,
-                dataIDNum: document.cookie.split('=')[1].split(';')[0],
                 URL: window.location.pathname,
             };
         } else if (window.location.pathname.includes('/profile/')) {
             studentData = {
                 displayName: document.getElementsByClassName('display')[0].value,
                 profilePicture: document.getElementsByClassName('profilepicture')[0].src,
-                dataIDNum: document.cookie.split('=')[1].split(';')[0],
                 URL: window.location.pathname,
             };
         }

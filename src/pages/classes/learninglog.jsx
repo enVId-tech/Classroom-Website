@@ -5,6 +5,7 @@ import SelectionBar from "../../Assets/jsx/selectionbar";
 import SubmitData from "../../Assets/jsx/learninglog";
 import ClassHelmet from "../../Assets/jsx/pagehead";
 
+// eslint-disable-next-line react/prop-types
 const LearningLog = ({ Pages, PagesArrayNumber, path, ClassNum }) => {
     const periodOptions = [];
     const dateOptions = [];

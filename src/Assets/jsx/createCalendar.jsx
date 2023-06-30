@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 const CreateCalendar = () => {
   const [months, setMonths] = useState([]);
   const [activeNum, setActiveNum] = useState([]);
+  // eslint-disable-next-line no-unused-vars
   const [hasPermission, setHasPermission] = useState(false);
 
   const date = new Date();
@@ -70,7 +71,6 @@ const CreateCalendar = () => {
   }
 
   async function checkUserPermission() {
-    const dataID = document.cookie.split("=")[1];
     const windowURL = window.location.pathname;
 
     const data = {
@@ -78,7 +78,7 @@ const CreateCalendar = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ dataID, windowURL }),
+      body: JSON.stringify({ windowURL }),
     };
 
     const response = await fetch("/class/agenda/permission", data);
@@ -106,7 +106,7 @@ const CreateCalendar = () => {
           months.map((month, index) => {
             const monthLabel = getMonthLabel(parseInt(month.split(" ")[0]));
             return (
-              <div className={`tab ${index === 0 ? 'active' : ''}`} onClick={() => setActive(index)}>
+              <div className={`tab ${index === 0 ? 'active' : ''}`} key={index} onClick={() => setActive(index)}>
                 {monthLabel}
               </div>
             );
