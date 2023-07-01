@@ -110,7 +110,7 @@ async function decryptData(encryptedData, authTag) {
     decipher.setAuthTag(authTag);
 
     // Decrypt the data
-    let decryptedData = decipher.update(encryptedData, 'hex', 'utf8');
+    let decryptedData = decipher.update(encryptedData.toString(), 'hex', 'utf8');
     decryptedData += decipher.final('utf8');
 
     return decryptedData;

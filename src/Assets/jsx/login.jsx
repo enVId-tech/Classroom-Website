@@ -21,29 +21,32 @@ const LogCheck = () => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        if (e) {
+            e.preventDefault();
+        }
 
         if (username === '') {
             setError('Username is required');
+            setTimeout(() => {
+                setError('');
+            }, 3000);
             return;
         }
 
         if (password === '') {
             setError('Password is required');
+            setTimeout(() => {
+                setError('');
+            }, 3000);
             return;
         }
-
-        const data = {
-            username,
-            password,
-        };
 
         const sendData = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify({ username, password }),
         };
 
         try {
@@ -79,12 +82,27 @@ const LogCheck = () => {
             <p id="LoginLabel">Login</p>
             <br /><br />
             <form>
-                <input type="text" autoComplete='current-password' placeholder='Username' id="username" spellCheck="false" onChange={handleUsernameChange} />
+                <input type="text"
+                    autoComplete='username'
+                    placeholder='Username'
+                    id="username"
+                    spellCheck="false"
+                    onChange={handleUsernameChange}
+                    onBlur={handleUsernameChange}
+                />
                 <br /><br />
-                <input type="password" autoComplete='current-password' placeholder='Password' id="password" spellCheck="false" onChange={handlePasswordChange} />
+                <input
+                    type="password"
+                    autoComplete='password'
+                    placeholder='Password'
+                    id="password"
+                    spellCheck="false"
+                    onChange={handlePasswordChange}
+                    onBlur={handlePasswordChange}
+                />
                 <br /><br />
                 <h1 id="Error">{error}</h1>
-                <button type="submit" id="LoginButton" onClick={handleSubmit}>Login</button>
+                <button type="submit" id="LoginButton" onClick={() => handleSubmit()}>Login</button>
             </form>
             <br /><br />
             <a href='http://localhost:3001/auth/google' className="googlesignin"><span className="fa fa-google" />Register/Sign In with Google</a>

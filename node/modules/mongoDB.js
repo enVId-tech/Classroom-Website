@@ -53,6 +53,36 @@ async function modifyInDatabase(filter, update, collectionName) {
   }
 }
 
+async function deleteFromDatabase(filter, collectionName, type) {
+  try {
+    await connectToDatabase();
+    
+    const database = client.db(clientDB);
+
+    if (type === 1 || type === "one") {
+      const collection = database.collection(collectionName);
+
+      const result = await collection.deleteOne(filter);
+
+      console.log("Deleted", result.deletedCount, "document(s)");
+
+      return result.deletedCount;
+
+    } else if (type === 2 || type === "many") {
+      const collection = database.collection(collectionName);
+
+      const result = await collection.deleteMany(filter);
+
+      console.log("Deleted", result.deletedCount, "document(s)");
+      
+      return result.deletedCount;
+    }
+  } catch (error) {
+    console.error("Error deleting document(s):", error);
+    throw error;
+  }
+}
+
 async function getItemsFromDatabase(collectionName, dataId) {
   try {
     await connectToDatabase();
@@ -79,5 +109,6 @@ async function getItemsFromDatabase(collectionName, dataId) {
 export {
   writeToDatabase,
   modifyInDatabase,
-  getItemsFromDatabase
+  getItemsFromDatabase,
+  deleteFromDatabase
 };

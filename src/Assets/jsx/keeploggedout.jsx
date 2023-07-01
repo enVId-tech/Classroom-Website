@@ -30,7 +30,7 @@ async function checkLoggedIn() {
     const response = await fetch('/student/data/logout/check', checkLoggedIndata);
 
     if (response.status !== 200) {
-      //window.location.href = "/User/Authentication/Log-In";
+      window.location.href = "/User/Authentication/Log-In";
     }
   } catch (error) {
     console.log('An error occurred while checking login:', error);

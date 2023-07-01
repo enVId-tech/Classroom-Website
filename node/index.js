@@ -4,14 +4,19 @@ const app = express();
 import session from 'express-session';
 import passport from 'passport';
 import Filter from 'bad-words';
+import cors from 'cors';
+import connectMongoDBSession from 'connect-mongodb-session';
+import mongoose from 'mongoose';
+const MongoDBStore = connectMongoDBSession(session);
 const filter = new Filter();
 import { processCommand } from './modules/consolecommands.js';
 import { generateRandomNumber, encryptPassword, comparePassword, encryptData, decryptData, encryptIP, permanentEncryptPassword } from './modules/encryption.js';
-import { writeToDatabase, modifyInDatabase, getItemsFromDatabase } from './modules/mongoDB.js';
+import { writeToDatabase, modifyInDatabase, getItemsFromDatabase, deleteFromDatabase } from './modules/mongoDB.js';
 import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth';
 
 // Library Initialization
 app.use(express.json());
+app.use(cors());
 app.set('trust proxy', true);
 
 //Credentials
@@ -21,21 +26,31 @@ dotenv.config({ path: './node/credentials.env' });
 //Website Pages Setup //DO NOT REMOVE THIS
 //app.use(express.static('./build'));
 
-//DO NOT REMOVE 
+const SECRET = permanentEncryptPassword(generateRandomNumber(256, "alphanumeric")).toString();
+
 app.use(session({
+  secret: SECRET,
   resave: false,
   saveUninitialized: true,
-  secret: permanentEncryptPassword(generateRandomNumber(256, "alphanumeric")).toString(),
-  dataID: null,
+  store: new MongoDBStore({
+    uri: process.env.MONGODB_URI,
+    databaseName: process.env.CLIENT_DB,
+    collection: 'sessions',
+    expires: 1000 * 60 * 60 * 24 * 31, // 1 month
+    autoRemove: 'interval',
+    autoRemoveInterval: 10 * 1000 // interval between expired sessions check in milliseconds
+  }),
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24 * 3.5, // 3.5 days
+  }
 }));
-
 
 app.use(passport.initialize());
 app.use(passport.session());
 // DO NOT REMOVE
 
 const port = process.env.PORT || 3001;
-app.listen(port, () => console.log('App listening on port ' + port));
+const clientPort = process.env.CLIENT_PORT || 3000;
 
 //Global Variables
 var userProfile;
@@ -48,21 +63,25 @@ var mainServerAuthTag;
 const GOOGLE_CLIENT_ID = process.env.CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.CLIENT_SECRET;
 
+// App hostname
+const APP_HOSTNAME = process.env.APP_HOSTNAME || 'localhost';
+
+// Requests for the main server
 passport.serializeUser(function (user, cb) {
   cb(null, user);
 });
 
+// Requests for the main server
 passport.deserializeUser(function (obj, cb) {
   cb(null, obj);
 });
 
 //Google OAuth2 Page
-
 // Passport session setup
 passport.use(new GoogleStrategy({
   clientID: GOOGLE_CLIENT_ID,
   clientSecret: GOOGLE_CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/auth/google/callback"
+  callbackURL: `http://${APP_HOSTNAME}:${port}/auth/google/callback`
 },
   function (accessToken, refreshToken, profile, done) {
     userProfile = profile;
@@ -73,22 +92,28 @@ passport.use(new GoogleStrategy({
 //Google Login
 
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/error' }), async (req, res) => {
+app.get('/auth/google/callback', passport.authenticate('google'), async (req, res) => {
   try {
+    //console.log("Google Callback");
     // Set the userProfile to the user's profile
     const userProfile = req.user;
+
     // Check if the user is using a valid email domain
     const validEmailDomains = ["student.auhsd.us", "auhsd.us", "frc4079.org"];
+
     if (validEmailDomains.includes(userProfile._json.hd)) {
       // Generate a random 64 integer number for the data ID
       const randomNumber = await generateRandomNumber(64, "alphanumeric");
+
       // Retrieves database data from the database
       const fileData = JSON.parse(await getItemsFromDatabase("students"));
+
       // Finds the index of the user's email in the database
       const numberFound = fileData.findIndex(item => item.email === userProfile.emails[0].value);
 
       // Creates a variable to store the JSON data
       let JSONdata;
+
       // If the numberFound variable is -1, then run the code below
       if (numberFound === -1) {
         // Create a JSON object to store the newly created user data
@@ -116,8 +141,9 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
             isLockedOut: false
           },
           dataIDNum: randomNumber,
-          sessiontime: 30 * 1000
+          sessiontime: 1000 * 60 * 60 * 24 * 3.5 // 3.5 days
         };
+
         // Write the data to the database
         await writeToDatabase(JSONdata, "students").catch(console.error);
 
@@ -127,58 +153,90 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
         // Sets a global variable to the data ID
         tempDataID = randomNumber;
 
+        // Encrypt the data ID
         const { encryptedData, authTag } = await encryptData(tempDataID);
 
+        // Set the main server authentication tag to the authTag variable
         mainServerAuthTag = authTag;
-        req.session.dataID = encryptedData;
-        req.session.cookie.maxAge = JSONdata.sessiontime;
 
-        res.redirect('/');
+        // Set the session data ID to the encryptedData variable
+        req.session.dataID = encryptedData.toString();
+
+        // Set the session cookie max age to the sessiontime variable
+        req.session.cookiemaxAge = JSONdata.sessiontime;
+
+        // Save the session
+        try {
+          const insertedId = await writeToDatabase(req.session, "sessions");
+          //console.log(`Session data inserted with _id ${insertedId}`);
+        } catch (error) {
+          console.error("Error writing session data to database:", error);
+        }
+
+        // Redirect to the home page
+        res.status(200).redirect(`http://${APP_HOSTNAME}:${clientPort}/`);
       } else {
         // Sets the JSONdata variable to the data in the database based off of the index
         JSONdata = fileData[numberFound];
+
         // Sets properties in the JSONdata variable
         JSONdata.unchangeableSettings.isLoggedin = true;
         JSONdata.unchangeableSettings.latestIPAddress = encryptIP(req.socket.remoteAddress);
         JSONdata.dataIDNum = randomNumber;
+
         // Modify the data in the database based off of the user's email
         await modifyInDatabase({ email: fileData[numberFound].email }, JSONdata, "students").catch(console.error);
 
         // Sets true to the loggedIn variable
         loggedIn = true;
+
         // Sets a global variable to the data ID
         tempDataID = randomNumber;
-        console.log("Data ID Num");
-        console.log(tempDataID);
 
+        // Encrypt the data ID
         const { encryptedData, authTag } = await encryptData(tempDataID);
 
+        // Set the main server authentication tag to the authTag variable
         mainServerAuthTag = authTag;
-        req.session.dataID = encryptedData;
+
+        // Set the session data ID to the encryptedData variable
+        req.session.dataID = encryptedData.toString();
+
+        // Set the session cookie max age to the sessiontime variable
         req.session.cookie.maxAge = JSONdata.sessiontime;
+
+        //console.log("User already exists");
+        //console.log(loggedIn, req.session.dataID, mainServerAuthTag, req.session.cookie.maxAge);
+
+        // Save the session
+        try {
+          const insertedId = await writeToDatabase(req.session, "sessions");
+          //console.log(`Session data inserted with _id ${insertedId}`);
+        } catch (error) {
+          console.error("Error writing session data to database:", error);
+        }
+
         // Redirect to the home page
-        console.log("User already exists");
-        console.log(loggedIn, req.session.dataID, mainServerAuthTag);
-        res.redirect('/');
+        res.status(200).redirect(`http://${APP_HOSTNAME}:${clientPort}/`);
       }
-    } else {
-      // Redirect to the login page if unsuccessful or not a student
-      res.redirect('/User/Authentication/Log-In');
     }
   } catch (error) {
     console.error(error);
-    res.redirect('/error');
+    res.status(500).redirect(`http://${APP_HOSTNAME}:${clientPort}/User/Authentication/Log-In/`);
   }
 });
-
 
 //Requests for classes
 
 //Permission to write to agenda in the database
 app.get('/class/agenda/permission', async (req, res) => {
   try {
-    // Retrieve the data ID number from the request body
-    const dataID = await decryptData(req.session.dataID, mainServerAuthTag);
+    const sessionID = req.session.dataID;
+    if (!sessionID) {
+      res.send({ error: "No session ID" });
+      return;
+    }
+    const dataID = await decryptData(sessionID, mainServerAuthTag);
 
     //If the global variable existingJSON is not defined, then read the data from the database
     if (!existingJSON) {
@@ -189,11 +247,11 @@ app.get('/class/agenda/permission', async (req, res) => {
     // Check if the user has permission to write to the agenda
     if (existingJSON.isStaff == true) {
       // Send true if the user has permission
-      console.log("User has permission")
+      //console.log("User has permission")
       res.send({ hasPermission: true });
     } else {
       // Send false if the user does not have permission
-      console.log("User does not have permission")
+      //console.log("User does not have permission")
       res.send({ hasPermission: false });
     }
   } catch (err) {
@@ -262,8 +320,12 @@ app.post('/class/announcements/get', async (req, res) => {
 app.get('/class/announcements/permission', async (req, res) => {
   try {
     // Retrieve the data ID number from the request body
-    const dataID = await decryptData(req.session.dataID, mainServerAuthTag);
-
+    const sessionID = req.session.dataID;
+    if (!sessionID) {
+      res.send({ error: "No session ID" });
+      return;
+    }
+    const dataID = await decryptData(sessionID, mainServerAuthTag);
     //If the global variable existingJSON is not defined, then read the data from the database
     if (!existingJSON) {
       // Read the existing JSON data from the file
@@ -298,9 +360,14 @@ app.post('/class/console/process', (req, res) => {
 app.get('/student/sidebar/get', async (req, res) => {
   try {
     // Retrieve the data ID number from the request body
-    console.log("Sidebar get");
-    console.log(req.session.dataID, mainServerAuthTag);
-    const dataID = await decryptData(req.session.dataID, mainServerAuthTag);
+    //console.log("Sidebar get");
+    const sessionID = req.session.dataID;
+    if (!sessionID) {
+      res.send({ error: "No session ID" });
+      return;
+    }
+    //console.log(sessionID, mainServerAuthTag);
+    const dataID = await decryptData(sessionID, mainServerAuthTag);
     // Read the student data from the file and return it using the student data ID, and makes it into an object after
     const existingJSON = JSON.parse(await getItemsFromDatabase("students", dataID));
 
@@ -337,8 +404,12 @@ app.get('/student/sidebar/get', async (req, res) => {
 app.post('/student/assignments/summary/get', async (req, res) => {
   try {
     let URL = req.body.url;
-    let dataID = await decryptData(req.session.dataID, mainServerAuthTag);
-
+    const sessionID = req.session.dataID;
+    if (!sessionID) {
+      res.send({ error: "No session ID" });
+      return;
+    }
+    const dataID = await decryptData(sessionID, mainServerAuthTag);
     let studentData = JSON.parse(await getItemsFromDatabase("students", dataID));
 
     if (studentData.length === 0) {
@@ -378,7 +449,13 @@ app.post('/student/learninglog/submit', async (req, res) => {
     // Retrieve the data from the request body and puts it in a constant variable
     const data = req.body;
     // Decrypt the data ID
-    const dataID = await decryptData(req.session.dataID, mainServerAuthTag);
+
+    const sessionID = req.session.dataID;
+    if (!sessionID) {
+      res.send({ error: "No session ID" });
+      return;
+    }
+    const dataID = await decryptData(sessionID, mainServerAuthTag);
     // Retrieve the student data from the database, get the data based off of the student's data ID and parse it
     const studentDatabaseData = JSON.parse(await getItemsFromDatabase("students", dataID));
 
@@ -485,7 +562,12 @@ app.post('/student/learninglog/submit', async (req, res) => {
 app.get('/student/data/logout', async (req, res) => {
   try {
     // Retrieve the data ID from the request body
-    const dataID = await decryptData(req.session.dataID, mainServerAuthTag);
+    const sessionID = req.session.dataID;
+    if (!sessionID) {
+      res.send({ error: "No session ID" });
+      return;
+    }
+    const dataID = await decryptData(sessionID, mainServerAuthTag);
 
     // Retrieve the student data from the database, get the data based off of the student's data ID
     const existingJSON = JSON.parse(await getItemsFromDatabase("students", dataID));
@@ -513,6 +595,7 @@ app.get('/student/data/logout', async (req, res) => {
         loggedIn = false;
         existingJSON = undefined;
 
+        await deleteFromDatabase({ _id: req.session._id }, "sessions", 1);
         req.session.destroy();
 
         res.redirect('/User/Authentication/Log-Out');
@@ -535,13 +618,13 @@ app.get('/student/data/logout/check', async (req, res) => {
   try {
     // Retrieve the data ID from the request body
 
-    if (!req.session.dataID) {
-      console.log("No session");
-      res.sendStatus(401);
+    const sessionID = req.session.dataID;
+    if (!sessionID) {
+      res.send({ error: "No session ID" });
       return;
     }
-
-    const dataID = await decryptData(req.session.dataID, mainServerAuthTag);
+    //console.log(sessionID, mainServerAuthTag);
+    const dataID = await decryptData(sessionID, mainServerAuthTag);
 
     // If the data ID is null, then send an error message
     if (!dataID) {
@@ -562,7 +645,7 @@ app.get('/student/data/logout/check', async (req, res) => {
 
     // If the existingJSON array is empty, then send an error message
     if (existingJSON.length === 0) {
-      console.log("No data");
+      //console.log("No data");
       loggedIn = false;
       res.sendStatus(401);
       return;
@@ -594,8 +677,14 @@ app.get('/student/data/logout/check', async (req, res) => {
 // Gets student data from the database
 app.get('/student/data', async (req, res) => {
   try {
+    //console.log(req.session.dataID, mainServerAuthTag)
     // Retrieve the data ID from the request body
-    const dataID = await decryptData(req.session.dataID, mainServerAuthTag);
+    const sessionID = req.session.dataID;
+    if (!sessionID) {
+      res.send({ error: "No session ID" });
+      return;
+    }
+    const dataID = await decryptData(sessionID, mainServerAuthTag);
     // Check if req.body.dataID or mainServerAuthTag is undefined
     if (!dataID || !mainServerAuthTag) {
       res.send({ error: 'Invalid data or authentication tag' });
@@ -729,15 +818,34 @@ app.post('/student/data/login', async (req, res) => {
           modifiedData.unchangeableSettings.latestIPAddress = encryptIP(req.socket.remoteAddress);
           modifiedData.dataIDNum = randomNumber;
 
-          // Sets a global variable to the data ID
-          tempDataID = randomNumber;
           // Sets true to the loggedIn variable
           loggedIn = true;
 
-          // Write the data to the database
-          await modifyInDatabase({ email: existingJSON[i].email }, modifiedData, "students");
-          // Send a success message if there is no error
-          res.send({ success: "Success" });
+          // Sets a global variable to the data ID
+          tempDataID = randomNumber;
+
+          // Encrypt the data ID
+          const { encryptedData, authTag } = await encryptData(tempDataID);
+
+          // Set the main server authentication tag to the authTag variable
+          mainServerAuthTag = authTag;
+
+          // Set the session data ID to the encryptedData variable
+          req.session.dataID = encryptedData.toString();
+
+          // Set the session cookie max age to the sessiontime variable
+          req.session.cookie.maxAge = modifiedData.sessiontime;
+
+          //console.log("User already exists");
+          //console.log(loggedIn, req.session.dataID, mainServerAuthTag, req.session.cookie.maxAge);
+
+          // Save the session
+          try {
+            const insertedId = await writeToDatabase(req.session, "sessions");
+            //console.log(`Session data inserted with _id ${insertedId}`);
+          } catch (error) {
+            console.error("Error writing session data to database:", error);
+          }
           // Breaks out of the loop
           break;
         } else {
@@ -765,24 +873,39 @@ app.post('/student/data/login', async (req, res) => {
 // Refresh the session
 app.get("/student/data/refresh", async (req, res) => {
   try {
-    // Checks if the session is active
-    if (req.session) {
-      // Refresh the session
-      req.session.regenerate((err) => {
-        if (err) {
-          console.error(err);
-          res.sendStatus(500);
-        } else {
-          // Sends a success status
-          res.sendStatus(200);
-        }
-      });
+    // Checks if the session ID is defined
+    if (!req.session.dataID) {
+      // Sends an error message if the session ID is not defined
+      res.status(500).send({ error: "No session ID" });
+      return;
     } else {
-      // Sends an error status if there is no active session
-      res.sendStatus(401);
+      // Refreshes the session
+      req.session.touch();
+      // Sends a success message if the session is refreshed
+      res.status(200).send({ success: "Success" });
     }
   } catch (err) {
+    // Sends an error message if there is an error
     console.log(err);
     res.send({ error: err });
   }
+});
+
+
+// Start the server on the port
+app.listen(port, () => console.log('App listening on port ' + port));
+
+// Gracefully shutdown the server
+process.on('SIGINT', async () => {
+  // Sends a message to the console to indicate that the server is shutting down
+  console.log('SIGINT signal received: closing HTTP server');
+
+  // Delete all sessions from the database
+  await deleteFromDatabase({}, "sessions", "many");
+
+  // Close the database connection if it is open
+  await mongoose.connection.close();
+  
+  // Exit the process
+  process.exit(0);
 });

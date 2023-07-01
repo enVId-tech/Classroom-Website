@@ -15,14 +15,9 @@ const LoadInStudentData = () => {
     }
 
     async function getUserDataFromServer() {
-        const response = await fetch("/student/data", {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+        const response = await fetch("/student/data");
 
-        console.log(response);
+        //console.log(response);
         return await response.json();
     }
 
@@ -31,22 +26,15 @@ const LoadInStudentData = () => {
             setInterval(async () => {
                 await refreshSessionCookie();
             }, 5000);
+            await refreshSessionCookie();
             const userInformation = await getUserDataFromServer();
             setUserInfoValues(userInformation);
 
-            const sidebarDataGet = {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            };
-
-            const response = await fetch('/student/sidebar/get', sidebarDataGet);
+            const response = await fetch('/student/sidebar/get');
             const data = await response.json();
-            if (data.error) {
-                await checkLoggedIn();
-                console.log(data.error);
-            }
+
+            await checkLoggedIn();
+
             const dataParsed = JSON.parse(data.studentData);
             const sidebarParse = JSON.parse(data.sidebarJSON);
 

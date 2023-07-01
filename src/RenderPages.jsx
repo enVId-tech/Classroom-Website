@@ -32,8 +32,6 @@ import LearningLog from './pages/classes/learninglog.jsx';
 import AssignmentList from './pages/classes/assignmentlist';
 import Calendar from './pages/classes/agenda';
 import Announcements from './pages/classes/announcements';
-import GoogleCallback from './pages/google';
-
 const Render = () => {
     const PagesArray = [
         ["Settings", "Profile"],
@@ -115,9 +113,6 @@ const Render = () => {
                 <Route path={`/Classes/${PagesArray[2][0][1]}/*`} element={<Navigate to={`/Classes/${PagesArray[2][0][1]}/${PagesPathArray[2][0]}`} />} />
                 <Route path={`/Classes/${PagesArray[2][0][2]}/*`} element={<Navigate to={`/Classes/${PagesArray[2][0][2]}/${PagesPathArray[2][0]}`} />} />
                 <Route path={`/Classes/${PagesArray[2][0][3]}/*`} element={<Navigate to={`/Classes/${PagesArray[2][0][3]}/${PagesPathArray[2][0]}`} />} />
-
-                {/* Google Login */}
-                <Route path="/auth/google/callback" element={<GoogleCallback />} />
 
                 {/* Pages */}
                 <Route path="/" element={<HomePage />} />
