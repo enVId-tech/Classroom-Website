@@ -1,31 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import '../css/log.css';
 
 const LogCheck = () => {
-    useEffect(() => {
-        if (document.cookie.includes("dataID")) {
-            document.cookie = "dataID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        }
-    }, []);
-
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-
-    const handleUsernameChange = (e) => {
-        setUsername(e.target.value);
-    };
-
-    const handlePasswordChange = (e) => {
-        setPassword(e.target.value);
-    };
 
     const handleSubmit = async (e) => {
         if (e) {
             e.preventDefault();
         }
 
-        if (username === '') {
+        if (document.getElementById('username').value === '') {
             setError('Username is required');
             setTimeout(() => {
                 setError('');
@@ -33,13 +17,16 @@ const LogCheck = () => {
             return;
         }
 
-        if (password === '') {
+        if (document.getElementById('password').value === '') {
             setError('Password is required');
             setTimeout(() => {
                 setError('');
             }, 3000);
             return;
         }
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
 
         const sendData = {
             method: 'POST',
@@ -87,8 +74,6 @@ const LogCheck = () => {
                     placeholder='Username'
                     id="username"
                     spellCheck="false"
-                    onChange={handleUsernameChange}
-                    onBlur={handleUsernameChange}
                 />
                 <br /><br />
                 <input
@@ -97,8 +82,6 @@ const LogCheck = () => {
                     placeholder='Password'
                     id="password"
                     spellCheck="false"
-                    onChange={handlePasswordChange}
-                    onBlur={handlePasswordChange}
                 />
                 <br /><br />
                 <h1 id="Error">{error}</h1>

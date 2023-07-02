@@ -32,18 +32,23 @@ import LearningLog from './pages/classes/learninglog.jsx';
 import AssignmentList from './pages/classes/assignmentlist';
 import Calendar from './pages/classes/agenda';
 import Announcements from './pages/classes/announcements';
+import AdminPanel from './pages/adminpanel.jsx';
+import StudentData from './pages/studentdata.jsx';
+
 const Render = () => {
     const PagesArray = [
         ["Settings", "Profile"],
         ["Connections", "View Appointments", "Request an Appointment"],
-        [["CSD", "APCSP", "APCSA", "MAD"], "Announcements", "Assignments", "Agenda", "Learning Log"]
+        [["CSD", "APCSP", "APCSA", "MAD"], "Announcements", "Assignments", "Agenda", "Learning Log"],
+        ["Admin Panel", "Student Data"]
     ];
 
     const PagesPathArray = [
         ["settings", "profile" ],
         ["connections", "appointmentRequest", "appointmentView"],
-        ["home", "announcements", "assignments", "agenda", "learninglog"]
-    ]
+        ["home", "announcements", "assignments", "agenda", "learninglog"],
+        ["adminpanel", "studentdata"]
+    ];
 
     const CSD = {
         Pages: PagesArray[2],
@@ -99,6 +104,18 @@ const Render = () => {
         path: PagesPathArray[0]
     }
 
+    const adminpanel = {
+        Pages: PagesArray[3],
+        PagesArrayNumber: 0,
+        path: PagesPathArray[3]
+    }
+
+    const studentdata = {
+        Pages: PagesArray[3],
+        PagesArrayNumber: 1,
+        path: PagesPathArray[3]
+    }
+
     return (
         <BrowserRouter>
             <Routes>
@@ -128,6 +145,10 @@ const Render = () => {
                     <Route path="home/*" element={<Connections {...connectionsHomeCONST} />} />
                     <Route path={PagesPathArray[1][1]} element={<ActiveConnections {...appointmentViewCONST} />} />
                     <Route path={PagesPathArray[1][2]} element={<RequestConnections {...appointmentRequestCONST} />} />
+                </Route>
+                <Route path={PagesPathArray[3][0]}>
+                    <Route path={PagesPathArray[3][0]} element={<AdminPanel {...adminpanel} />} />
+                    <Route path={PagesPathArray[3][1]} element={<StudentData {...studentdata} />} />
                 </Route>
 
                 {/* Classes */}

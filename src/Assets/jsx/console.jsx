@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
+/* eslint-disable */
 function Console() {
   const [inputHistory, setInputHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(0);

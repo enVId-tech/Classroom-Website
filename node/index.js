@@ -165,14 +165,6 @@ app.get('/auth/google/callback', passport.authenticate('google'), async (req, re
         // Set the session cookie max age to the sessiontime variable
         req.session.cookiemaxAge = JSONdata.sessiontime;
 
-        // Save the session
-        try {
-          const insertedId = await writeToDatabase(req.session, "sessions");
-          //console.log(`Session data inserted with _id ${insertedId}`);
-        } catch (error) {
-          console.error("Error writing session data to database:", error);
-        }
-
         // Redirect to the home page
         res.status(200).redirect(`http://${APP_HOSTNAME}:${clientPort}/`);
       } else {
@@ -207,14 +199,6 @@ app.get('/auth/google/callback', passport.authenticate('google'), async (req, re
 
         //console.log("User already exists");
         //console.log(loggedIn, req.session.dataID, mainServerAuthTag, req.session.cookie.maxAge);
-
-        // Save the session
-        try {
-          const insertedId = await writeToDatabase(req.session, "sessions");
-          //console.log(`Session data inserted with _id ${insertedId}`);
-        } catch (error) {
-          console.error("Error writing session data to database:", error);
-        }
 
         // Redirect to the home page
         res.status(200).redirect(`http://${APP_HOSTNAME}:${clientPort}/`);
@@ -586,23 +570,25 @@ app.get('/student/data/logout', async (req, res) => {
       modifiedData.dataIDNum = "null";
 
       // Writes the data to the database
-      let userData = modifyInDatabase({ email: existingJSON[0].email }, modifiedData, "students");
+      await modifyInDatabase({ email: existingJSON[0].email }, modifiedData, "students");
 
-      // If the userData variable has a returned value of success, then redirect the user to the login page
-      if (userData) {
-        userProfile = undefined;
-        tempDataID = undefined;
-        loggedIn = false;
-        existingJSON = undefined;
+      // Remove the session data from the database
+      await deleteFromDatabase({ _id: req.session._id }, "sessions", "one");
 
-        await deleteFromDatabase({ _id: req.session._id }, "sessions", 1);
-        req.session.destroy();
+      // Destroy the session
+      req.session.destroy((err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
 
-        res.redirect('/User/Authentication/Log-Out');
-      } else {
-        // Send an error message if there is an error
-        res.send({ error: "Error" });
-      }
+      // Set the global variables to undefined
+      userProfile = undefined;
+      tempDataID = undefined;
+      loggedIn = false;
+      existingJSON = undefined;
+
+      res.redirect('/User/Authentication/Log-Out');
     } else {
       // Send an error message if there is an error
       res.send({ error: "Error" });
@@ -784,6 +770,8 @@ app.post('/student/data/login', async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
+    console.log(username, password);
+
     // Retrieve the student data from the database
     const existingJSON = JSON.parse(await getItemsFromDatabase("students"));
 
@@ -798,31 +786,27 @@ app.post('/student/data/login', async (req, res) => {
     // Runs for the length of the existingJSON array
     for (let i = 0; i < existingJSON.length; i++) {
       // If the username matches the username in the JSON object, then run the code below
+      //console.log(existingJSON[i].siteUsername, username);
       if (existingJSON[i].siteUsername == username) {
 
         // Decrypt the password
         const decryptedPassword = await comparePassword(password, existingJSON[i].sitePassword, existingJSON[i].authTag);
 
+        //console.log(decryptedPassword);
+
         // If the decryptedPassword variable is true, then run the code below
         if (decryptedPassword) {
-          // Sets the userFound variable to true
+          // Set the global variables to the data ID
+          tempDataID = existingJSON[i].dataIDNum;
+
+          existingJSON[i].unchangeableSettings.isLoggedin = true;
+          existingJSON[i].unchangeableSettings.latestIPAddress = encryptIP(req.socket.remoteAddress);
+          existingJSON[i].dataIDNum = tempDataID;
+
+          // Write the data to the database
+          await modifyInDatabase({ email: existingJSON[i].email }, existingJSON[i], "students");
+          // Set the userFound variable to true
           userFound = true;
-
-          // Generate a random 64 integer number for the data ID
-          const randomNumber = await generateRandomNumber(64, "alphanumeric");
-
-          // Sets properties in the modifiedData variable
-          const modifiedData = existingJSON[i];
-          // Sets properties in the modifiedData variable
-          modifiedData.unchangeableSettings.isLoggedin = true;
-          modifiedData.unchangeableSettings.latestIPAddress = encryptIP(req.socket.remoteAddress);
-          modifiedData.dataIDNum = randomNumber;
-
-          // Sets true to the loggedIn variable
-          loggedIn = true;
-
-          // Sets a global variable to the data ID
-          tempDataID = randomNumber;
 
           // Encrypt the data ID
           const { encryptedData, authTag } = await encryptData(tempDataID);
@@ -834,18 +818,10 @@ app.post('/student/data/login', async (req, res) => {
           req.session.dataID = encryptedData.toString();
 
           // Set the session cookie max age to the sessiontime variable
-          req.session.cookie.maxAge = modifiedData.sessiontime;
+          req.session.cookie.maxAge = existingJSON[i].sessiontime;
 
-          //console.log("User already exists");
-          //console.log(loggedIn, req.session.dataID, mainServerAuthTag, req.session.cookie.maxAge);
-
-          // Save the session
-          try {
-            const insertedId = await writeToDatabase(req.session, "sessions");
-            //console.log(`Session data inserted with _id ${insertedId}`);
-          } catch (error) {
-            console.error("Error writing session data to database:", error);
-          }
+          // Redirect to the home page
+          res.status(200).send({ success: "Success" });
           // Breaks out of the loop
           break;
         } else {
@@ -905,7 +881,7 @@ process.on('SIGINT', async () => {
 
   // Close the database connection if it is open
   await mongoose.connection.close();
-  
+
   // Exit the process
   process.exit(0);
 });

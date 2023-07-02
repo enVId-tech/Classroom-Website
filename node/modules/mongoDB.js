@@ -26,7 +26,7 @@ async function writeToDatabase(data, collectionName) {
 
     const result = await collection.insertOne(data);
 
-    //console.log("Inserted document with _id:", result.insertedId);
+    console.log("Inserted document with _id:", result.insertedId);
     return result.insertedId;
   } catch (error) {
     console.error("Error writing to database:", error);

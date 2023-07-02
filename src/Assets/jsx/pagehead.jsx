@@ -68,6 +68,14 @@ const ClassHelmet = ({ page, classType, classPage }) => {
                 </Helmet>
             )
         }
+        case "adminpanel": {
+            return (
+                <Helmet>
+                    <title>CS Pathway - Admin Panel</title>
+                    <link rel="shortcut icon" href="/images/AdminIcon.png" type="image/x-icon"></link>
+                </Helmet>
+            )
+        }
         case "class": {
             switch (classPage) {
                 case "home": {
