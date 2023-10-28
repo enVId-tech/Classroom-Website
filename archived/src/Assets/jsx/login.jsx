@@ -64,7 +64,7 @@ const LogCheck = () => {
         <div className='LoginContainer'>
             <span id="BackgroundImage">
                 <br /><br /><br />
-                <h1 id="CopyrightedMaterial">© MrWai.com</h1>
+                <h1 id="CopyrightedMaterial">© test</h1>
             </span>
             <p id="LoginLabel">Login</p>
             <br /><br />

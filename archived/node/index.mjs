@@ -245,35 +245,35 @@ app.get('/class/agenda/permission', async (req, res) => {
   }
 });
 
-// Write to the agenda in the database
-app.post('/class/agenda/write', async (req, res) => {
-  try {
-    // Retrieve the content from the request body
-    const content = req.body.content;
+// // Write to the agenda in the database
+// app.post('/class/agenda/write', async (req, res) => {
+//   try {
+//     // Retrieve the content from the request body
+//     const content = req.body.content;
 
-    // Retrieve the URL from the request body
-    const windowURL = req.body.windowURL;
+//     // Retrieve the URL from the request body
+//     const windowURL = req.body.windowURL;
 
-    // Runs for the length of the agendaJSON array
-    for (let i = 0; i < agendaJSON.length; i++) {
-      // If the URL matches the URL in the JSON object, then add the content to the array
-      if (agendaJSON[i].url === windowURL) {
-        // Add the content to the array
-        agendaJSON[i].Calendar += content.content;
-        // Write the data to the database
-        await modifyInDatabase({ url: windowURL }, agendaJSON, "agenda");
-        // Breaks out of the loop
-        break;
-      }
-    }
+//     // Runs for the length of the agendaJSON array
+//     for (let i = 0; i < agendaJSON.length; i++) {
+//       // If the URL matches the URL in the JSON object, then add the content to the array
+//       if (agendaJSON[i].url === windowURL) {
+//         // Add the content to the array
+//         agendaJSON[i].Calendar += content.content;
+//         // Write the data to the database
+//         await modifyInDatabase({ url: windowURL }, agendaJSON, "agenda");
+//         // Breaks out of the loop
+//         break;
+//       }
+//     }
 
-    res.send(agendaJSON);
-  } catch (err) {
-    // Send an error message if there is an error
-    console.log(err);
-    res.send({ error: err });
-  }
-});
+//     res.send(agendaJSON);
+//   } catch (err) {
+//     // Send an error message if there is an error
+//     console.log(err);
+//     res.send({ error: err });
+//   }
+// });
 
 // Get the data in announcements from the database
 app.post('/class/announcements/get', async (req, res) => {

@@ -37,7 +37,7 @@ function generateRandomNumber(NumberofDigits, typeofGeneration) {
     console.log(err);
     return err;
   }
-};
+}
 
 //Random encryption key and iv
 const encryptionKey = crypto.randomBytes(32); // 256 bytes for AES-256
@@ -58,7 +58,7 @@ async function permanentEncryptPassword(myPlaintextPassword) {
     const hash = crypto.createHash('sha256');
 
     const data = hash.update(myPlaintextPassword, 'utf-8');
-    const gen_hash = data.digest('hex');
+    let gen_hash = data.digest('hex');
     if (typeof gen_hash !== 'string') {
       gen_hash = gen_hash.toString();
     }
